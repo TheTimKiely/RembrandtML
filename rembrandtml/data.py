@@ -20,6 +20,8 @@ class DataContainer(MLEntityBase):
         self.train_generator = None
         self.val_generator = None
         self.test_generator = None
+        self.X = None
+        self.y = None
 
     def get_data_provider(self, framework_name):
         if framework_name == 'sklearn':
@@ -76,7 +78,7 @@ class DataContainer(MLEntityBase):
             #print(f'Sample: {samples[0,0,0]} Target: {targets[0]}')
             yield samples, targets
 
-    def prepare_data(self, dataset = 'imdb', features = None, sample_size=1000000):
+    def prepare_data(self, features = None, sample_size=None):
         """
 
         :param dataset:
@@ -84,11 +86,11 @@ class DataContainer(MLEntityBase):
         :param sample_size:
         :return:
         """
-        if(dataset == 'imdb'):
+        if(self.dataset_name == 'imdb'):
             self.prepare_imdb_data()
-        elif(dataset == 'jena_climate'):
+        elif(self.dataset_name == 'jena_climate'):
             self.prepare_climage_data(sample_size)
-        elif(dataset == 'boston'):
+        elif(self.dataset_name == 'boston'):
             #boston = pd.read_csv('boston.csv')
             # X = boston.drop('MEDV', axis=1).values
             #y = boston['MEDV'].values
@@ -100,9 +102,9 @@ class DataContainer(MLEntityBase):
             # ToDo: why reshape
             # 1. What is the shape supposed to be?
             # 2. How do we know the required shape?
-            y = y.reshape(1, -1)
-            X_rooms = X_rooms.reshape(1, -1)
-        return X_rooms, y
+            self.y = y.reshape(-1, 1)
+            self.X = X_rooms.reshape(-1, 1)
+        return self.X, self.y
 
     def prepare_imdb_data(self):
         # Get X and y (training data and labels) from imdb dataset

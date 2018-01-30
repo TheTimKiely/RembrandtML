@@ -29,7 +29,7 @@ class Plotter(object):
         plt.savefig(name)
 
     def show(self):
-        if len(self.Style) > 0:
+        if self.Style:
             plt.style.use(self.Style)
         plt.show()
 
@@ -42,10 +42,13 @@ class Plotter(object):
             plt.xlabel('Number of Neighbors')
             plt.ylabel('Accuracy')
 
-    def plot_scatter(self, X, y, xlabel, ylabel):
-        plt.scatter(X, y)
+    def plot_scatter(self, X, y, xlabel=None, ylabel=None, color=None):
+        plt.scatter(X, y, color=color)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
+
+    def plot(self, X, y, color = 'blue', linewidth=2):
+        plt.plot(X, y, color=color, linewidth=linewidth)
 
 class MetricsPlotter(Plotter):
     def __init__(self):

@@ -1,5 +1,6 @@
 import sys
 
+from rembrandtml.test.test_MLModel import TestMLModel
 from rembrandtml.test.test_MLModelBase import TestMLModelBase
 from rembrandtml.test.test_dataContainer import TestDataContainer
 from rembrandtml.test.test_plotter import TestPlotter
@@ -16,8 +17,13 @@ def testMLBase():
     tests = TestMLModelBase()
     tests.test_prepare_data()
 
+def testLinearRegression():
+    tests = TestMLModel()
+    tests.test_fit_linear_regression()
+
 def main(params):
-    testScatterPlot()
+    testLinearRegression()
+    #testScatterPlot()
     #testDataContainer()
     #testMLBase()
 

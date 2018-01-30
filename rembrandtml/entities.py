@@ -1,5 +1,8 @@
 import os
 
+from rembrandtml.configuration import Verbosity
+
+
 class MLEntityBase(object):
     def __init__(self):
         self.Base_Directory = os.path.abspath(os.path.join(os.getcwd(), '../../..'))
@@ -10,15 +13,23 @@ class MLEntityBase(object):
         return file_property.__get__(self)
 
     '''verbosity levels: s(silence) q(quiet) m(moderate) d(debug) (noisy)'''
-    def log(self, msg, verbosity='d'):
-        if(self.Config.Verbose == verbosity):
+    def log(self, msg, verbosity=Verbosity.DEBUG):
+        '''
+        Write the msg parameter to the console if the verbosity parameter is >= this objects configured verbosity in MLConfig.Verbosity
+        :param msg:
+        :param verbosity:
+        :return: The msg parameter echoed back.  This allows nesting calls to log, e.g.raise TypeError(self.log(f'The features parameter was not supplied.')
+        '''
+        if(verbosity >= self.Config.Verbosity):
             print(msg)
+        return msg
 
 class MLContext(MLEntityBase):
     """The RMLContext object is an organizing structure to group the data, model, and plotter that are used in common ML tasks.
     It provides a collection of DataContainers, MLModels, and DataContainers to that that comparing entities becomes easy.
     """
     def __init__(self):
+        super()
         self.plotters = {}
         self.data_containers = {}
         self.models = {}

@@ -21,7 +21,7 @@ class ModelType(Enum):
 class MLModelBase(MLEntityBase):
     def __init__(self, name, ml_config):
         super(MLModelBase, self).__init__()
-        self.Name = name
+        self.name = name
         self.Config = ml_config
         self._model_file_attribute = 0
         self._weights_file_attribute = 0
@@ -132,6 +132,16 @@ class MLModelBase(MLEntityBase):
             dill.dump(self._tokenizer, file_handle, protocol=dill.HIGHEST_PROTOCOL)
 
 
+    def validate_fit_call(self):
+        if self._model_impl == None:
+            raise TypeError(f'{self.name}.  The model implementation has not been initialized')
+
+        #if self.data_container == None:
+        #    raise AttributeError('This model had no DataContainer, please call build_model(data_container) first.')
+        #if self.data_container.train_generator == None:
+        #    raise AttributeError('This model does not have a training generator.  Please check your configuration')
+
+
     def prepare_data(self):
         pass
 
@@ -154,7 +164,8 @@ class MLModelBase(MLEntityBase):
         pass
 
 class MathModel(MLModelBase):
-    def __init__(self, ml_config):
+    def __init__(self, name, ml_config):
+        super(MathModel, self).__init__(name, ml_config)
         self.Config = ml_config
 
     def evaluate(self, data_container):
@@ -194,11 +205,26 @@ class MLModel(MLModelBase):
     def train(self):
         pass
 
-    def fit(self, weights_file=None, model_file=None, save=False):
-        if self.data_container == None:
-            raise AttributeError('This model had no DataContainer, please call build_model(data_container) first.')
-        if self.data_container.train_generator == None:
-            raise AttributeError('This model does not have a training generator.  Please check your configuration')
+    def fit(self, X = None, y = None, features = '', weights_file=None, model_file=None, save=False):
+        """
+
+        :param X: The feature dataset to fit against
+        :param y: The labels to fit against
+        :param features: A tuple of the features to be included in X.  If X and y are not supplied, this parameter will be used to retrieve data from the DataContainer
+        :param weights_file:
+        :param model_file:
+        :param save: A boolean indicating whether or not to save the fitted model to a file
+        :return: The path of the saved file if 'save' was 'True'
+        """
+        self.validate_fit_call();
+        if not X:
+            if not features:
+                raise TypeError(self.log(f'The features parameter was not supplied.  When calling fit, either X and y or features must be supplied.'))
+            X, y = self.data_container.prepare_data(features=features);
+        self.log(f'Running fit with implementation: {type(self._model_impl)}')
+
+        self._model_impl.fit(X, y);
+        return None
 
         '''
         lookback = 1440
@@ -217,7 +243,7 @@ class MLModel(MLModelBase):
                                       validation_steps=self.DataContainer.val_steps)
 
         '''
-        self.log(f'Training model: {self.Name}')
+        self.log(f'Training model: {self.name}')
         history = self.Model.fit_generator(self.data_container.train_generator,
                                            steps_per_epoch=500,
                                            epochs=self.Config.Epochs,
@@ -266,7 +292,8 @@ class MLModel(MLModelBase):
         return loss
 
     def predict(self, X):
-        pass
+        prediction = self._model_impl.predict(X)
+        return prediction
 
 
 

@@ -21,7 +21,7 @@ class TestMLModelBase(TestCase):
         self.assertIsNotNone(model, 'Failed to create MLModel')
 
     def test_scatter_plot(self):
-
+        pass
 
     def test_build_model(self):
         self.fail()

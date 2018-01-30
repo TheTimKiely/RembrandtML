@@ -6,8 +6,34 @@ class Verbosity(Enum):
     DEBUG = 2
     NOISY = 3
 
+    def __eq__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value == other.value
+        return NotImplemented
+
+    def __lt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value < other.value
+        return NotImplemented
+
+    def __le__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value <= other.value
+        return NotImplemented
+
+    def __gt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value > other.value
+        return NotImplemented
+
+    def __ge__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value >= other.value
+        return NotImplemented
+
 class DataConfig(object):
-    def __init__(self, dataset_name, sample_size = -1):
+    def __init__(self, framework_name, dataset_name, sample_size = -1):
+        self.framework_name = framework_name
         self.dataset_name = dataset_name
         self.sample_size = sample_size
 
@@ -18,7 +44,7 @@ class MLConfig(object):
         self._model_type = model_type
         # Properties probably aren't necessary, so experimenting with public fields
         self.Layers = layers
-        self.Framework = framework
+        self.framework = framework
         self.Nodes = nodes
         self._epochs = epochs
         self.BatchSize = batch_size

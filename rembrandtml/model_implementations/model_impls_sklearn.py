@@ -1,10 +1,19 @@
 import numpy as np
+from sklearn import  linear_model
 from sklearn.neighbors import KNeighborsClassifier
 
 from rembrandtml.model_implementations.model_impls import MLModelImplementation
 from rembrandtml.plotting import Plotter
 
 class MLModelSkLearn(MLModelImplementation):
+    def __init__(self):
+        super(MLModelSkLearn, self).__init__()
+        self._reg = None
+
+    def fit(self, X, y):
+        self._reg = linear_model.LinearRegression()
+        self._reg.fit(X, y)
+
     def train(self):
         # Setup arrays to store train and test accuracies
         neighbors = np.arange(1, 9)
@@ -28,3 +37,9 @@ class MLModelSkLearn(MLModelImplementation):
         plotter = Plotter()
         plotter.plot_model_complexity(neighbors, train_accuracy, test_accuracy)
         plotter.show();
+
+    def predict(self, X):
+        if not self._reg:
+            raise TypeError(self.log(f'The model has not yet been fit.  Precit() can only be called after the model has been fit.'))
+        prediction = self._reg.predict(X)
+        return prediction

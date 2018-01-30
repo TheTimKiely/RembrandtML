@@ -10,8 +10,8 @@ from rembrandtml.entities import MLEntityBase
 
 
 class DataContainer(MLEntityBase):
-    def __init__(self, framework_name, dataset_name):
-        super(DataContainer, self).__init__()
+    def __init__(self, framework_name, dataset_name, instrumentation_config = None):
+        super(DataContainer, self).__init__(instrumentation_config)
         self.data_provider = self.get_data_provider(framework_name)
         self.dataset_name = dataset_name
         self.data = None
@@ -86,6 +86,7 @@ class DataContainer(MLEntityBase):
         :param sample_size:
         :return:
         """
+        self.log(f'Preparing data from dataset: {self.dataset_name}')
         if(self.dataset_name == 'imdb'):
             self.prepare_imdb_data()
         elif(self.dataset_name == 'jena_climate'):
@@ -96,14 +97,19 @@ class DataContainer(MLEntityBase):
             #y = boston['MEDV'].values
 
             boston = datasets.load_boston()
-            indeces = np.where(boston['feature_names'] == 'RM')
-            X_rooms = boston['data'][:, 5]
+            data = boston['data']
+            indeces = [i for i,k in enumerate(boston['feature_names']) if k in features]
+            X_rooms = data[:, 5]
+            X = np.zeros((data.shape[0], len(indeces)))
+            for i, index in enumerate(indeces):
+                X[:,i] = data[:,index]
             y = boston['target']
             # ToDo: why reshape
             # 1. What is the shape supposed to be?
             # 2. How do we know the required shape?
             self.y = y.reshape(-1, 1)
-            self.X = X_rooms.reshape(-1, 1)
+            self.X = X
+            #self.X = X_rooms.reshape(-1, 1)
         return self.X, self.y
 
     def prepare_imdb_data(self):

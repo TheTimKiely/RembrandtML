@@ -2,7 +2,7 @@ import getopt
 
 from core import MLEntityBase
 
-from rembrandtml.configuration import ModelConfig, MLConfig, Verbosity, DataConfig
+from rembrandtml.configuration import ModelConfig, MLConfig, Verbosity, DataConfig, InstrumentationConfig
 
 
 class MLFile(MLEntityBase):
@@ -60,9 +60,22 @@ class CommandLineParser(object):
             elif opt == 'x':
                 metrics = arg
 
-        ml_config = MLConfig(nn_type, framework, mode, layers, nodes, epochs, batch_size, verbosity)
+        ml_config = MLConfig(nn_type, framework, mode, layers, nodes, epochs, batch_size)
         model_config.metrics = metrics
         ml_config.model_config = model_config
+        instr_config = InstrumentationConfig(verbosity)
+        ml_config.instrumentation_config = instr_config
         data_config = DataConfig(dataset_name, sample_size)
         ml_config.data_config = data_config
         return ml_config
+
+class MLLogger(object):
+    def __init__(self, instrumentation_config = None):
+        if instrumentation_config:
+            self.instrumentation_config = instrumentation_config
+        else:
+            self.instrumentation_config = InstrumentationConfig(Verbosity.DEBUG)
+
+    def log(self, msg, verbosity = None):
+        if (verbosity >= self.instrumentation_config.verbosity):
+            print(msg)

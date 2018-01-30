@@ -37,6 +37,9 @@ class DataConfig(object):
         self.dataset_name = dataset_name
         self.sample_size = sample_size
 
+class InstrumentationConfig(object):
+    def __init__(self, verbosity):
+        self.verbosity = verbosity
 
 class MLConfig(object):
     def __init__(self, model_type, framework, mode, verbosity = Verbosity.QUIET, layers = 4, nodes = 16, epochs = 10, batch_size = 32):
@@ -54,6 +57,7 @@ class MLConfig(object):
         self.Mode = mode
         self.model_config = None
         self.data_config = None
+        self.instrumentation_config = None
 
     @property
     def Verbosity(self):

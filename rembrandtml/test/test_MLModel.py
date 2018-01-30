@@ -37,10 +37,22 @@ class TestMLModel(TestCase):
         plotter.show()
         #model.plot()
 
-        features = (['RM', 'CR'])
-        model.fit(features)
-        prediction = model.predict()
-        model.plot()
+        features = (['RM', 'CRIM'])
+        model.fit(features=features)
+
+        X_test = model.data_container.X
+        y_test = model.data_container.y
+        prediction_2_features = model.predict(X_test)
+        plotter.clear()
+        X_test = model.data_container.X
+        y_test = model.data_container.y
+        return
+        # ToDo figure out how to plot 3D
+        plotter.plot_scatter(X_test[:,0],X_test[:,1], y_test, color='blue')
+        plotter.plot(X_test_space, prediction, color='black')
+        plotter.show()
+
+        #model.plot()
 
 
     def test_load_from_file(self):

@@ -1,18 +1,20 @@
 import os
 
 from rembrandtml.configuration import Verbosity
+from rembrandtml.utils import MLLogger
 
 
 class MLEntityBase(object):
-    def __init__(self):
+    def __init__(self, instrumentation_config = None):
         self.Base_Directory = os.path.abspath(os.path.join(os.getcwd(), '../../..'))
+        self.logger = MLLogger(instrumentation_config)
 
     def unique_file_name(self, file_property, attribute_property):
         while(os.path.isfile(file_property.__get__(self))):
             attribute_property.__set__(self, attribute_property.__get__(self) + 1)
         return file_property.__get__(self)
 
-    '''verbosity levels: s(silence) q(quiet) m(moderate) d(debug) (noisy)'''
+    # ToDo move to MLLogger
     def log(self, msg, verbosity=Verbosity.DEBUG):
         '''
         Write the msg parameter to the console if the verbosity parameter is >= this objects configured verbosity in MLConfig.Verbosity
@@ -20,8 +22,7 @@ class MLEntityBase(object):
         :param verbosity:
         :return: The msg parameter echoed back.  This allows nesting calls to log, e.g.raise TypeError(self.log(f'The features parameter was not supplied.')
         '''
-        if(verbosity >= self.Config.Verbosity):
-            print(msg)
+        self.logger.log(msg, verbosity)
         return msg
 
 class MLContext(MLEntityBase):

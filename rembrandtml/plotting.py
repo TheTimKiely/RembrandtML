@@ -50,6 +50,9 @@ class Plotter(object):
     def plot(self, X, y, color = 'blue', linewidth=2):
         plt.plot(X, y, color=color, linewidth=linewidth)
 
+    def clear(self):
+        plt.clf()
+
 class MetricsPlotter(Plotter):
     def __init__(self):
         self.Style = 'ggplot'

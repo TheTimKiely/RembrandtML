@@ -1,5 +1,7 @@
-from rembrandtml.models import *
-from rembrandtml.nnmodels import *
+from keras import models
+from keras import layers
+from rembrandtml.models import MLModel, MathModel, ModelType
+from rembrandtml.nnmodels import ConvolutionalNeuralNetwork, RecurrentNeuralNetwork, LstmRNN, GruNN
 
 
 class ModelFactory(object):

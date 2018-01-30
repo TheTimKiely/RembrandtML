@@ -29,10 +29,23 @@ class Plotter(object):
         plt.savefig(name)
 
     def show(self):
-        if len(self.Style) > 0;
+        if len(self.Style) > 0:
             plt.style.use(self.Style)
-
         plt.show()
+
+    def plot_model_complexity(neighbors, train_accuracy, test_accuracy):
+            # Generate plot
+            plt.title('k-NN: Varying Number of Neighbors')
+            plt.plot(neighbors, test_accuracy, label='Testing Accuracy')
+            plt.plot(neighbors, train_accuracy, label='Training Accuracy')
+            plt.legend()
+            plt.xlabel('Number of Neighbors')
+            plt.ylabel('Accuracy')
+
+    def plot_scatter(self, X, y, xlabel, ylabel):
+        plt.scatter(X, y)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
 
 class MetricsPlotter(Plotter):
     def __init__(self):

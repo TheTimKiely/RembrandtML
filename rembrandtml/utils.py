@@ -62,7 +62,7 @@ class CommandLineParser(object):
 
         ml_config = MLConfig(nn_type, framework, mode, layers, nodes, epochs, batch_size, verbosity)
         model_config.metrics = metrics
-        ml_config.ModelConfig = model_config
+        ml_config.model_config = model_config
         data_config = DataConfig(dataset_name, sample_size)
-        ml_config.DataConfig = data_config
+        ml_config.data_config = data_config
         return ml_config

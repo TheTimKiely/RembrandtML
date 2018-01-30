@@ -1,0 +1,3 @@
+
+def KerasDataProvider(object):
+    pass

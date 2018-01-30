@@ -26,8 +26,8 @@ class MLConfig(object):
         self.TestDir = ''
         self.ValidationDir = ''
         self.Mode = mode
-        self.ModelConfig = None
-        self.DataConfig = None
+        self.model_config = None
+        self.data_config = None
 
     @property
     def Verbosity(self):

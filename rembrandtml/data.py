@@ -1,20 +1,33 @@
 import os
 import numpy as np
+from sklearn import datasets
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
+
+from rembrandtml.data_providers.keras import KerasDataProvider
+from rembrandtml.data_providers.sklearn import SkLearnDataProvider
 from rembrandtml.entities import MLEntityBase
 
 
 class DataContainer(MLEntityBase):
-    def __init__(self, dataset):
+    def __init__(self, framework_name, dataset_name):
         super(DataContainer, self).__init__()
-        self.DatasetName = dataset
-        self.Data = None
+        self.data_provider = self.get_data_provider(framework_name)
+        self.dataset_name = dataset_name
+        self.data = None
         self.val_steps = 0
         self.test_steps = 0
         self.train_generator = None
         self.val_generator = None
         self.test_generator = None
+
+    def get_data_provider(self, framework_name):
+        if framework_name == 'sklearn':
+            return SkLearnDataProvider()
+        elif framework_name == 'keras':
+            return KerasDataProvider()
+        else:
+            raise TypeError(f'The specified framework, {framework_name}, is not supported as a DataProvider.')
 
     def build_generator(self, data, lookback, delay, min_index, max_index, shuffle, batch_size, step):
         if(max_index is None):
@@ -63,11 +76,33 @@ class DataContainer(MLEntityBase):
             #print(f'Sample: {samples[0,0,0]} Target: {targets[0]}')
             yield samples, targets
 
-    def prepare_data(self, dataset = 'imdb', sample_size=1000000):
+    def prepare_data(self, dataset = 'imdb', features = None, sample_size=1000000):
+        """
+
+        :param dataset:
+        :param features: Tuple of features to be included in X.  If None, all features will be included.
+        :param sample_size:
+        :return:
+        """
         if(dataset == 'imdb'):
             self.prepare_imdb_data()
         elif(dataset == 'jena_climate'):
             self.prepare_climage_data(sample_size)
+        elif(dataset == 'boston'):
+            #boston = pd.read_csv('boston.csv')
+            # X = boston.drop('MEDV', axis=1).values
+            #y = boston['MEDV'].values
+
+            boston = datasets.load_boston()
+            indeces = np.where(boston['feature_names'] == 'RM')
+            X_rooms = boston['data'][:, 5]
+            y = boston['target']
+            # ToDo: why reshape
+            # 1. What is the shape supposed to be?
+            # 2. How do we know the required shape?
+            y = y.reshape(1, -1)
+            X_rooms = X_rooms.reshape(1, -1)
+        return X_rooms, y
 
     def prepare_imdb_data(self):
         # Get X and y (training data and labels) from imdb dataset
@@ -132,7 +167,7 @@ class DataContainer(MLEntityBase):
         mean = raw_data[:sample_size].mean(axis=0)
         regularized_data = raw_data - mean
         std = regularized_data[:sample_size].std(axis = 0)
-        self.Data = regularized_data / std
+        self.data = regularized_data / std
 
         lookback =1440
         step =6
@@ -140,15 +175,15 @@ class DataContainer(MLEntityBase):
         batch_size = 128
         min_index = 0
         max_index = 200000
-        self.train_generator = self.generator(self.Data, lookback, delay, min_index, max_index, True, batch_size, step)
+        self.train_generator = self.generator(self.data, lookback, delay, min_index, max_index, True, batch_size, step)
         min_index = 200001
         max_index = 300000
         self.val_steps = (max_index - min_index - lookback) // batch_size
-        self.val_generator = self.generator(self.Data, lookback, delay, min_index, max_index, False, batch_size, step)
+        self.val_generator = self.generator(self.data, lookback, delay, min_index, max_index, False, batch_size, step)
         min_index = 300001
         max_index = None
-        self.test_steps = (len(self.Data) - min_index - lookback) // batch_size
-        self.test_generator = self.generator(self.Data, lookback, delay, min_index, max_index, False, batch_size, step)
+        self.test_steps = (len(self.data) - min_index - lookback) // batch_size
+        self.test_generator = self.generator(self.data, lookback, delay, min_index, max_index, False, batch_size, step)
 
         # temp = data[:,1]
         # #plt.plot(range(len(temp)), temp)

@@ -1,12 +1,11 @@
-import os, time, dill
+import os, dill
 from enum import Enum
 import numpy as np
 from keras.models import Sequential, load_model
 from keras.layers import Dense, Flatten
 from rembrandtml.entities import MLEntityBase
-from rembrandtml.sklearn_models.model_impls import MLModelSkLearn
-from rembrandtml.tensorflow_models.model_impls import MLModelTensorflow
-
+from rembrandtml.model_implementations.model_impls_sklearn import MLModelSkLearn
+from rembrandtml.model_implementations.model_impls_tensorflow import MLModelTensorflow
 
 class ModelType(Enum):
     MATH = 0
@@ -30,7 +29,7 @@ class MLModelBase(MLEntityBase):
         self._history_file_attribute = 0
         self._model = None
         self._tokenizer = None
-        self.DataContainer = None
+        self.data_container = None
         self._model_impl = None
 
     @property
@@ -142,7 +141,10 @@ class MLModelBase(MLEntityBase):
     def load_from_file(self, file_name = None):
         pass
 
-    def fit_and_save(self):
+    def fit(self, save=False):
+        pass
+
+    def train(self):
         pass
 
     def evaluate(self, val_X, val_y):
@@ -150,7 +152,6 @@ class MLModelBase(MLEntityBase):
 
     def predict(self, X):
         pass
-
 
 class MathModel(MLModelBase):
     def __init__(self, ml_config):
@@ -179,22 +180,24 @@ class MLModel(MLModelBase):
     # Requires a DataContainer because we might need to know the data shape to initialize layers
     def build_model(self, data_container):
         # Should to a state change to a data-bound model
-        self.DataContainer = data_container
+        self.data_container = data_container
         self.Model = Sequential()
         lookback = 1440
         step = 6
-        self.Model.add(Flatten(input_shape=(lookback // step, self.DataContainer.Data.shape[-1])))
+        self.Model.add(Flatten(input_shape=(lookback // step, self.data_container.Data.shape[-1])))
         self.Model.add(Dense(32, activation='relu'))
         self.Model.add(Dense(1))
         self.Model.compile(optimizer=self.Config.ModelConfig.optimizer,
                            loss=self.Config.ModelConfig.loss_function,
                            metrics=self.Config.ModelConfig.metrics)
 
+    def train(self):
+        pass
 
-    def fit_and_save(self, weights_file=None, model_file=None):
-        if self.DataContainer == None:
+    def fit(self, weights_file=None, model_file=None, save=False):
+        if self.data_container == None:
             raise AttributeError('This model had no DataContainer, please call build_model(data_container) first.')
-        if self.DataContainer.train_generator == None:
+        if self.data_container.train_generator == None:
             raise AttributeError('This model does not have a training generator.  Please check your configuration')
 
         '''
@@ -215,12 +218,12 @@ class MLModel(MLModelBase):
 
         '''
         self.log(f'Training model: {self.Name}')
-        history = self.Model.fit_generator(self.DataContainer.train_generator,
-                       steps_per_epoch=500,
-                       epochs=self.Config.Epochs,
-                       validation_data=self.DataContainer.val_generator,
-                       validation_steps=self.DataContainer.val_steps,
-                        verbose=2)
+        history = self.Model.fit_generator(self.data_container.train_generator,
+                                           steps_per_epoch=500,
+                                           epochs=self.Config.Epochs,
+                                           validation_data=self.data_container.val_generator,
+                                           validation_steps=self.data_container.val_steps,
+                                           verbose=2)
 
         weights_file = self.unique_file_name(MLModelBase.__dict__['WeightsFile'], MLModelBase.__dict__['WeightsFileAttribute'])
         self.Model.save_weights(weights_file)
@@ -250,17 +253,20 @@ class MLModel(MLModelBase):
         self.log(f'Loading model from {model_file}')
         self.Model = load_model(model_file)
         self.log(f'Loaded model: {self.Model.summary()}')
-        self.DataContainer = data_container
+        self.data_container = data_container
         self.log('Added DataContainer')
 
     def evaluate(self, val_X = None, val_y = None):
         loss = None
         if val_X == None:
             self.log(f'X and y were not passed as parameters.  Using DataContainer.')
-            loss = self.Model.evaluate_generator(self.DataContainer.val_generator, steps=self.DataContainer.val_steps)
+            loss = self.Model.evaluate_generator(self.data_container.val_generator, steps=self.data_container.val_steps)
         else:
             loss = self.Model.evaluate(val_X, val_y)
         return loss
+
+    def predict(self, X):
+        pass
 
 
 

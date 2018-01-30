@@ -1,0 +1,30 @@
+import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
+
+from rembrandtml.model_implementations.model_impls import MLModelImplementation
+from rembrandtml.plotting import Plotter
+
+class MLModelSkLearn(MLModelImplementation):
+    def train(self):
+        # Setup arrays to store train and test accuracies
+        neighbors = np.arange(1, 9)
+        train_accuracy = np.empty(len(neighbors))
+        test_accuracy = np.empty(len(neighbors))
+
+        # Loop over different values of k
+        for i, k in enumerate(neighbors):
+            # Setup a k-NN Classifier with k neighbors: knn
+            knn = KNeighborsClassifier(n_neighbors=k)
+
+            # Fit the classifier to the training data
+            knn.fit(self.data_container.X_train, self.data_container.y_train)
+
+            # Compute accuracy on the training set
+            train_accuracy[i] = knn.score(self.data_container.X_train, self.data_container.y_train)
+
+            # Compute accuracy on the testing set
+            test_accuracy[i] = knn.score(self.data_container.X_test, self.data_container.y_test)
+
+        plotter = Plotter()
+        plotter.plot_model_complexity(neighbors, train_accuracy, test_accuracy)
+        plotter.show();

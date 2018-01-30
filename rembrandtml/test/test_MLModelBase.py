@@ -20,6 +20,9 @@ class TestMLModelBase(TestCase):
         (X_train, y_train), (X_val, y_val), (X_test, y_test) = model.prepare_data(df)
         self.assertIsNotNone(model, 'Failed to create MLModel')
 
+    def test_scatter_plot(self):
+
+
     def test_build_model(self):
         self.fail()
 

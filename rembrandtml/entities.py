@@ -14,6 +14,25 @@ class MLEntityBase(object):
         if(self.Config.Verbose == verbosity):
             print(msg)
 
+class MLContext(MLEntityBase):
+    """The RMLContext object is an organizing structure to group the data, model, and plotter that are used in common ML tasks.
+    It provides a collection of DataContainers, MLModels, and DataContainers to that that comparing entities becomes easy.
+    """
+    def __init__(self):
+        self.plotters = {}
+        self.data_containers = {}
+        self.models = {}
+
+    def plot(self, model_name = '', data_container_name = '', plotter_name = ''):
+        pass
+
+
+
+
+class Accuracy(object):
+    def __init__(self):
+        pass
+
 class Prediction(object):
     def __init__(self):
         pass

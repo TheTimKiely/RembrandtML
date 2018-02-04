@@ -131,7 +131,6 @@ class MLModelBase(MLEntityBase):
         with open(self.TokenizerFile, 'wb') as file_handle:
             dill.dump(self._tokenizer, file_handle, protocol=dill.HIGHEST_PROTOCOL)
 
-
     def validate_fit_call(self):
         if self._model_impl == None:
             raise TypeError(f'{self.name}.  The model implementation has not been initialized')
@@ -157,7 +156,7 @@ class MLModelBase(MLEntityBase):
     def train(self):
         pass
 
-    def evaluate(self, val_X, val_y):
+    def evaluate(self, X, y):
         pass
 
     def predict(self, X):
@@ -205,7 +204,7 @@ class MLModel(MLModelBase):
     def train(self):
         pass
 
-    def fit(self, X = None, y = None, features = '', weights_file=None, model_file=None, save=False):
+    def fit(self, X = None, y = None, features = '', regularize=True, validate=False, weights_file=None, model_file=None, save=False):
         """
 
         :param X: The feature dataset to fit against
@@ -218,12 +217,13 @@ class MLModel(MLModelBase):
         """
         self.validate_fit_call();
         if not X:
-            if not features:
-                raise TypeError(self.log(f'The features parameter was not supplied.  When calling fit, either X and y or features must be supplied.'))
-            X, y = self.data_container.prepare_data(features=features);
+            self.log(f'X was not supplied, retreiving data from the DataContainer')
+            (X_train, y_train), (X_test, y_test) = self.data_container.prepare_data(features=features)
+            X = X_train
+            y = y_train
         self.log(f'Running fit with implementation: {type(self._model_impl)}')
 
-        self._model_impl.fit(X, y);
+        self._model_impl.fit(X, y, validate)
         return None
 
         '''
@@ -282,14 +282,14 @@ class MLModel(MLModelBase):
         self.data_container = data_container
         self.log('Added DataContainer')
 
-    def evaluate(self, val_X = None, val_y = None):
-        loss = None
-        if val_X == None:
+    def evaluate(self, X = None, y = None):
+        score = None
+        if X == None:
             self.log(f'X and y were not passed as parameters.  Using DataContainer.')
             loss = self.Model.evaluate_generator(self.data_container.val_generator, steps=self.data_container.val_steps)
         else:
-            loss = self.Model.evaluate(val_X, val_y)
-        return loss
+            score = self._model_impl.evaluate(X, y)
+        return score
 
     def predict(self, X):
         prediction = self._model_impl.predict(X)

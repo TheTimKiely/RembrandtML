@@ -1,6 +1,6 @@
-import getopt
+import time, getopt
 
-from core import MLEntityBase
+from rembrandtml.core import MLEntityBase
 
 from rembrandtml.configuration import ModelConfig, MLConfig, Verbosity, DataConfig, InstrumentationConfig
 
@@ -79,3 +79,30 @@ class MLLogger(object):
     def log(self, msg, verbosity = None):
         if (verbosity >= self.instrumentation_config.verbosity):
             print(msg)
+
+class Split(object):
+    def __init__(self, name, start_time):
+        self.Name = name
+        self.StartTime = start_time
+
+class Timer(object):
+    def __init__(self):
+        self.StartTime = None
+        self.Splits = []
+
+    def start(self):
+        self.StartTime = time.time()
+
+    def start_split(self, name):
+        self.Splits.append(Split(name, time.time()))
+
+    def get_split(self, name = None):
+        if name == None:
+            return time.time() - self.StartTime
+        if self.Splits[name] == None:
+            raise KeyError(f'The Split {name} has not been created.')
+        return self.Splits[name].StartTime
+
+class Instrumentation(object):
+    def __init__(self):
+        self.Timer = Timer()

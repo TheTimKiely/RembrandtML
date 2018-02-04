@@ -1,10 +1,10 @@
 import os
 import numpy as np
-from sklearn import datasets
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 
 from rembrandtml.data_providers.keras import KerasDataProvider
+from rembrandtml.data_providers.pandas import PandasDataProvider
 from rembrandtml.data_providers.sklearn import SkLearnDataProvider
 from rembrandtml.entities import MLEntityBase
 
@@ -20,14 +20,20 @@ class DataContainer(MLEntityBase):
         self.train_generator = None
         self.val_generator = None
         self.test_generator = None
-        self.X = None
-        self.y = None
+        self.X_train = None
+        self.X_test = None
+        self.X_val = None
+        self.y_train = None
+        self.y_test = None
+        self.y_val = None
 
     def get_data_provider(self, framework_name):
         if framework_name == 'sklearn':
             return SkLearnDataProvider()
         elif framework_name == 'keras':
             return KerasDataProvider()
+        elif framework_name == 'pandas':
+            return PandasDataProvider()
         else:
             raise TypeError(f'The specified framework, {framework_name}, is not supported as a DataProvider.')
 
@@ -78,39 +84,16 @@ class DataContainer(MLEntityBase):
             #print(f'Sample: {samples[0,0,0]} Target: {targets[0]}')
             yield samples, targets
 
-    def prepare_data(self, features = None, sample_size=None):
+    def prepare_data(self, features = None, target_feature = None, sample_size=None):
         """
-
-        :param dataset:
+        Loads data from the DataContainers dataset, using the framework specified in the constructor.
         :param features: Tuple of features to be included in X.  If None, all features will be included.
+        :param target_feature: The feaute in the dataset that will be removed from the training data(X) and assigned to the label data(y).
         :param sample_size:
         :return:
         """
-        self.log(f'Preparing data from dataset: {self.dataset_name}')
-        if(self.dataset_name == 'imdb'):
-            self.prepare_imdb_data()
-        elif(self.dataset_name == 'jena_climate'):
-            self.prepare_climage_data(sample_size)
-        elif(self.dataset_name == 'boston'):
-            #boston = pd.read_csv('boston.csv')
-            # X = boston.drop('MEDV', axis=1).values
-            #y = boston['MEDV'].values
-
-            boston = datasets.load_boston()
-            data = boston['data']
-            indeces = [i for i,k in enumerate(boston['feature_names']) if k in features]
-            X_rooms = data[:, 5]
-            X = np.zeros((data.shape[0], len(indeces)))
-            for i, index in enumerate(indeces):
-                X[:,i] = data[:,index]
-            y = boston['target']
-            # ToDo: why reshape
-            # 1. What is the shape supposed to be?
-            # 2. How do we know the required shape?
-            self.y = y.reshape(-1, 1)
-            self.X = X
-            #self.X = X_rooms.reshape(-1, 1)
-        return self.X, self.y
+        self.log(f'Preparing data from dataset: {self.dataset_name} using {self.data_provider.name}')
+        (self.X_train, self.y_train), (self.X_test, self.y_test) = self.data_provider.prepare_data(features, target_feature)
 
     def prepare_imdb_data(self):
         # Get X and y (training data and labels) from imdb dataset

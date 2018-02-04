@@ -1,3 +1,36 @@
+from enum import Enum
+
+class Verbosity(Enum):
+    SILENT = 0
+    QUIET = 1
+    DEBUG = 2
+    NOISY = 3
+
+    def __eq__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value == other.value
+        return NotImplemented
+
+    def __lt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value < other.value
+        return NotImplemented
+
+    def __le__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value <= other.value
+        return NotImplemented
+
+    def __gt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value > other.value
+        return NotImplemented
+
+    def __ge__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value >= other.value
+        return NotImplemented
+
 
 class MLEntityBase(object):
     def __init__(self):

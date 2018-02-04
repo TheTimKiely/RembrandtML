@@ -1,12 +1,15 @@
 import os
 
 from rembrandtml.configuration import Verbosity
-from rembrandtml.utils import MLLogger
+from rembrandtml.utils import MLLogger, Instrumentation
 
 
 class MLEntityBase(object):
+    '''
+    Provided instrumentation functionality to all subclasses
+    '''
     def __init__(self, instrumentation_config = None):
-        self.Base_Directory = os.path.abspath(os.path.join(os.getcwd(), '../../..'))
+        self.Base_Directory = os.path.abspath(os.path.join(os.getcwd(), '..'))
         self.logger = MLLogger(instrumentation_config)
 
     def unique_file_name(self, file_property, attribute_property):
@@ -34,6 +37,7 @@ class MLContext(MLEntityBase):
         self.plotters = {}
         self.data_containers = {}
         self.models = {}
+        self.instrumentation = Instrumentation()
 
     def plot(self, model_name = '', data_container_name = '', plotter_name = ''):
         pass

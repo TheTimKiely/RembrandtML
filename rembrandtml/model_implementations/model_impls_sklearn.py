@@ -10,9 +10,15 @@ class MLModelSkLearn(MLModelImplementation):
         super(MLModelSkLearn, self).__init__()
         self._reg = None
 
-    def fit(self, X, y):
+    def fit(self, X, y, validate=False):
         self._reg = linear_model.LinearRegression()
+        from sklearn.model_selection import cross_val_score
         self._reg.fit(X, y)
+
+    def evaluate(self, X, y):
+        self.validate_trained()
+        score = self._reg.score(X, y)
+        return score
 
     def train(self):
         # Setup arrays to store train and test accuracies
@@ -39,7 +45,6 @@ class MLModelSkLearn(MLModelImplementation):
         plotter.show();
 
     def predict(self, X):
-        if not self._reg:
-            raise TypeError(self.log(f'The model has not yet been fit.  Precit() can only be called after the model has been fit.'))
+        self.validate_trained()
         prediction = self._reg.predict(X)
         return prediction

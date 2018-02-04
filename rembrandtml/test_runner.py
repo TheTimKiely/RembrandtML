@@ -19,7 +19,9 @@ def testMLBase():
 
 def testLinearRegression():
     tests = TestMLModel()
-    tests.test_fit_linear_regression()
+    #tests.test_fit_linear_regression_sklearn_single_feature()
+    tests.test_fit_linear_regression_sklearn('pandas', 'gapminder', '')
+    #tests.test_fit_linear_regression_tensorflow()
 
 def main(params):
     testLinearRegression()

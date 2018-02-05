@@ -1,9 +1,8 @@
 import unittest
 
-from rembrandtml.configuration import MLConfig, DataConfig, ModelConfig
-from rembrandtml.core import Verbosity
-from rembrandtml.entities import MLContext
-from rembrandtml.factories import ModelFactory
+from rembrandtml.configuration import ContextConfig, DataConfig, ModelConfig, Verbosity
+from rembrandtml.core import MLContext
+from rembrandtml.factories import ModelFactory, ContextFactory
 from rembrandtml.models import ModelType
 from rembrandtml.plotting import Plotter
 
@@ -14,13 +13,13 @@ class TestClassifiers(unittest.TestCase):
         data_config = DataConfig('sklearn', 'mnist-original')
 
         # Create ModelConfig that describes the model
-        model_config = ModelConfig(ModelType.KNN, 'sklearn', )
+        model_config = ModelConfig(ModelType.KNN, 'sklearn')
 
         # Create ContextConfig that describes context features, such as logging and instrumentation
-        config = MLConfig(model_config, data_config, Verbosity.DEBUG)
+        config = ContextConfig(model_config, data_config, Verbosity.DEBUG)
 
         # Instantiate the MLContext
-        ctxt = MLContext.create(config)
+        ctxt = ContextFactory.create(config)
 
         #Prepare the data
         ctxt.prepare_data()

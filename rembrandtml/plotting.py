@@ -55,11 +55,11 @@ class Plotter(object):
     def plot_model_complexity(neighbors, train_accuracy, test_accuracy):
             # Generate plot
             plt.title('k-NN: Varying Number of Neighbors')
-            plt.plot(neighbors, test_accuracy, label='Testing Accuracy')
-            plt.plot(neighbors, train_accuracy, label='Training Accuracy')
+            plt.plot(neighbors, test_accuracy, label='Testing Score')
+            plt.plot(neighbors, train_accuracy, label='Training Score')
             plt.legend()
             plt.xlabel('Number of Neighbors')
-            plt.ylabel('Accuracy')
+            plt.ylabel('Score')
 
     def heatmap(corr, square=True, cmap='RdYlGn'):
         sns.heatmap(corr, square=True, cmap='RdYlGn')
@@ -135,9 +135,9 @@ class MetricsPlotter(Plotter):
         plt.clf()
         acc = history['acc']
         val_acc = history['val_acc']
-        acc_series = self.build_series(epochs, acc, 'ro', 'Training Accuracy')
+        acc_series = self.build_series(epochs, acc, 'ro', 'Training Score')
         self.add_series(acc_series)
-        val_acc_series = self.build_series(epochs, val_acc, 'r', 'Validation Accuracy')
+        val_acc_series = self.build_series(epochs, val_acc, 'r', 'Validation Score')
         self.add_series(val_acc_series)
         '''
         plt.title('Training & Validation Loss')

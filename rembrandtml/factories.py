@@ -1,19 +1,37 @@
+from rembrandtml.core import MLContext
 from rembrandtml.data import DataContainer
 from rembrandtml.models import MLModel, MathModel, ModelType
 from rembrandtml.nnmodels import ConvolutionalNeuralNetwork, RecurrentNeuralNetwork, LstmRNN, GruNN
 
+class ContextFactory(object):
+    @staticmethod
+    def create(config):
+        '''
+        Factory method to instantiate a new machine learning context
+        :param MLCnfig:
+        :return: MLContext
+        '''
+        model = ModelFactory.create('SkLearnKnn', config)
+        context = MLContext(model, config)
+        return context
+
+class DataContainerFactory(object):
+    @staticmethod
+    def create(name, data_config):
+        data_container = DataContainer(name, data_config.framework_name, data_config.dataset_name)
+        return data_container
 
 class ModelFactory(object):
     @staticmethod
     def create(name, ml_config):
         '''
         Factory method for creating ML models.
-        This method first creates a DataContainer from the parameters specified in MLConfig.DataConfig.
+        This method first creates a DataContainer from the parameters specified in ContextConfig.DataConfig.
         :param name: The name of this model, e.g. SkLearnLinearRegression
-        :param ml_config: An instance of MLConfig, containing the parameters for this model and it's DataContainer.
+        :param ml_config: An instance of ContextConfig, containing the parameters for this model and it's DataContainer.
         :return:
         '''
-        data_container = DataContainer(ml_config.data_config.framework_name, ml_config.data_config.dataset_name)
+        data_container = DataContainerFactory.create(DataContainer(ml_config.data_config))
         # I'm not sure if a DataContain should be in __init__ for the models.
         # So, for now, we'll set the property
         if(ml_config.model_type == ModelType.CNN):

@@ -10,8 +10,9 @@ from rembrandtml.entities import MLEntityBase
 
 
 class DataContainer(MLEntityBase):
-    def __init__(self, framework_name, dataset_name, instrumentation_config = None):
-        super(DataContainer, self).__init__(instrumentation_config)
+    def __init__(self, name, framework_name, dataset_name, instrumentation = None):
+        super(DataContainer, self).__init__(instrumentation)
+        self.name = name
         self.data_provider = self.get_data_provider(framework_name)
         self.dataset_name = dataset_name
         self.data = None

@@ -1,7 +1,8 @@
 import numpy as np
 import  tensorflow as tf
 from rembrandtml.model_implementations.model_impls import MLModelImplementation
-from rembrandtml.core import Verbosity
+from rembrandtml.configuration import Verbosity
+
 
 class MLModelTensorflow(MLModelImplementation):
 

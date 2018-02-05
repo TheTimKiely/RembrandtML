@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from rembrandtml.configuration import MLConfig, Verbosity
+from rembrandtml.configuration import ContextConfig, Verbosity
 from rembrandtml.data import DataContainer
 from rembrandtml.factories import ModelFactory
 from rembrandtml.models import ModelType
@@ -9,7 +9,7 @@ from sklearn import datasets
 
 class TestMLModelBase(TestCase):
     def __init__(self):
-        self.Config = MLConfig(ModelType.LINEAR_REGRESSION, 'sklearn', 't', Verbosity.DEBUG)
+        self.Config = ContextConfig(ModelType.LINEAR_REGRESSION, 'sklearn', 't', Verbosity.DEBUG)
 
     def test_prepare_data(self):
         # Should data be prepared in the model or the DataContainer?

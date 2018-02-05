@@ -1,6 +1,6 @@
 from unittest import TestCase
 import numpy as np
-from rembrandtml.configuration import MLConfig, Verbosity, DataConfig, ModelConfig
+from rembrandtml.configuration import ContextConfig, DataConfig, ModelConfig, Verbosity
 from rembrandtml.factories import ModelFactory
 from rembrandtml.models import ModelType
 from rembrandtml.plotting import Plotter
@@ -37,12 +37,12 @@ class TestMLModel(TestCase):
 
     def test_fit_classification(self):
         # ToDo: Should there be seperate model classes for classification and linear regression
-        config = MLConfig(ModelType.SIMPLE_CLASSIFICATION, 'sklearn', 't', Verbosity.DEBUG)
+        config = ContextConfig(ModelType.SIMPLE_CLASSIFICATION, 'sklearn', 't', Verbosity.DEBUG)
 
     # ToDo make data-driven test
     # @data('boston', 'ca_housing')
     def test_fit_linear_regression_tensorflow(self):
-        config = MLConfig(ModelType.LINEAR_REGRESSION, 'tensorflow', 't', Verbosity.DEBUG)
+        config = ContextConfig(ModelType.LINEAR_REGRESSION, 'tensorflow', 't', Verbosity.DEBUG)
         config.data_config = DataConfig('sklearn', 'ca_housing')
         config.model_config = ModelConfig()
         model = ModelFactory.create('TensorFlowLinReg', config)
@@ -62,7 +62,7 @@ class TestMLModel(TestCase):
         model.fit(features=features)
 
     def test_fit_linear_regression_sklearn(self, framework='sklearn', dataset='boston', features=('RM', 'CRIM')):
-        config = MLConfig(ModelType.LINEAR_REGRESSION, 'sklearn', 't', Verbosity.DEBUG)
+        config = ContextConfig(ModelType.LINEAR_REGRESSION, 'sklearn', 't', Verbosity.DEBUG)
 
         '''
         from sklearn import datasets
@@ -111,7 +111,7 @@ class TestMLModel(TestCase):
         y_test = model.data_container.y
 
     def test_fit_linear_regression_sklearn_single_feature(self):
-        config = MLConfig(ModelType.LINEAR_REGRESSION, 'sklearn', 't', Verbosity.DEBUG)
+        config = ContextConfig(ModelType.LINEAR_REGRESSION, 'sklearn', 't', Verbosity.DEBUG)
         config.data_config = DataConfig('sklearn', 'boston')
         config.model_config = ModelConfig()
         model = ModelFactory.create('SkLearnLinReg', config)

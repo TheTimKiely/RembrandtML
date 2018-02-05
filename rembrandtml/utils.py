@@ -1,21 +1,6 @@
 import time, getopt
 
-from rembrandtml.core import MLEntityBase
-
-from rembrandtml.configuration import ModelConfig, MLConfig, Verbosity, DataConfig, InstrumentationConfig
-
-
-class MLFile(MLEntityBase):
-    def __init__(self):
-        super(MLFile, self).__init__()
-        self._base_dir = ''
-
-    @property
-    def BaseDir(self):
-        return self._base_dir
-
-    def unique_file_name(self):
-        return 'file path'
+from rembrandtml.configuration import ModelConfig, ContextConfig, DataConfig, InstrumentationConfig
 
 class CommandLineParser(object):
     @staticmethod
@@ -26,7 +11,7 @@ class CommandLineParser(object):
         batch_size = 64
         nn_type = 'cnn'
         mode = 'p'
-        verbosity = Verbosity.QUIET
+        verbosity_code = 'q'
         sample_size = 0
         dataset_name = ''
         framework = 'tensorflow'
@@ -56,29 +41,19 @@ class CommandLineParser(object):
             elif opt == '-t':
                 nn_type = arg
             elif opt == '-v':
-                verbosity = Verbosity(arg)
+                verbosity_code = arg
             elif opt == 'x':
                 metrics = arg
 
-        ml_config = MLConfig(nn_type, framework, mode, layers, nodes, epochs, batch_size)
+        ml_config = ContextConfig(nn_type, framework, mode, layers, nodes, epochs, batch_size)
         model_config.metrics = metrics
         ml_config.model_config = model_config
-        instr_config = InstrumentationConfig(verbosity)
+        instr_config = InstrumentationConfig(verbosity_code)
         ml_config.instrumentation_config = instr_config
         data_config = DataConfig(dataset_name, sample_size)
         ml_config.data_config = data_config
         return ml_config
 
-class MLLogger(object):
-    def __init__(self, instrumentation_config = None):
-        if instrumentation_config:
-            self.instrumentation_config = instrumentation_config
-        else:
-            self.instrumentation_config = InstrumentationConfig(Verbosity.DEBUG)
-
-    def log(self, msg, verbosity = None):
-        if (verbosity >= self.instrumentation_config.verbosity):
-            print(msg)
 
 class Split(object):
     def __init__(self, name, start_time):
@@ -87,22 +62,28 @@ class Split(object):
 
 class Timer(object):
     def __init__(self):
-        self.StartTime = None
-        self.Splits = []
+        self.start_time = None
+        self.splits = []
 
-    def start(self):
-        self.StartTime = time.time()
+    def get_start(self):
+        self.start_time = time.time()
+
+    def get_elapsed(self):
+        return time.time() - self.get_start()
 
     def start_split(self, name):
-        self.Splits.append(Split(name, time.time()))
+        self.splits.append(Split(name, time.time()))
 
     def get_split(self, name = None):
         if name == None:
-            return time.time() - self.StartTime
-        if self.Splits[name] == None:
+            return time.time() - self.start_time
+        if self.splits[name] == None:
             raise KeyError(f'The Split {name} has not been created.')
-        return self.Splits[name].StartTime
+        return self.splits[name].StartTime
 
 class Instrumentation(object):
-    def __init__(self):
+    def __init__(self, instrumentation_config = None):
         self.Timer = Timer()
+        if instrumentation_config == None:
+            config = InstrumentationConfig()
+        self.config = instrumentation_config

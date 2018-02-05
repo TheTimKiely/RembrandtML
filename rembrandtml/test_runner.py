@@ -16,7 +16,7 @@ def testMLBase():
 def testModelContext():
     from rembrandtml.test.test_MLContext import TestClassifiers
     tests = TestClassifiers()
-    tests.test_knn()
+    tests.test_knn_sklearn()
 
 def testLinearRegression():
     tests = TestMLModel()

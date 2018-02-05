@@ -1,4 +1,42 @@
-from rembrandtml.core import Verbosity, RunMode
+from enum import Enum
+
+
+class RunMode(Enum):
+    TRAIN = 0
+    EVALUATE = 1
+    PREDICT = 2
+
+
+class Verbosity(Enum):
+    SILENT = 0
+    QUIET = 1
+    DEBUG = 2
+    NOISY = 3
+
+    def __eq__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value == other.value
+        return NotImplemented
+
+    def __lt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value < other.value
+        return NotImplemented
+
+    def __le__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value <= other.value
+        return NotImplemented
+
+    def __gt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value > other.value
+        return NotImplemented
+
+    def __ge__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value >= other.value
+        return NotImplemented
 
 
 class DataConfig(object):
@@ -8,16 +46,16 @@ class DataConfig(object):
         self.sample_size = sample_size
 
 class InstrumentationConfig(object):
-    def __init__(self, verbosity):
-        self.verbosity = verbosity
+    def __init__(self, verbosity_code):
+        self.verbosity = Verbosity(verbosity_code)
 
-class MLConfig(object):
-    def __init__(self, mode = RunMode.TRAIN, verbosity = Verbosity.QUIET, layers = 4, nodes = 16, epochs = 10, batch_size = 32):
+class ContextConfig(object):
+    def __init__(self, model_config, data_config, mode = RunMode.TRAIN, verbosity = Verbosity.QUIET, layers = 4, nodes = 16, epochs = 10, batch_size = 32):
         self._verbosity = verbosity
-        self._model_type = model_type
+        self._model_config = model_config
+        self._data_config = data_config
         # Properties probably aren't necessary, so experimenting with public fields
         self.Layers = layers
-        self.framework = framework
         self.Nodes = nodes
         self._epochs = epochs
         self.BatchSize = batch_size
@@ -47,7 +85,9 @@ class MLConfig(object):
 
 
 class ModelConfig(object):
-    def __init__(self):
+    def __init__(self, model_type, framework_name):
+        self.model_type = model_type
+        self.framework_name = framework_name
         self._metrics = []
         self._layers = []
         self.LayerCount = 1
@@ -107,3 +147,5 @@ class ModelConfig(object):
     @layers.setter
     def layers(self, layers):
         self._layers = layers
+
+

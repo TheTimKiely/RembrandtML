@@ -1,17 +1,19 @@
 import os
 
-from rembrandtml.configuration import Verbosity
-from rembrandtml.factories import ModelFactory
-from rembrandtml.utils import MLLogger, Instrumentation
+from rembrandtml.configuration import InstrumentationConfig, Verbosity
+from rembrandtml.utils import Instrumentation
 
 
 class MLEntityBase(object):
-    '''
+    """
     Provided instrumentation functionality to all subclasses
-    '''
-    def __init__(self, instrumentation_config = None):
+    """
+    def __init__(self, instrumentation = None):
         self.Base_Directory = os.path.abspath(os.path.join(os.getcwd(), '..'))
-        self.logger = MLLogger(instrumentation_config)
+        if instrumentation == None:
+            instrumentation = Instrumentation()
+        self.instrumentation = instrumentation
+        self.logger = MLLogger(instrumentation.config)
 
     def unique_file_name(self, file_property, attribute_property):
         while(os.path.isfile(file_property.__get__(self))):
@@ -21,7 +23,7 @@ class MLEntityBase(object):
     # ToDo move to MLLogger
     def log(self, msg, verbosity=Verbosity.DEBUG):
         '''
-        Write the msg parameter to the console if the verbosity parameter is >= this objects configured verbosity in MLConfig.Verbosity
+        Write the msg parameter to the console if the verbosity parameter is >= this objects configured verbosity in ContextConfig.Verbosity
         :param msg:
         :param verbosity:
         :return: The msg parameter echoed back.  This allows nesting calls to log, e.g.raise TypeError(self.log(f'The features parameter was not supplied.')
@@ -29,39 +31,29 @@ class MLEntityBase(object):
         self.logger.log(msg, verbosity)
         return msg
 
-class MLContext(MLEntityBase):
-    """The RMLContext object is an organizing structure to group the data, model, and plotter that are used in common ML tasks.
-    It provides a collection of DataContainers, MLModels, and DataContainers to that that comparing entities becomes easy.
-    """
 
-    @staticmethod
-    def create(config):
-        '''
-        Factory method to instantiate a new machine learning context
-        :param MLCnfig:
-        :return: MLContext
-        '''
-        model = ModelFactory.create('SkLearnKnn', config)
-        context = MLContext(model, config)
-        return context
-
+class MLFile(MLEntityBase):
     def __init__(self):
-        super()
-        self.plotters = {}
-        self.data_containers = {}
-        self.models = {}
-        self.instrumentation = Instrumentation()
+        super(MLFile, self).__init__()
+        self._base_dir = ''
 
-    def plot(self, model_name = '', data_container_name = '', plotter_name = ''):
-        pass
+    @property
+    def BaseDir(self):
+        return self._base_dir
+
+    def unique_file_name(self):
+        return 'file path'
 
 
+class MLLogger(object):
+    def __init__(self, instrumentation_config = None):
+        if instrumentation_config:
+            self.instrumentation_config = instrumentation_config
+        else:
+            self.instrumentation_config = InstrumentationConfig(Verbosity.DEBUG)
 
-
-class Accuracy(object):
-    def __init__(self):
-        pass
-
-class Prediction(object):
-    def __init__(self):
-        pass
+    def log(self, msg, verbosity = None):
+        if (verbosity > self.instrumentation_config.verbosity):
+            return
+        instr_msg = f'{self.time.get_elapsed()} Split: {self.timer.get_split()}: {msg}'
+        print(msg)

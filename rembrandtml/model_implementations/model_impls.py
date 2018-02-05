@@ -1,5 +1,6 @@
 from rembrandtml.entities import MLEntityBase
 
+
 class MLModelImplementation(MLEntityBase):
     def __init__(self):
         super(MLModelImplementation, self).__init__()

@@ -1,5 +1,10 @@
 from enum import Enum
 
+class RunMode(Enum):
+    TRAIN = 0
+    EVALUATE = 1
+    PREDICT = 2
+
 class Verbosity(Enum):
     SILENT = 0
     QUIET = 1

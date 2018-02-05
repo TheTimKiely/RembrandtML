@@ -1,14 +1,11 @@
 import os, time, dill
 import numpy as np
-import matplotlib.pyplot as plt
 from keras import models
 from keras import layers
 from keras import optimizers
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Embedding, LSTM
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
 
 from rembrandtml.models import MLModel
 
@@ -68,6 +65,7 @@ class NeuralNetwork(MLModel):
 
     @property
     def TestData(self):
+        from keras.preprocessing.sequence import pad_sequences
         if(self.X_test == None):
             data_dir = os.path.join(self.Base_Directory, os.path.join('data','imdb','aclImdb','test'))
             raw_X_test, raw_y_test = self.get_test_data_from_file(data_dir, ['pos', 'neg'])

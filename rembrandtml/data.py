@@ -1,7 +1,7 @@
 import os
 import numpy as np
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
+#from keras.preprocessing.text import Tokenizer
+#from keras.preprocessing.sequence import pad_sequences
 
 from rembrandtml.data_providers.keras import KerasDataProvider
 from rembrandtml.data_providers.pandas import PandasDataProvider

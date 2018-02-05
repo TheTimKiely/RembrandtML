@@ -1,6 +1,7 @@
 import os
 
 from rembrandtml.configuration import Verbosity
+from rembrandtml.factories import ModelFactory
 from rembrandtml.utils import MLLogger, Instrumentation
 
 
@@ -32,6 +33,18 @@ class MLContext(MLEntityBase):
     """The RMLContext object is an organizing structure to group the data, model, and plotter that are used in common ML tasks.
     It provides a collection of DataContainers, MLModels, and DataContainers to that that comparing entities becomes easy.
     """
+
+    @staticmethod
+    def create(config):
+        '''
+        Factory method to instantiate a new machine learning context
+        :param MLCnfig:
+        :return: MLContext
+        '''
+        model = ModelFactory.create('SkLearnKnn', config)
+        context = MLContext(model, config)
+        return context
+
     def __init__(self):
         super()
         self.plotters = {}

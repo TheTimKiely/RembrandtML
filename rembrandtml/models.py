@@ -1,8 +1,6 @@
 import os, dill
 from enum import Enum
 import numpy as np
-from keras.models import Sequential, load_model
-from keras.layers import Dense, Flatten
 from rembrandtml.entities import MLEntityBase
 from rembrandtml.model_implementations.model_impls_sklearn import MLModelSkLearn
 from rembrandtml.model_implementations.model_impls_tensorflow import MLModelTensorflow
@@ -12,11 +10,12 @@ class ModelType(Enum):
     LINEAR_REGRESSION = 1
     SIMPLE_CLASSIFICATION = 2
     MULTIPLE_CLASSIFICATION = 3
-    LOGISTIC_REGRESSION = 4
-    CNN = 5
-    RNN = 6
-    LSTM = 7
-    GRU = 8
+    KNN = 4
+    LOGISTIC_REGRESSION = 5
+    CNN = 6
+    RNN = 7
+    LSTM = 8
+    GRU = 9
 
 class MLModelBase(MLEntityBase):
     def __init__(self, name, ml_config):

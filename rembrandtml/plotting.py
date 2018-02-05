@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib import  cm
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -67,6 +68,27 @@ class Plotter(object):
         plt.scatter(X, y, color=color)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
+
+    def plot_image(self, data):
+        image = data.reshape(28, 28)
+        plt.imshow(image, cmap=cm.binary,
+                   interpolation="nearest")
+        plt.axis("off")
+
+    def plot_images(self, instances, images_per_row=10, **options):
+        size = 28
+        images_per_row = min(len(instances), images_per_row)
+        images = [instance.reshape(size, size) for instance in instances]
+        n_rows = (len(instances) - 1) // images_per_row + 1
+        row_images = []
+        n_empty = n_rows * images_per_row - len(instances)
+        images.append(np.zeros((size, size * n_empty)))
+        for row in range(n_rows):
+            rimages = images[row * images_per_row: (row + 1) * images_per_row]
+            row_images.append(np.concatenate(rimages, axis=1))
+        image = np.concatenate(row_images, axis=0)
+        plt.imshow(image, cmap=cm.binary, **options)
+        plt.axis("off")
 
     def plot(self, X, y, color = 'blue', linewidth=2):
         plt.plot(X, y, color=color, linewidth=linewidth)

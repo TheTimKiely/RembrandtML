@@ -1,4 +1,4 @@
-from rembrandtml.core import Verbosity
+from rembrandtml.core import Verbosity, RunMode
 
 
 class DataConfig(object):
@@ -12,7 +12,7 @@ class InstrumentationConfig(object):
         self.verbosity = verbosity
 
 class MLConfig(object):
-    def __init__(self, model_type, framework, mode, verbosity = Verbosity.QUIET, layers = 4, nodes = 16, epochs = 10, batch_size = 32):
+    def __init__(self, mode = RunMode.TRAIN, verbosity = Verbosity.QUIET, layers = 4, nodes = 16, epochs = 10, batch_size = 32):
         self._verbosity = verbosity
         self._model_type = model_type
         # Properties probably aren't necessary, so experimenting with public fields

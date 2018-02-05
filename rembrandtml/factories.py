@@ -1,6 +1,3 @@
-from keras import models
-from keras import layers
-
 from rembrandtml.data import DataContainer
 from rembrandtml.models import MLModel, MathModel, ModelType
 from rembrandtml.nnmodels import ConvolutionalNeuralNetwork, RecurrentNeuralNetwork, LstmRNN, GruNN

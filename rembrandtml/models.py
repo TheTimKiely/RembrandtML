@@ -18,10 +18,10 @@ class ModelType(Enum):
     GRU = 9
 
 class MLModelBase(MLEntityBase):
-    def __init__(self, name, ml_config):
+    def __init__(self, name, model_config):
         super(MLModelBase, self).__init__()
         self.name = name
-        self.Config = ml_config
+        self.model_config = model_config
         self._model_file_attribute = 0
         self._weights_file_attribute = 0
         self._tokenizer_file_attribute = 0
@@ -34,7 +34,7 @@ class MLModelBase(MLEntityBase):
     @property
     def Model(self):
         if (self._model == None):
-            raise ValueError(f'The model is not initialize and we are in {self.Config.Mode} mode.')
+            raise ValueError(f'The model is not initialize and we are in {self.model_config.Mode} mode.')
 
         return self._model
 
@@ -132,7 +132,11 @@ class MLModelBase(MLEntityBase):
 
     def validate_fit_call(self):
         if self._model_impl == None:
-            raise TypeError(f'{self.name}.  The model implementation has not been initialized')
+            raise TypeError(f'{self.name}: The model implementation has not been initialized')
+        if not self.data_container.X_train:
+            self.log(f'{self.name}: X_train is not populated, using X.')
+            if self.data_container.X == None:
+                raise TypeError(f'{self.name}: Training data has not been prepared.  Both X_train and X and empty.')
 
         #if self.data_container == None:
         #    raise AttributeError('This model had no DataContainer, please call build_model(data_container) first.')
@@ -162,9 +166,9 @@ class MLModelBase(MLEntityBase):
         pass
 
 class MathModel(MLModelBase):
-    def __init__(self, name, ml_config):
-        super(MathModel, self).__init__(name, ml_config)
-        self.Config = ml_config
+    def __init__(self, name, model_config):
+        super(MathModel, self).__init__(name, model_config)
+        self.model_config = model_config
 
     def evaluate(self, data_container):
         self.log(f'MathModel.evaluate(): steps: {data_container.val_steps}')
@@ -178,11 +182,11 @@ class MathModel(MLModelBase):
         return batch_maes
 
 class MLModel(MLModelBase):
-    def __init__(self, name, ml_config):
-        super(MLModel, self).__init__(name,ml_config)
-        if  ml_config.framework == 'sklearn':
+    def __init__(self, name, model_config):
+        super(MLModel, self).__init__(name,model_config)
+        if  model_config.framework_name == 'sklearn':
             self._model_impl = MLModelSkLearn()
-        elif ml_config.framework == 'tensorflow':
+        elif model_config.framework_name == 'tensorflow':
                 self._model_impl = MLModelTensorflow()
 
 
@@ -196,14 +200,24 @@ class MLModel(MLModelBase):
         self.Model.add(Flatten(input_shape=(lookback // step, self.data_container.Data.shape[-1])))
         self.Model.add(Dense(32, activation='relu'))
         self.Model.add(Dense(1))
-        self.Model.compile(optimizer=self.Config.ModelConfig.optimizer,
-                           loss=self.Config.ModelConfig.loss_function,
-                           metrics=self.Config.ModelConfig.metrics)
+        self.Model.compile(optimizer=self.model_config.ModelConfig.optimizer,
+                           loss=self.model_config.ModelConfig.loss_function,
+                           metrics=self.model_config.ModelConfig.metrics)
 
     def train(self):
         pass
 
-    def fit(self, X = None, y = None, features = '', regularize=True, validate=False, weights_file=None, model_file=None, save=False):
+    def get_data_from_data_container(self):
+        self.validate_fit_call();
+        if self.data_container.X_train:
+            X = self.data_container.X_train
+        else:
+            X = self.data_container.X
+
+        y = self.data_container.y
+        return X, y
+
+    def fit(self, regularize=True, validate=False, weights_file=None, model_file=None, save=False):
         """
 
         :param X: The feature dataset to fit against
@@ -214,15 +228,11 @@ class MLModel(MLModelBase):
         :param save: A boolean indicating whether or not to save the fitted model to a file
         :return: The path of the saved file if 'save' was 'True'
         """
-        self.validate_fit_call();
-        if not X:
-            self.log(f'X was not supplied, retreiving data from the DataContainer')
-            (X_train, y_train), (X_test, y_test) = self.data_container.prepare_data(features=features)
-            X = X_train
-            y = y_train
-        self.log(f'Running fit with implementation: {type(self._model_impl)}')
-
+        X, y = self.get_data_from_data_container()
+        self.log(f'Running fit with implementation: {type(self._model_impl)} X: {X.shape} y: {y.shape}')
         self._model_impl.fit(X, y, validate)
+
+
         return None
 
         '''
@@ -281,13 +291,14 @@ class MLModel(MLModelBase):
         self.data_container = data_container
         self.log('Added DataContainer')
 
-    def evaluate(self, X = None, y = None):
+    def evaluate(self):
         score = None
-        if X == None:
-            self.log(f'X and y were not passed as parameters.  Using DataContainer.')
-            loss = self.Model.evaluate_generator(self.data_container.val_generator, steps=self.data_container.val_steps)
-        else:
-            score = self._model_impl.evaluate(X, y)
+        #if X == None:
+        #    self.log(f'X and y were not passed as parameters.  Using DataContainer.')
+        #    loss = self.Model.evaluate_generator(self.data_container.val_generator, steps=self.data_container.val_steps)
+        #else:
+        X, y = self.get_data_from_data_container()
+        score = self._model_impl.evaluate(X, y)
         return score
 
     def predict(self, X):

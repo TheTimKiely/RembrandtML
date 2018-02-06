@@ -2,6 +2,7 @@ import numpy as np
 from sklearn import  linear_model
 from sklearn.neighbors import KNeighborsClassifier
 
+from rembrandtml.core import Score, ScoreType
 from rembrandtml.model_implementations.model_impls import MLModelImplementation
 from rembrandtml.plotting import Plotter
 
@@ -12,12 +13,12 @@ class MLModelSkLearn(MLModelImplementation):
 
     def fit(self, X, y, validate=False):
         self._reg = linear_model.LinearRegression()
-        from sklearn.model_selection import cross_val_score
         self._reg.fit(X, y)
 
     def evaluate(self, X, y):
         self.validate_trained()
-        score = self._reg.score(X, y)
+        value = self._reg.score(X, y)
+        score = Score(ScoreType.R2, value)
         return score
 
     def train(self):

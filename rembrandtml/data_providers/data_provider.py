@@ -5,15 +5,26 @@ from rembrandtml.entities import MLEntityBase
 
 
 class DataProviderBase(MLEntityBase):
-    def __init__(self, name):
+    def __init__(self, name, dataset_name):
         self.name = name
+        self.dataset_name = dataset_name
+
+
+    def get_dataset(self):
+        pass
 
     def prepare_data(self, features=None, target_feature=None, sample_size=None):
+        # Retrieve X and y from dataset
+        return
 
-        if self.data_provider.name.lower() == 'pandas':
+        # 2. get dataset
+        dataset = self.get_dataset()
+        if self.name.lower() == 'pandas':
             self.prepare_data_pandas(features, target_feature)
-        else:
+        elif self.name.lower() == 'sklearn':
             self.prepare_data_sklearn(features, sample_size)
+        else:
+            raise TypeError(f'Unsupported data provider {self.name}')
 
     def prepare_data_pandas(self, features, target_feature):
         import pandas as pd
@@ -31,7 +42,9 @@ class DataProviderBase(MLEntityBase):
             self.prepare_imdb_data()
         elif (self.dataset_name.lower() == 'jena_climate'):
             self.prepare_climage_data(sample_size)
-        elif (self.dataset_name.lower() == 'boston'):
+        elif self.dataset_name.lower() == 'boston' or \
+                self.dataset_name.lower() == 'mnist-original':
+            from sklearn import datasets
             # boston = pd.read_csv('boston.csv')
             # X = boston.drop('MEDV', axis=1).values
             # y = boston['MEDV'].values

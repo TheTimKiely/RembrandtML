@@ -2,9 +2,8 @@ import unittest
 
 from rembrandtml.configuration import ContextConfig, DataConfig, ModelConfig, Verbosity
 from rembrandtml.core import MLContext
-from rembrandtml.factories import ModelFactory, ContextFactory
+from rembrandtml.factories import ContextFactory
 from rembrandtml.models import ModelType
-from rembrandtml.plotting import Plotter
 
 
 class TestClassifiers(unittest.TestCase):
@@ -29,6 +28,7 @@ class TestClassifiers(unittest.TestCase):
 
         #Evaluate the model
         score = ctxt.evaluate()
+        print(f'Model score: {str(score)}')
 
     def test_knn(self):
         import numpy as np

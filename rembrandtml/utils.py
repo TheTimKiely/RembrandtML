@@ -4,6 +4,11 @@ from rembrandtml.configuration import ModelConfig, ContextConfig, DataConfig, In
 
 class CommandLineParser(object):
     @staticmethod
+    def print_usage():
+        # Vebosity Codes: 's', 'q', 'd', 'n'
+        print(f'')
+
+    @staticmethod
     def parse_command_line(params):
         layers = 3
         nodes = 16
@@ -42,7 +47,7 @@ class CommandLineParser(object):
                 nn_type = arg
             elif opt == '-v':
                 verbosity_code = arg
-            elif opt == 'x':
+            elif opt == '-x':
                 metrics = arg
 
         ml_config = ContextConfig(nn_type, framework, mode, layers, nodes, epochs, batch_size)
@@ -65,25 +70,36 @@ class Timer(object):
         self.start_time = None
         self.splits = []
 
-    def get_start(self):
+    def start(self):
         self.start_time = time.time()
 
+    def get_start(self):
+        if self.start_time == None:
+            raise TypeError('The time has not yet been started.  It must be started to get the elapsed time.')
+        return self.start_time
+
+    def split_time(self, seconds):
+        m, s = divmod(seconds, 60)
+        h, m = divmod(m, 60)
+        return (h, m, s)
+
     def get_elapsed(self):
-        return time.time() - self.get_start()
+        return self.split_time(time.time() - self.start_time)
 
     def start_split(self, name):
         self.splits.append(Split(name, time.time()))
 
     def get_split(self, name = None):
         if name == None:
-            return time.time() - self.start_time
+            return self.split_time((time.time() - self.start_time))
         if self.splits[name] == None:
             raise KeyError(f'The Split {name} has not been created.')
         return self.splits[name].StartTime
 
 class Instrumentation(object):
     def __init__(self, instrumentation_config = None):
-        self.Timer = Timer()
+        self.timer = Timer()
         if instrumentation_config == None:
-            config = InstrumentationConfig()
-        self.config = instrumentation_config
+            self.config = InstrumentationConfig()
+        else:
+            self.config = instrumentation_config

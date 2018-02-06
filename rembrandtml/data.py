@@ -10,11 +10,12 @@ from rembrandtml.entities import MLEntityBase
 
 
 class DataContainer(MLEntityBase):
-    def __init__(self, name, framework_name, dataset_name, instrumentation = None):
+    """
+    DataContainer manages the structures that hold training and target data.
+    """
+    def __init__(self, data_config, instrumentation = None):
         super(DataContainer, self).__init__(instrumentation)
-        self.name = name
-        self.data_provider = self.get_data_provider(framework_name)
-        self.dataset_name = dataset_name
+        self.data_provider = self.get_data_provider(data_config.framework_name, data_config.dataset_name)
         self.data = None
         self.val_steps = 0
         self.test_steps = 0
@@ -28,13 +29,13 @@ class DataContainer(MLEntityBase):
         self.y_test = None
         self.y_val = None
 
-    def get_data_provider(self, framework_name):
+    def get_data_provider(self, framework_name, dataset_name):
         if framework_name == 'sklearn':
-            return SkLearnDataProvider()
+            return SkLearnDataProvider(dataset_name)
         elif framework_name == 'keras':
-            return KerasDataProvider()
+            return KerasDataProvider(dataset_name)
         elif framework_name == 'pandas':
-            return PandasDataProvider()
+            return PandasDataProvider(dataset_name)
         else:
             raise TypeError(f'The specified framework, {framework_name}, is not supported as a DataProvider.')
 
@@ -93,8 +94,12 @@ class DataContainer(MLEntityBase):
         :param sample_size:
         :return:
         """
-        self.log(f'Preparing data from dataset: {self.dataset_name} using {self.data_provider.name}')
-        (self.X_train, self.y_train), (self.X_test, self.y_test) = self.data_provider.prepare_data(features, target_feature)
+        self.log(f'Preparing data from dataset: {self.data_provider.dataset_name} using {self.data_provider.name}')
+        self.X, self.y = self.data_provider.prepare_data(features, target_feature)
+
+
+    def split(self, test_size=0.3, random_state=42):
+        (self.X_train, self.y_train), (self.X_test, self.y_test) = self.data_provider.split(self.X, self.y)
 
     def prepare_imdb_data(self):
         # Get X and y (training data and labels) from imdb dataset

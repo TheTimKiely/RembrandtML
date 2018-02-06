@@ -11,19 +11,21 @@ class ContextFactory(object):
         :param MLCnfig:
         :return: MLContext
         '''
-        model = ModelFactory.create('SkLearnKnn', config)
+
+        data_container = DataContainerFactory.create(config.data_config)
+        model = ModelFactory.create('SkLearnKnn', config.model_config, data_container)
         context = MLContext(model, config)
         return context
 
 class DataContainerFactory(object):
     @staticmethod
-    def create(name, data_config):
-        data_container = DataContainer(name, data_config.framework_name, data_config.dataset_name)
+    def create(data_config):
+        data_container = DataContainer(data_config)
         return data_container
 
 class ModelFactory(object):
     @staticmethod
-    def create(name, ml_config):
+    def create(name, model_config, data_container):
         '''
         Factory method for creating ML models.
         This method first creates a DataContainer from the parameters specified in ContextConfig.DataConfig.
@@ -31,27 +33,27 @@ class ModelFactory(object):
         :param ml_config: An instance of ContextConfig, containing the parameters for this model and it's DataContainer.
         :return:
         '''
-        data_container = DataContainerFactory.create(DataContainer(ml_config.data_config))
         # I'm not sure if a DataContain should be in __init__ for the models.
         # So, for now, we'll set the property
-        if(ml_config.model_type == ModelType.CNN):
-            network = ConvolutionalNeuralNetwork(name,ml_config)
-        elif(ml_config.model_type == ModelType.MATH):
-            network = MathModel( name,ml_config)
-        elif ml_config.model_type == ModelType.LINEAR_REGRESSION or \
-                ml_config.model_type == ModelType.SIMPLE_CLASSIFICATION or \
-                ml_config.model_type == ModelType.MULTIPLE_CLASSIFICATION:
-            network = MLModel( name,ml_config)
-        elif ml_config.model_type == ModelType.RNN:
-            network = RecurrentNeuralNetwork( name,ml_config)
+        if(model_config.model_type == ModelType.CNN):
+            network = ConvolutionalNeuralNetwork(name,model_config)
+        elif(model_config.model_type == ModelType.MATH):
+            network = MathModel( name,model_config)
+        elif model_config.model_type == ModelType.LINEAR_REGRESSION or \
+                model_config.model_type == ModelType.SIMPLE_CLASSIFICATION or \
+                model_config.model_type == ModelType.MULTIPLE_CLASSIFICATION or \
+                model_config.model_type == ModelType.KNN:
+            network = MLModel(name, model_config)
+        elif model_config.model_type == ModelType.RNN:
+            network = RecurrentNeuralNetwork( name,model_config)
         #elif(ml_config.model_type == 'DvsC'):
         #    network = ConvnetDogsVsCats( name,ml_config)
-        elif ml_config.model_type == ModelType.LSTM:
-            network = LstmRNN( name,ml_config)
-        elif ml_config.model_type ==  ModelType.GRU:
-            network = GruNN( name,ml_config)
+        elif model_config.model_type == ModelType.LSTM:
+            network = LstmRNN( name,model_config)
+        elif model_config.model_type ==  ModelType.GRU:
+            network = GruNN( name,model_config)
         else:
-            raise TypeError(f'Network type {ml_config.model_type} is not defined.')
+            raise TypeError(f'Network type {model_config.model_type} is not defined.')
         network.data_container = data_container
         return network
 

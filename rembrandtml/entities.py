@@ -46,14 +46,23 @@ class MLFile(MLEntityBase):
 
 
 class MLLogger(object):
+    class Colors:
+        HEADER = '\033[95m'
+        OKBLUE = '\033[94m'
+        OKGREEN = '\033[92m'
+        WARNING = '\033[93m'
+        FAIL = '\033[91m'
+        ENDC = '\033[0m'
+        BOLD = '\033[1m'
+        UNDERLINE = '\033[4m'
+
     def __init__(self, instrumentation_config = None):
         if instrumentation_config:
             self.instrumentation_config = instrumentation_config
         else:
             self.instrumentation_config = InstrumentationConfig(Verbosity.DEBUG)
 
-    def log(self, msg, verbosity = None):
+    def log(self, msg, verbosity = Verbosity.DEBUG):
         if (verbosity > self.instrumentation_config.verbosity):
             return
-        instr_msg = f'{self.time.get_elapsed()} Split: {self.timer.get_split()}: {msg}'
-        print(msg)
+        print(MLLogger.Colors.FAIL + msg + MLLogger.Colors.ENDC)

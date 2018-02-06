@@ -1,5 +1,7 @@
 import sys
 
+from rembrandtml.test.test_dataContainer import TestDataContainer
+
 
 def testScatterPlot():
     tests = TestPlotter()
@@ -7,7 +9,8 @@ def testScatterPlot():
 
 def testDataContainer():
     tests = TestDataContainer()
-    tests.test_prepare_data()
+    tests.test_prepare_data_sklearn_boston()
+    tests.test_prepare_data_sklearn_mnist()
 
 def testMLBase():
     tests = TestMLModelBase()
@@ -30,9 +33,6 @@ def main(params):
     #testScatterPlot()
     #testDataContainer()
     #testMLBase()
-
-
-
 
 if __name__ == '__main__':
     main(sys.argv[1:])

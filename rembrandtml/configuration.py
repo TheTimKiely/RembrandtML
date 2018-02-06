@@ -13,6 +13,19 @@ class Verbosity(Enum):
     DEBUG = 2
     NOISY = 3
 
+    @staticmethod
+    def code_to_verbosity(code):
+        if code == 's':
+            return Verbosity.SILENT
+        elif code == 'q':
+            return Verbosity.QUIET
+        elif code == 'd':
+            return Verbosity.DEBUG
+        elif code == 'n':
+            return Verbosity.NOISY
+        else:
+            raise TypeError(f'Undefined verbosity code: {code}')
+
     def __eq__(self, other):
         if self.__class__ is other.__class__:
             return self.value == other.value
@@ -46,14 +59,12 @@ class DataConfig(object):
         self.sample_size = sample_size
 
 class InstrumentationConfig(object):
-    def __init__(self, verbosity_code):
-        self.verbosity = Verbosity(verbosity_code)
+    def __init__(self, verbosity_code = 'd'):
+        self.verbosity = Verbosity.code_to_verbosity(verbosity_code)
 
 class ContextConfig(object):
     def __init__(self, model_config, data_config, mode = RunMode.TRAIN, verbosity = Verbosity.QUIET, layers = 4, nodes = 16, epochs = 10, batch_size = 32):
         self._verbosity = verbosity
-        self._model_config = model_config
-        self._data_config = data_config
         # Properties probably aren't necessary, so experimenting with public fields
         self.Layers = layers
         self.Nodes = nodes
@@ -63,8 +74,8 @@ class ContextConfig(object):
         self.TestDir = ''
         self.ValidationDir = ''
         self.Mode = mode
-        self.model_config = None
-        self.data_config = None
+        self.model_config = model_config
+        self.data_config = data_config
         self.instrumentation_config = None
 
     @property

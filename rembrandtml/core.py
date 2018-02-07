@@ -13,12 +13,35 @@ class ScoreType(Enum):
     F1 = 4
 
 class Score(object):
-    def __init__(self, score_type, value):
+    def __init__(self, model_config, score_type, value):
         self.score_type = score_type
         self.value = value
+        self._model_config = model_config
+
+    def __gt__(self, other):
+        return self.value > other.value
+
+
+    def __lt__(self, other):
+        return self.value < other.value
+
+    @property
+    def model_name(self):
+        return self._model_config.name
+
+
+    @property
+    def model_type(self):
+        return self._model_config.model_type
+
+
+    @property
+    def model_framework(self):
+        return self._model_config.framework_name
 
     def __str__(self):
-        return f'Score: {self.score_type.name} Value: {self.value}'
+        return f'Name:{self.model_name} Model Type: {self.model_type} Framework:{self.model_framework}\n\t' \
+               f'Score: {self.score_type.name} Value: {self.value}'
 
 
 class Prediction(object):
@@ -26,22 +49,24 @@ class Prediction(object):
         pass
 
 
-class MLContext(MLEntityBase):
+class MLContext(object):
     """The RMLContext object is an organizing structure to group the data, model, and plotter that are used in common ML tasks.
     It provides a collection of DataContainers, MLModels, and DataContainers to that that comparing entities becomes easy.
+    The MLContext also holds singletons, such as Instrumentation and Timer.
     """
 
-    def __init__(self, model, config):
-        super(MLContext, self).__init__(Instrumentation(config.instrumentation_config))
+    def __init__(self, model, instrumentation, config):
+        super(MLContext, self).__init__()
         self.config = config
         self.plotter = Plotter()
         self.model = model
         # Start the timer to that we can log elapsed times
+        self.instrumentation = instrumentation
         self.instrumentation.timer.start()
 
-    def prepare_data(self):
+    def prepare_data(self, features=None, target_feature=None):
         self.log(f'Preparing data with {str(self.model.data_container)}')
-        self.model.data_container.prepare_data()
+        self.model.data_container.prepare_data(features, target_feature)
         self.log(f'Finished preparing data with {str(self.model.data_container)}')
 
     def train(self):
@@ -54,10 +79,16 @@ class MLContext(MLEntityBase):
         self.log(f'Finished training model: {str(self.model)}')
 
     def evaluate(self):
-        self.log(f'Training model: {str(self.model)}')
+        self.log(f'Evaluating model: {str(self.model)}')
         score = self.model.evaluate()
-        self.log(f'Finished training model: {str(self.model)}')
+        self.log(f'Finished evaluating model: {str(self.model)}')
         return score
+
+    def predict(self, X):
+        self.log(f'Predicting: {str(self.model)}')
+        prediction = self.model.predict(X)
+        self.log(f'Finished predicting: {str(self.model)}')
+        return prediction
 
     def plot(self, model_name = '', data_container_name = '', plotter_name = ''):
         pass
@@ -69,4 +100,4 @@ class MLContext(MLEntityBase):
         start_string = self.time_to_string(*self.instrumentation.timer.get_elapsed())
         split_string = self.time_to_string(*self.instrumentation.timer.get_split())
         instr_msg = f'{start_string} Split: {split_string}: {msg}'
-        super(MLContext, self).log(instr_msg, verbosity)
+        self.instrumentation.logger.log(instr_msg, verbosity)

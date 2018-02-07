@@ -2,6 +2,7 @@ import time, getopt
 
 from rembrandtml.configuration import ModelConfig, ContextConfig, DataConfig, InstrumentationConfig
 
+
 class CommandLineParser(object):
     @staticmethod
     def print_usage():
@@ -97,9 +98,10 @@ class Timer(object):
         return self.splits[name].StartTime
 
 class Instrumentation(object):
-    def __init__(self, instrumentation_config = None):
+    def __init__(self, instrumentation_config = None, logger = None):
         self.timer = Timer()
         if instrumentation_config == None:
             self.config = InstrumentationConfig()
         else:
             self.config = instrumentation_config
+        self.logger = logger

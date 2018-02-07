@@ -1,0 +1,16 @@
+ScikitLearn Random Forest Name:ScikitLearn Random Forest Model Type: ModelType.RANDOM_FOREST_CLASSIFIER Framework:sklearn
+	Score: R2 Value: 0.8283582089552238
+ScikitLearn Random Forest Name:ScikitLearn Random Forest Model Type: ModelType.RANDOM_FOREST_CLASSIFIER Framework:sklearn
+	Score: R2 Value: 0.8208955223880597
+ScikitLearn Logistic Regression Name:ScikitLearn Random Forest Model Type: ModelType.RANDOM_FOREST_CLASSIFIER Framework:sklearn
+	Score: R2 Value: 0.8171641791044776
+ScikitLearn KNN Name:ScikitLearn Random Forest Model Type: ModelType.RANDOM_FOREST_CLASSIFIER Framework:sklearn
+	Score: R2 Value: 0.8097014925373134
+ScikitLearn KNN Name:ScikitLearn Random Forest Model Type: ModelType.RANDOM_FOREST_CLASSIFIER Framework:sklearn
+	Score: R2 Value: 0.8097014925373134
+ScikitLearn SGD Name:ScikitLearn Random Forest Model Type: ModelType.RANDOM_FOREST_CLASSIFIER Framework:sklearn
+	Score: R2 Value: 0.7798507462686567
+ScikitLearn KNN Name:ScikitLearn Random Forest Model Type: ModelType.RANDOM_FOREST_CLASSIFIER Framework:sklearn
+	Score: R2 Value: 0.7276119402985075
+ScikitLearn SGD Name:ScikitLearn Random Forest Model Type: ModelType.RANDOM_FOREST_CLASSIFIER Framework:sklearn
+	Score: R2 Value: 0.6156716417910447

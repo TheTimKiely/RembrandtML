@@ -52,6 +52,9 @@ class Plotter(object):
     def boxplot(data_frame, x_column_name, y_column_name, rot):
         data_frame.boxplot(x_column_name, y_column_name, rot=rot)
 
+    def plot_bar(self, xlabel, ylabel, data):
+        sns.barplot(xlabel, ylabel, data)
+
     def plot_model_complexity(neighbors, train_accuracy, test_accuracy):
             # Generate plot
             plt.title('k-NN: Varying Number of Neighbors')
@@ -89,6 +92,27 @@ class Plotter(object):
         image = np.concatenate(row_images, axis=0)
         plt.imshow(image, cmap=cm.binary, **options)
         plt.axis("off")
+
+    def plot_facetgrid(self, df):
+        FacetGrid = sns.FacetGrid(df, row='Embarked', size=4.5, aspect=1.6)
+        FacetGrid.map(sns.pointplot, 'Pclass', 'Survived', 'Sex', palette=None, order=None, hue_order=None)
+        FacetGrid.add_legend()
+
+    def plot_histogram(self, df):
+        survived = 'survived'
+        not_survived = 'not survived'
+        fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 4))
+        women = df[df['Sex'] == 'female']
+        men = df[df['Sex'] == 'male']
+        ax = sns.distplot(women[women['Survived'] == 1].Age.dropna(), bins=18, label=survived, ax=axes[0], kde=False)
+        ax = sns.distplot(women[women['Survived'] == 0].Age.dropna(), bins=40, label=not_survived, ax=axes[0],
+                          kde=False)
+        ax.legend()
+        ax.set_title('Female')
+        ax = sns.distplot(men[men['Survived'] == 1].Age.dropna(), bins=18, label=survived, ax=axes[1], kde=False)
+        ax = sns.distplot(men[men['Survived'] == 0].Age.dropna(), bins=40, label=not_survived, ax=axes[1], kde=False)
+        ax.legend()
+        _ = ax.set_title('Male')
 
     def plot(self, X, y, color = 'blue', linewidth=2):
         plt.plot(X, y, color=color, linewidth=linewidth)

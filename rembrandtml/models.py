@@ -2,8 +2,6 @@ import os, dill
 from enum import Enum
 import numpy as np
 from rembrandtml.entities import MLEntityBase
-from rembrandtml.model_implementations.model_impls_sklearn import MLModelSkLearn
-from rembrandtml.model_implementations.model_impls_tensorflow import MLModelTensorflow
 
 class ModelType(Enum):
     MATH = 0
@@ -12,24 +10,33 @@ class ModelType(Enum):
     MULTIPLE_CLASSIFICATION = 3
     KNN = 4
     LOGISTIC_REGRESSION = 5
-    CNN = 6
-    RNN = 7
-    LSTM = 8
-    GRU = 9
+    STOCHASTIC_GRAD_DESC_CLASSIFIER = 6
+    RANDOM_FOREST_CLASSIFIER = 7
+    NAIVE_BAYES = 8
+    PERCEPTRON = 9
+    SVC = 10
+    DECISTION_TREE_CLASSIFIER = 11
+    CNN = 12
+    RNN = 13
+    LSTM = 14
+    GRU = 15
 
 class MLModelBase(MLEntityBase):
-    def __init__(self, name, model_config):
-        super(MLModelBase, self).__init__()
+    """
+    The MLModel represents the type of model, e.g. Linear Regression, K Nearest Neighbor, etc.
+    The private field, _model_impl is the selected framework's implementation of that model.
+    """
+    def __init__(self, name, model_config, model_impl, instrumentation):
+        super(MLModelBase, self).__init__(instrumentation)
         self.name = name
+        self._model_impl = model_impl
         self.model_config = model_config
         self._model_file_attribute = 0
         self._weights_file_attribute = 0
         self._tokenizer_file_attribute = 0
         self._history_file_attribute = 0
-        self._model = None
         self._tokenizer = None
         self.data_container = None
-        self._model_impl = None
 
     @property
     def Model(self):
@@ -133,7 +140,7 @@ class MLModelBase(MLEntityBase):
     def validate_fit_call(self):
         if self._model_impl == None:
             raise TypeError(f'{self.name}: The model implementation has not been initialized')
-        if not self.data_container.X_train:
+        if self.data_container.X_train == None:
             self.log(f'{self.name}: X_train is not populated, using X.')
             if self.data_container.X == None:
                 raise TypeError(f'{self.name}: Training data has not been prepared.  Both X_train and X and empty.')
@@ -182,12 +189,8 @@ class MathModel(MLModelBase):
         return batch_maes
 
 class MLModel(MLModelBase):
-    def __init__(self, name, model_config):
-        super(MLModel, self).__init__(name,model_config)
-        if  model_config.framework_name == 'sklearn':
-            self._model_impl = MLModelSkLearn()
-        elif model_config.framework_name == 'tensorflow':
-                self._model_impl = MLModelTensorflow()
+    def __init__(self, name, model_config, model_impl, instrumentation):
+        super(MLModel, self).__init__(name,model_config, model_impl, instrumentation)
 
 
     # Requires a DataContainer because we might need to know the data shape to initialize layers
@@ -207,14 +210,19 @@ class MLModel(MLModelBase):
     def train(self):
         pass
 
-    def get_data_from_data_container(self):
+    def get_data_from_data_container(self, train=True):
         self.validate_fit_call();
-        if self.data_container.X_train:
-            X = self.data_container.X_train
+
+        if self.data_container.X_train != None:
+            if train:
+                X = self.data_container.X_train
+                y = self.data_container.y_train
+            else:
+                X = self.data_container.X_test
+                y = self.data_container.y_test
         else:
             X = self.data_container.X
-
-        y = self.data_container.y
+            y = self.data_container.y
         return X, y
 
     def fit(self, regularize=True, validate=False, weights_file=None, model_file=None, save=False):
@@ -297,7 +305,7 @@ class MLModel(MLModelBase):
         #    self.log(f'X and y were not passed as parameters.  Using DataContainer.')
         #    loss = self.Model.evaluate_generator(self.data_container.val_generator, steps=self.data_container.val_steps)
         #else:
-        X, y = self.get_data_from_data_container()
+        X, y = self.get_data_from_data_container(train=False)
         score = self._model_impl.evaluate(X, y)
         return score
 

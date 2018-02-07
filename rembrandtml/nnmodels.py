@@ -11,8 +11,8 @@ from rembrandtml.models import MLModel
 
 
 class NeuralNetwork(MLModel):
-    def __init__(self, name, ml_config):
-        super(NeuralNetwork, self).__init__(name, ml_config)
+    def __init__(self, name, ml_config, instrumentation):
+        super(NeuralNetwork, self).__init__(name, ml_config, instrumentation)
         self._layers = ml_config.Layers
         self._nodes = ml_config.Nodes
         self._epochs = ml_config.Epochs
@@ -102,8 +102,8 @@ class ConvolutionalNeuralNetwork(NeuralNetwork):
 
 class ConvnetDogsVsCats(NeuralNetwork):
 
-    def __init__(self, name, ml_config):
-        super(ConvnetDogsVsCats, self).__init__(name, ml_config)
+    def __init__(self, name, ml_config, instrumentation):
+        super(ConvnetDogsVsCats, self).__init__(name, ml_config, instrumentation)
         self.ValidationGenerator = None
         self.TrainGenerator = None
         self.ModelFile = 'DogsVsCats_small_1.h5'
@@ -207,8 +207,8 @@ class ConvnetDogsVsCats(NeuralNetwork):
 
 class RecurrentNeuralNetwork(NeuralNetwork):
 
-    def __init__(self, name, ml_config):
-        super(RecurrentNeuralNetwork, self).__init__(name, ml_config)
+    def __init__(self, name, ml_config, instrumentation):
+        super(RecurrentNeuralNetwork, self).__init__(name, ml_config, instrumentation)
         self._max_len = 20
         self._max_features = 10000
         self._max_words = 10000
@@ -314,8 +314,8 @@ class RecurrentNeuralNetwork(NeuralNetwork):
 
 class LstmRNN(RecurrentNeuralNetwork):
 
-    def __init__(self, name, ml_config):
-        super(LstmRNN, self).__init__(name, ml_config)
+    def __init__(self, name, ml_config, instrumentation):
+        super(LstmRNN, self).__init__(name, ml_config, instrumentation)
 
     def build_model(self):
         self.Model = models.Sequential()
@@ -329,8 +329,8 @@ class LstmRNN(RecurrentNeuralNetwork):
         self.Model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
 
 class GruNN(NeuralNetwork):
-    def __init__(self, name, ml_config):
-        super(GruNN, self).__init__(name, ml_config)
+    def __init__(self, name, ml_config, instrumentation):
+        super(GruNN, self).__init__(name, ml_config, instrumentation)
         self._max_len = 20
         self._max_features = 10000
         self._max_words = 10000

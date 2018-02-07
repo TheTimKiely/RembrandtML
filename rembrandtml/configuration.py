@@ -57,6 +57,7 @@ class DataConfig(object):
         self.framework_name = framework_name
         self.dataset_name = dataset_name
         self.sample_size = sample_size
+        self.parameters = {}
 
 class InstrumentationConfig(object):
     def __init__(self, verbosity_code = 'd'):
@@ -96,7 +97,8 @@ class ContextConfig(object):
 
 
 class ModelConfig(object):
-    def __init__(self, model_type, framework_name):
+    def __init__(self, name, framework_name, model_type):
+        self.name = name
         self.model_type = model_type
         self.framework_name = framework_name
         self._metrics = []
@@ -104,6 +106,7 @@ class ModelConfig(object):
         self.LayerCount = 1
         self.Dropout = 0
         self.RecurrentDropout = 0
+        self.parameters = {}
 
 
     @property

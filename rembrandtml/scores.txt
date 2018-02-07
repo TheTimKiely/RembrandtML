@@ -1,0 +1,15 @@
+++++++++++++++++++++++++++++++++++
+Name:ScikitLearn Logistic Regression Model Type: ModelType.LOGISTIC_REGRESSION Framework:sklearn
+	Score: R2 Value: 0.8208955223880597
+Model Params: {}
+Data Params: {'create_alone_column': True, 'use_age_times_class': True, 'use_fare_per_person': True}
+++++++++++++++++++++++++++++++++++
+Name:ScikitLearn KNN Model Type: ModelType.KNN Framework:sklearn
+	Score: R2 Value: 0.8059701492537313
+Model Params: {}
+Data Params: {'create_alone_column': True, 'use_age_times_class': True, 'use_fare_per_person': True}
+++++++++++++++++++++++++++++++++++
+Name:ScikitLearn SGD Model Type: ModelType.STOCHASTIC_GRAD_DESC_CLASSIFIER Framework:sklearn
+	Score: R2 Value: 0.7611940298507462
+Model Params: {}
+Data Params: {'create_alone_column': True, 'use_age_times_class': True, 'use_fare_per_person': True}

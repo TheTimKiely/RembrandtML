@@ -8,12 +8,9 @@ class MLEntityBase(object):
     """
     Provided instrumentation functionality to all subclasses
     """
-    def __init__(self, instrumentation = None):
+    def __init__(self, instrumentation):
         self.Base_Directory = os.path.abspath(os.path.join(os.getcwd(), '..'))
-        if instrumentation == None:
-            instrumentation = Instrumentation()
         self.instrumentation = instrumentation
-        self.logger = MLLogger(instrumentation.config)
 
     def unique_file_name(self, file_property, attribute_property):
         while(os.path.isfile(file_property.__get__(self))):
@@ -28,7 +25,7 @@ class MLEntityBase(object):
         :param verbosity:
         :return: The msg parameter echoed back.  This allows nesting calls to log, e.g.raise TypeError(self.log(f'The features parameter was not supplied.')
         '''
-        self.logger.log(msg, verbosity)
+        self.instrumentation.logger.log(msg, verbosity)
         return msg
 
 
@@ -60,9 +57,9 @@ class MLLogger(object):
         if instrumentation_config:
             self.instrumentation_config = instrumentation_config
         else:
-            self.instrumentation_config = InstrumentationConfig(Verbosity.DEBUG)
+            self.instrumentation_config = InstrumentationConfig('d')
 
     def log(self, msg, verbosity = Verbosity.DEBUG):
         if (verbosity > self.instrumentation_config.verbosity):
             return
-        print(MLLogger.Colors.FAIL + msg + MLLogger.Colors.ENDC)
+        print(MLLogger.Colors.OKBLUE + msg + MLLogger.Colors.ENDC)

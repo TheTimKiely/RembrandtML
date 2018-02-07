@@ -1,6 +1,7 @@
 import sys
 
 from rembrandtml.test.test_dataContainer import TestDataContainer
+from rembrandtml.test.test_kaggle import KaggleTests
 
 
 def testScatterPlot():
@@ -19,7 +20,7 @@ def testMLBase():
 def testModelContext():
     from rembrandtml.test.test_MLContext import TestClassifiers
     tests = TestClassifiers()
-    tests.test_knn_sklearn()
+    tests.test_knn()#_sklearn()
 
 def testLinearRegression():
     tests = TestMLModel()
@@ -27,8 +28,13 @@ def testLinearRegression():
     tests.test_fit_linear_regression_sklearn('pandas', 'gapminder', '')
     #tests.test_fit_linear_regression_tensorflow()
 
+def test_kaggle():
+    tests = KaggleTests()
+    tests.test_titanic_competition()
+
 def main(params):
-    testModelContext()
+    test_kaggle()
+    #testModelContext()
     #testLinearRegression()
     #testScatterPlot()
     #testDataContainer()

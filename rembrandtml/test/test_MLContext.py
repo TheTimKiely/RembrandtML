@@ -30,6 +30,29 @@ class TestClassifiers(unittest.TestCase):
         score = ctxt.evaluate()
         print(f'Model score: {str(score)}')
 
+    def test_knn_sklearn_tune(self):
+        # Create DataConfiguration that describes the Dataprovider
+        data_config = DataConfig('sklearn', 'mnist-original')
+
+        # Create ModelConfig that describes the model
+        model_config = ModelConfig(ModelType.KNN, 'sklearn')
+
+        # Create ContextConfig that describes context features, such as logging and instrumentation
+        config = ContextConfig(model_config, data_config, Verbosity.DEBUG)
+
+        # Instantiate the MLContext
+        ctxt = ContextFactory.create(config)
+
+        # Prepare the data
+        ctxt.prepare_data()
+
+        # Train the model
+        ctxt.train()
+
+        # Evaluate the model
+        score = ctxt.evaluate()
+        print(f'Model score: {str(score)}')
+
     def test_knn(self):
         import numpy as np
         from sklearn import datasets

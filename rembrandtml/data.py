@@ -13,9 +13,10 @@ class DataContainer(MLEntityBase):
     """
     DataContainer manages the structures that hold training and target data.
     """
-    def __init__(self, data_config, instrumentation = None):
+    def __init__(self, data_config, instrumentation):
         super(DataContainer, self).__init__(instrumentation)
-        self.data_provider = self.get_data_provider(data_config.framework_name, data_config.dataset_name)
+        self.data_provider = self.get_data_provider(data_config)
+        self.config = data_config
         self.data = None
         self.val_steps = 0
         self.test_steps = 0
@@ -29,13 +30,13 @@ class DataContainer(MLEntityBase):
         self.y_test = None
         self.y_val = None
 
-    def get_data_provider(self, framework_name, dataset_name):
-        if framework_name == 'sklearn':
-            return SkLearnDataProvider(dataset_name)
-        elif framework_name == 'keras':
-            return KerasDataProvider(dataset_name)
-        elif framework_name == 'pandas':
-            return PandasDataProvider(dataset_name)
+    def get_data_provider(self, data_config):
+        if data_config.framework_name == 'sklearn':
+            return SkLearnDataProvider(data_config, self.instrumentation)
+        elif data_config.framework_name == 'keras':
+            return KerasDataProvider(data_config, self.instrumentation)
+        elif data_config.framework_name == 'pandas':
+            return PandasDataProvider(data_config, self.instrumentation)
         else:
             raise TypeError(f'The specified framework, {framework_name}, is not supported as a DataProvider.')
 
@@ -86,7 +87,7 @@ class DataContainer(MLEntityBase):
             #print(f'Sample: {samples[0,0,0]} Target: {targets[0]}')
             yield samples, targets
 
-    def prepare_data(self, features = None, target_feature = None, sample_size=None):
+    def prepare_data(self, features = None, target_feature = None, split=True, sample_size=None):
         """
         Loads data from the DataContainers dataset, using the framework specified in the constructor.
         :param features: Tuple of features to be included in X.  If None, all features will be included.
@@ -94,9 +95,10 @@ class DataContainer(MLEntityBase):
         :param sample_size:
         :return:
         """
-        self.log(f'Preparing data from dataset: {self.data_provider.dataset_name} using {self.data_provider.name}')
+        self.log(f'Preparing data from dataset: {self.config.dataset_name} using {self.data_provider.name}')
         self.X, self.y = self.data_provider.prepare_data(features, target_feature)
-
+        if split:
+            self.split()
 
     def split(self, test_size=0.3, random_state=42):
         (self.X_train, self.y_train), (self.X_test, self.y_test) = self.data_provider.split(self.X, self.y)

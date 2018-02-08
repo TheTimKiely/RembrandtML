@@ -5,8 +5,6 @@ from rembrandtml.configuration import Verbosity
 
 
 class MLModelTensorflow(MLModelImplementation):
-
-
     def fit_normal_equation(self, X, y):
         m, n = X.shape
         housing_data_plus_bias = np.c_[np.ones((m, 1)), X]

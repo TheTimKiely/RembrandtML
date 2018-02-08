@@ -1,6 +1,7 @@
 from rembrandtml.core import MLContext
 from rembrandtml.data import DataContainer
 from rembrandtml.entities import MLLogger
+from rembrandtml.model_implementations.model_impls_keras import MLModelImplementationKeras
 from rembrandtml.model_implementations.model_impls_sklearn import MLModelSkLearn
 from rembrandtml.model_implementations.model_impls_tensorflow import MLModelTensorflow
 from rembrandtml.models import MLModel, MathModel, ModelType
@@ -37,6 +38,10 @@ class ModelImplFactory(object):
             model_impl = MLModelSkLearn(model_config, instrumentation)
         elif model_config.framework_name == 'tensorflow':
             model_impl = MLModelTensorflow(model_config, instrumentation)
+        elif model_config.framework_name == 'keras':
+            model_impl = MLModelImplementationKeras(model_config, instrumentation)
+        else:
+            raise TypeError(f'The requested framework, {model_config.framework_name}, is not implemented.')
         return model_impl
 
 

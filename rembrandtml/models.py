@@ -1,6 +1,8 @@
 import os, dill
 from enum import Enum
 import numpy as np
+
+from rembrandtml.core import FunctionNotImplementedError
 from rembrandtml.entities import MLEntityBase
 
 class ModelType(Enum):
@@ -169,6 +171,10 @@ class MLModelBase(MLEntityBase):
     def evaluate(self, X, y):
         pass
 
+
+    def tune(self, parameters):
+        raise FunctionNotImplementedError(self.__class__.__name__, 'tune')
+
     def predict(self, X):
         pass
 
@@ -207,10 +213,17 @@ class MLModel(MLModelBase):
                            loss=self.model_config.ModelConfig.loss_function,
                            metrics=self.model_config.ModelConfig.metrics)
 
-    def train(self):
-        pass
+    def tune(self, tuning_parameters, parameters):
+        X, y = self.get_data_from_data_container(train=False)
+        results = self._model_impl.tune(X, y, tuning_parameters, parameters)
+        return results
 
     def get_data_from_data_container(self, train=True):
+        """
+        Retrieves X and y data from the DataContainer.
+        :param train: Specifies which data tensors to retrun.  Default is 'True'.  If 'False', test tensors are returned
+        :return: X and y tensors
+        """
         self.validate_fit_call();
 
         if self.data_container.X_train != None:

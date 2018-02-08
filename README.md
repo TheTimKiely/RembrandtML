@@ -12,7 +12,11 @@ How to use:
 2. Call the test from a test runner or test_runner.py
 3. Step through the code in a debugger
 
-More advanced software engineer techniques
+More advanced software engineer techniques:
+    Dependency Injection
+        A logger and time are used by all custom types in the project.  These services are provided to each object through the Instrumentation singleton.
+    Custom Errors
+        While it is a trivial savings a keystrokes, the custom FunctionNotImplementedError demonstrates how to extend Errors for customized functionality.
 	Design Patterns
 		The DataProvider classes give an example of the Template Patterns
 			The abstract base class defines the algorithm of retrieving data from a dataset.

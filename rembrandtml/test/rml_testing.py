@@ -1,7 +1,7 @@
 import pandas as pd
 
 class TestConfig(object):
-    def __init__(self, model_name, log_file):
+    def __init__(self, model_name, log_file = None):
         self.model_name = model_name
         self.log_file = log_file
 

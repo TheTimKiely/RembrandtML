@@ -30,6 +30,7 @@ def testLinearRegression():
 
 def test_kaggle():
     tests = KaggleTests()
+    #tests.test_tune_titanic_competition()
     tests.test_titanic_competition()
 
 def main(params):

@@ -134,6 +134,11 @@ class PandasDataProvider(DataProviderBase):
         df = pd.read_csv(file_name)
         if target_feature:
             y = df[target_feature]
+        else:
+            if 'target' in df.keys():
+                y = df['target']
+            else:
+                raise TypeError(f'Could not find target column.  Either the \'target_feature\' parameter must be supplied or the dataset must have a column named \'target\'')
         if data_dir.lower() == 'titanic':
             X = self.preprocess_titanic_data(df)
         elif features:

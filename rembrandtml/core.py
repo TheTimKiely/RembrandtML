@@ -6,17 +6,19 @@ from rembrandtml.plotting import Plotter
 from rembrandtml.utils import Instrumentation
 
 class ScoreType(Enum):
-    ACCURACY = 0
-    R2 = 1
-    PRECISION = 2
-    RECALL = 3
-    F1 = 4
+    LOSS = 0
+    ACCURACY = 1
+    R2 = 2
+    PRECISION = 3
+    RECALL = 4
+    F1 = 5
 
 class Score(object):
     def __init__(self, model_config, score_type, value):
         self.score_type = score_type
         self.value = value
         self._model_config = model_config
+        self.metrics = {}
 
     def __gt__(self, other):
         return self.value > other.value
@@ -41,7 +43,14 @@ class Score(object):
 
     def __str__(self):
         return f'Name:{self.model_name} Model Type: {self.model_type} Framework:{self.model_framework}\n\t' \
-               f'Score: {self.score_type.name} Value: {self.value}'
+               f'Score: {self.score_type.name} Value: {self.value}\n\t' \
+               f'Metrics: {self.metrics}'
+
+
+class TuningResults(object):
+    def __init__(self, model_name, best_params):
+        self.model_name = model_name
+        self.best_params = best_params
 
 
 class Prediction(object):
@@ -84,6 +93,18 @@ class MLContext(object):
         self.log(f'Finished evaluating model: {str(self.model)}')
         return score
 
+    def tune(self, tuning_parameters, model_parameters):
+        """
+        Tunes the model's hyperparameters.
+        :param parameters: A dictionary of hyperparameters to be used.
+        :return: A TuningResults instance.
+        """
+        self.log(f'Tuning model: {str(self.model)}')
+        results = self.model.tune(tuning_parameters, model_parameters)
+        self.log(f'Finished tuning model: {str(self.model)}')
+        return results
+
+
     def predict(self, X):
         self.log(f'Predicting: {str(self.model)}')
         prediction = self.model.predict(X)
@@ -101,3 +122,7 @@ class MLContext(object):
         split_string = self.time_to_string(*self.instrumentation.timer.get_split())
         instr_msg = f'{start_string} Split: {split_string}: {msg}'
         self.instrumentation.logger.log(instr_msg, verbosity)
+
+class FunctionNotImplementedError(NotImplementedError):
+    def __init__(self,  type_name, function_name):
+        super(FunctionNotImplementedError, self).__init__(self, f'{type_name}.{function_name}')

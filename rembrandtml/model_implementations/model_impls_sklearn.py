@@ -1,8 +1,9 @@
 import numpy as np
+import  pandas as pd
 from sklearn import  linear_model, ensemble
 from sklearn.neighbors import KNeighborsClassifier
 
-from rembrandtml.core import Score, ScoreType
+from rembrandtml.core import Score, ScoreType, TuningResults
 from rembrandtml.model_implementations.model_impls import MLModelImplementation
 from rembrandtml.models import ModelType
 from rembrandtml.plotting import Plotter
@@ -41,9 +42,21 @@ class MLModelSkLearn(MLModelImplementation):
     # This class should be RandomForestClassifierImpl to get rid of all these ifs
     def customize_score(self, score):
         if isinstance(self._model, ensemble.RandomForestClassifier):
+            importances = pd.DataFrame(
+                {'feature': X_train.columns, 'importance': np.round(self._model.feature_importances_, 3)})
+            importances = importances.sort_values('importance', ascending=False).set_index('feature')
+            importances.plot.bar()
             if self._model.oob_score:
-                score.metrics.append('oob', self._model.oob_score_)
+                score.metrics['oob'] = self._model.oob_score_
 
+    def tune(self, X, y, tuning_parameters, model_parameters):
+        from sklearn.model_selection import GridSearchCV
+        #Check the list of available parameters with `estimator.get_params().keys()`
+        keys = self._model.get_params().keys()
+        grid = GridSearchCV(self._model, param_grid=model_parameters, **tuning_parameters)
+        grid.fit(X, y)
+        tuning_results = TuningResults(self.model_config.name, grid.best_params_)
+        return tuning_results
 
     def evaluate(self, X, y):
         self.validate_trained()

@@ -1,7 +1,6 @@
 import os
 
 from rembrandtml.configuration import InstrumentationConfig, Verbosity
-from rembrandtml.utils import Instrumentation
 
 
 class MLEntityBase(object):

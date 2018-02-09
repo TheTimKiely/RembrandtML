@@ -20,7 +20,8 @@ def testMLBase():
 def testModelContext():
     from rembrandtml.test.test_MLContext import TestClassifiers
     tests = TestClassifiers()
-    tests.test_knn()#_sklearn()
+    tests.test_cntk()
+    #tests.test_knn()#_sklearn()
 
 def testLinearRegression():
     tests = TestMLModel()
@@ -34,8 +35,8 @@ def test_kaggle():
     tests.test_titanic_competition()
 
 def main(params):
-    test_kaggle()
-    #testModelContext()
+    #test_kaggle()
+    testModelContext()
     #testLinearRegression()
     #testScatterPlot()
     #testDataContainer()

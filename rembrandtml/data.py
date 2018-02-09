@@ -3,9 +3,9 @@ import numpy as np
 #from keras.preprocessing.text import Tokenizer
 #from keras.preprocessing.sequence import pad_sequences
 
-from rembrandtml.data_providers.keras import KerasDataProvider
-from rembrandtml.data_providers.pandas import PandasDataProvider
-from rembrandtml.data_providers.sklearn import SkLearnDataProvider
+from rembrandtml.data_providers.data_provider_keras import KerasDataProvider
+from rembrandtml.data_providers.data_provider_pandas import PandasDataProvider
+from rembrandtml.data_providers.data_provider_sklearn import SkLearnDataProvider
 from rembrandtml.entities import MLEntityBase
 
 
@@ -39,6 +39,9 @@ class DataContainer(MLEntityBase):
             return PandasDataProvider(data_config, self.instrumentation)
         else:
             raise TypeError(f'The specified framework, {framework_name}, is not supported as a DataProvider.')
+
+    def get_prediction_data(self, prediction_file):
+        return self.data_provider.get_prediction_data(prediction_file)
 
     def build_generator(self, data, lookback, delay, min_index, max_index, shuffle, batch_size, step):
         if(max_index is None):
@@ -98,9 +101,13 @@ class DataContainer(MLEntityBase):
         self.log(f'Preparing data from dataset: {self.config.dataset_name} using {self.data_provider.name}')
         self.X, self.y = self.data_provider.prepare_data(features, target_feature)
         if split:
-            self.split()
+            self.split(features)
 
-    def split(self, test_size=0.3, random_state=42):
+
+    def get_column_values(self, file_path, column_name):
+        return self.data_provider.get_column_values(file_path, column_name)
+
+    def split(self, features = None, test_size=0.3, random_state=42):
         (self.X_train, self.y_train), (self.X_test, self.y_test) = self.data_provider.split(self.X, self.y)
 
     def prepare_imdb_data(self):

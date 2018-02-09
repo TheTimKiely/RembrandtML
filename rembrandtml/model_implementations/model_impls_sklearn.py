@@ -3,7 +3,7 @@ import  pandas as pd
 from sklearn import  linear_model, ensemble
 from sklearn.neighbors import KNeighborsClassifier
 
-from rembrandtml.core import Score, ScoreType, TuningResults
+from rembrandtml.core import Score, ScoreType, TuningResults, Prediction
 from rembrandtml.model_implementations.model_impls import MLModelImplementation
 from rembrandtml.models import ModelType
 from rembrandtml.plotting import Plotter
@@ -17,7 +17,7 @@ class MLModelSkLearn(MLModelImplementation):
             self._model = linear_model.LogisticRegression()
         elif model_config.model_type == ModelType.LINEAR_REGRESSION:
             self._model = linear_model.LinearRegression()
-        elif model_config.model_type == ModelType.STOCHASTIC_GRAD_DESC_CLASSIFIER:
+        elif model_config.model_type == ModelType.SGD_CLASSIFIER:
             self._model = linear_model.SGDClassifier()
         elif model_config.model_type == ModelType.RANDOM_FOREST_CLASSIFIER:
             self._model = ensemble.RandomForestClassifier(**self.model_config.parameters)
@@ -42,10 +42,10 @@ class MLModelSkLearn(MLModelImplementation):
     # This class should be RandomForestClassifierImpl to get rid of all these ifs
     def customize_score(self, score):
         if isinstance(self._model, ensemble.RandomForestClassifier):
-            importances = pd.DataFrame(
-                {'feature': X_train.columns, 'importance': np.round(self._model.feature_importances_, 3)})
-            importances = importances.sort_values('importance', ascending=False).set_index('feature')
-            importances.plot.bar()
+            #importances = pd.DataFrame(
+             #   {'feature': X_train.columns, 'importance': np.round(self._model.feature_importances_, 3)})
+            #importances = importances.sort_values('importance', ascending=False).set_index('feature')
+            #importances.plot.bar()
             if self._model.oob_score:
                 score.metrics['oob'] = self._model.oob_score_
 
@@ -91,5 +91,6 @@ class MLModelSkLearn(MLModelImplementation):
 
     def predict(self, X):
         self.validate_trained()
-        prediction = self._model.predict(X)
+        y_pred = self._model.predict(X)
+        prediction = Prediction(self.model_config.name, y_pred)
         return prediction

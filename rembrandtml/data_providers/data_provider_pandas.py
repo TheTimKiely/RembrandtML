@@ -9,10 +9,13 @@ class PandasDataProvider(DataProviderBase):
 
     def prepare_data(self, features=None, target_feature=None, sample_size=None):
         dataset = None
-        if self.data_config.dataset_name[0:6].lower() == 'kaggle':
-            dataset = self.get_dataset_kaggle(features, target_feature)
-        else:
-            raise TypeError(f'The dataset {self.data_config.dataset_name} is not supported for {self.name}')
+        #if self.data_config.dataset_name.lower() == 'titanic':
+        dataset = self.get_dataset_from_file(features, self.data_config.dataset_file_path, target_feature)
+        #else:
+        #    dataset = self.load_from_file(self.data_config.dataset_file_path, features, target_feature)
+        # commented out while I try to generalize dataset loading
+        #else:
+        #    raise TypeError(f'The dataset {self.data_config.dataset_name} is not supported for {self.name}')
         return dataset
 
     def get_dataset(self, features=None, target_feature=None, sample_size=None):
@@ -25,7 +28,7 @@ class PandasDataProvider(DataProviderBase):
             X.append(df[feature])
         return tuple(X)
 
-    def preprocess_titanic_data(self, df):
+    def preprocess_titanic_data(self, df, training=True):
         import  re
 
         title_na = 0
@@ -63,8 +66,8 @@ class PandasDataProvider(DataProviderBase):
         df['Fare'] = df['Fare'].astype(int)
 
         # Drop unhelpful features
-
-        df = df.drop('Survived', axis=1)
+        if training:
+            df = df.drop('Survived', axis=1)
         df = df.drop('PassengerId', axis=1)
         df = df.drop('Ticket', axis=1)
 
@@ -126,21 +129,40 @@ class PandasDataProvider(DataProviderBase):
 
         return df.values
 
-    def get_dataset_kaggle(self, features, target_feature):
-        data_name, data_dir = self.data_config.dataset_name.split('-')
-        dir = os.path.abspath(os.path.join(self.Base_Directory, '..'))
-        dir = os.path.join(dir, 'kaggle', data_dir)
-        file_name = os.path.join(dir, "train.csv")
-        df = pd.read_csv(file_name)
-        if target_feature:
-            y = df[target_feature]
-        else:
-            if 'target' in df.keys():
-                y = df['target']
+    def get_column_values(self, file_path, column_name):
+        df = pd.read_csv(file_path)
+        return df[column_name]
+
+    def get_prediction_data(self, prediction_file):
+        # y_pred will be None because we are getting the prediction data
+        X_pred, y_pred = self.get_dataset_from_file(None, prediction_file, training=False)
+        return X_pred
+
+    #def get_dataset_kaggle(self, features, target_feature):
+    #    return self.get_dataset_from_file(features, self.data_config.dataset_file_path, target_feature)
+
+    def get_dataset_from_file(self, features, file_name, target_feature = None, training=True):
+        """
+        Loads a file into a pandas DataFrame and then parses out columns based on the 'features' and 'target_feature' parameters
+        :param path: The platform-agnostic path to the data file to be loaded
+        :param features: An interable of features to be used from the dataset.  If 'None', all features will be used
+        :param target_feature: The name of the column that contains label data.
+        :return:
+        """
+
+        df = pd.read_csv(file_name, sep=self.data_config.file_separator)
+        if training:
+            if target_feature:
+                y = df[target_feature]
             else:
-                raise TypeError(f'Could not find target column.  Either the \'target_feature\' parameter must be supplied or the dataset must have a column named \'target\'')
-        if data_dir.lower() == 'titanic':
-            X = self.preprocess_titanic_data(df)
+                if 'target' in df.keys():
+                    y = df['target']
+                else:
+                    raise TypeError(f'Could not find target column.  Either the \'target_feature\' parameter must be supplied or the dataset must have a column named \'target\'')
+        else:
+            y = None
+        if 'titanic' in self.data_config.dataset_name.lower():
+            X = self.preprocess_titanic_data(df, training)
         elif features:
             X = self.get_features(df, features)
         else:

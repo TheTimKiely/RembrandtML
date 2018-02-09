@@ -1,6 +1,0 @@
-++++++++++++++++++++++++++++++++++
-Name:ScikitLearn Logistic Regression Model Type: ModelType.LOGISTIC_REGRESSION Framework:sklearn
-	Score: R2 Value: 0.8208955223880597
-	Metrics: {}
-Model Params: {}
-Data Params: {'create_alone_column': True, 'use_age_times_class': True, 'use_fare_per_person': True}

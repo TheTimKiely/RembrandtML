@@ -4,9 +4,25 @@ from rembrandtml.configuration import ContextConfig, DataConfig, ModelConfig, Ve
 from rembrandtml.core import MLContext
 from rembrandtml.factories import ContextFactory
 from rembrandtml.models import ModelType
+from rembrandtml.test.rml_testing import RmlTest
 
 
-class TestClassifiers(unittest.TestCase):
+class TestClassifiers(unittest.TestCase, RmlTest):
+    def __init__(self):
+        super(TestClassifiers, self).__init__()
+
+    def test_cntk(self):
+        #data_file = self.get_data_file_path()
+        data_file = 'D:\code\ML\data\msdn\wheat\seeds_dataset.txt'
+        data_config = DataConfig('pandas', 'wheat', data_file)
+        data_config.file_separator = '\t'
+        modle_config = ModelConfig('CNTK SVM', 'cntk', ModelType.SGD_CLASSIFIER)
+        context = ContextFactory.create(ContextConfig(modle_config, data_config))
+
+        context.prepare_data(target_feature='type')
+        context.fit()
+
+
     def test_knn_sklearn(self):
         # Create DataConfiguration that describes the Dataprovider
         data_config = DataConfig('sklearn', 'mnist-original')

@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 from rembrandtml.entities import MLEntityBase
+from rembrandtml.core import FunctionNotImplementedError
 
 
 class DataProviderBase(MLEntityBase):
@@ -13,6 +14,10 @@ class DataProviderBase(MLEntityBase):
     def split(self, X, y, test_size=0.3, random_state=42):
         X_train, X_test, y_train, y_test =  train_test_split(X, y, test_size=test_size, random_state=random_state)
         return ((X_train, y_train), (X_test, y_test))
+
+
+    def get_column_values(self, file_path, column_name):
+        raise FunctionNotImplementedError(self.__class__.__name__, 'get_column_values')
 
     def get_dataset(self):
         pass
@@ -40,6 +45,9 @@ class DataProviderBase(MLEntityBase):
         else:
             raise TypeError(
                 f'The dataset: {self.data_config.dataset_name} is not supported in the framework: {self.framework_name}')
+
+    def get_prediction_data(self, prediction_file):
+        raise FunctionNotImplementedError(self.__class__.name, 'get_prediction_data')
 
     def prepare_data_sklearn(self, features, sample_size):
         if (self.data_config.dataset_name.lower() == 'imdb'):

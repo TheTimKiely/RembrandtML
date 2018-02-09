@@ -1,4 +1,5 @@
 from enum import Enum
+import pandas as pd
 
 from rembrandtml.configuration import Verbosity
 from rembrandtml.entities import MLEntityBase
@@ -54,8 +55,9 @@ class TuningResults(object):
 
 
 class Prediction(object):
-    def __init__(self):
-        pass
+    def __init__(self, model_name, prediction):
+        self.model_name = model_name
+        self.values = prediction
 
 
 class MLContext(object):
@@ -106,9 +108,9 @@ class MLContext(object):
 
 
     def predict(self, X):
-        self.log(f'Predicting: {str(self.model)}')
+        self.log(f'Predicting: {self.model.name}')
         prediction = self.model.predict(X)
-        self.log(f'Finished predicting: {str(self.model)}')
+        self.log(f'Finished predicting: {self.model.name}')
         return prediction
 
     def plot(self, model_name = '', data_container_name = '', plotter_name = ''):

@@ -12,7 +12,7 @@ class ModelType(Enum):
     MULTIPLE_CLASSIFICATION = 3
     KNN = 4
     LOGISTIC_REGRESSION = 5
-    STOCHASTIC_GRAD_DESC_CLASSIFIER = 6
+    SGD_CLASSIFIER = 6
     RANDOM_FOREST_CLASSIFIER = 7
     NAIVE_BAYES = 8
     PERCEPTRON = 9
@@ -142,9 +142,9 @@ class MLModelBase(MLEntityBase):
     def validate_fit_call(self):
         if self._model_impl == None:
             raise TypeError(f'{self.name}: The model implementation has not been initialized')
-        if self.data_container.X_train == None:
+        if self.data_container.X_train is None:
             self.log(f'{self.name}: X_train is not populated, using X.')
-            if self.data_container.X == None:
+            if self.data_container.X is None:
                 raise TypeError(f'{self.name}: Training data has not been prepared.  Both X_train and X and empty.')
 
         #if self.data_container == None:
@@ -175,7 +175,7 @@ class MLModelBase(MLEntityBase):
     def tune(self, parameters):
         raise FunctionNotImplementedError(self.__class__.__name__, 'tune')
 
-    def predict(self, X):
+    def predict(self, X, prediction_column = None, index_column = None):
         pass
 
 class MathModel(MLModelBase):

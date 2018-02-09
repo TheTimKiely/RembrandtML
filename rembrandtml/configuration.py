@@ -53,11 +53,13 @@ class Verbosity(Enum):
 
 
 class DataConfig(object):
-    def __init__(self, framework_name, dataset_name, sample_size = -1):
+    def __init__(self, framework_name, dataset_name, file_path, sample_size = -1):
         self.framework_name = framework_name
         self.dataset_name = dataset_name
         self.sample_size = sample_size
         self.parameters = {}
+        self.dataset_file_path = file_path
+        self.file_separator = ','
 
 class InstrumentationConfig(object):
     def __init__(self, verbosity_code = 'd'):

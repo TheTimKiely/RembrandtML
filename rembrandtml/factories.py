@@ -1,6 +1,7 @@
 from rembrandtml.core import MLContext
 from rembrandtml.data import DataContainer
 from rembrandtml.entities import MLLogger
+from rembrandtml.model_implementations.model_impls_cntk import MLModelImplementationCntk
 from rembrandtml.model_implementations.model_impls_keras import MLModelImplementationKeras
 from rembrandtml.model_implementations.model_impls_sklearn import MLModelSkLearn
 from rembrandtml.model_implementations.model_impls_tensorflow import MLModelTensorflow
@@ -40,6 +41,8 @@ class ModelImplFactory(object):
             model_impl = MLModelTensorflow(model_config, instrumentation)
         elif model_config.framework_name == 'keras':
             model_impl = MLModelImplementationKeras(model_config, instrumentation)
+        elif model_config.framework_name == 'cntk':
+            model_impl = MLModelImplementationCntk(model_config, instrumentation)
         else:
             raise TypeError(f'The requested framework, {model_config.framework_name}, is not implemented.')
         return model_impl
@@ -66,7 +69,7 @@ class ModelFactory(object):
                 model_config.model_type == ModelType.MULTIPLE_CLASSIFICATION or \
                 model_config.model_type == ModelType.KNN or \
                 model_config.model_type == ModelType.LOGISTIC_REGRESSION or \
-                model_config.model_type == ModelType.STOCHASTIC_GRAD_DESC_CLASSIFIER or \
+                model_config.model_type == ModelType.SGD_CLASSIFIER or \
                 model_config.model_type == ModelType.RANDOM_FOREST_CLASSIFIER or \
                 model_config.model_type == ModelType.NAIVE_BAYES or \
                 model_config.model_type == ModelType.PERCEPTRON or \

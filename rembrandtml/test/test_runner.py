@@ -1,6 +1,8 @@
 import sys
 
+from rembrandtml.test.test_MLModel import TestMLModel
 from rembrandtml.test.test_dataContainer import TestDataContainer
+from rembrandtml.test.test_ensemble_models import TestEnsembleModels
 from rembrandtml.test.test_kaggle import KaggleTests
 
 
@@ -34,8 +36,13 @@ def test_kaggle():
     #tests.test_tune_titanic_competition()
     tests.test_titanic_competition()
 
+def test_ensemble_models():
+    tests= TestEnsembleModels()
+    tests.test_voting_sklearn_estimators_error()
+
 def main(params):
-    test_kaggle()
+    test_ensemble_models()
+    #test_kaggle()
     #testModelContext()
     #testLinearRegression()
     #testScatterPlot()

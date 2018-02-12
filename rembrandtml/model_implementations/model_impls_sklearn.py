@@ -48,6 +48,9 @@ class MLModelSkLearn(MLModelImplementation):
         elif model_config.model_type == ModelType.NAIVE_BAYES:
             from sklearn.naive_bayes import GaussianNB
             self._model = GaussianNB()
+        elif model_config.model_type == ModelType.VOTING_CLASSIFIER:
+            # We cannot instantiate the ScikitLearn VotingClassifier until we have instantiated the estimators
+            pass
         else:
             raise TypeError(f'The model type {self.model_config.model_type} is not suppored for the framework: {self.model_config.framework_name}')
 

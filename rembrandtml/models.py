@@ -5,6 +5,7 @@ import numpy as np
 from rembrandtml.core import FunctionNotImplementedError
 from rembrandtml.entities import MLEntityBase
 
+
 class ModelType(Enum):
     MATH = 0
     LINEAR_REGRESSION = 1
@@ -30,18 +31,17 @@ class MLModelBase(MLEntityBase):
     The MLModel represents the type of model, e.g. Linear Regression, K Nearest Neighbor, etc.
     The private field, _model_impl is the selected framework's implementation of that model.
     """
-    def __init__(self, model_config, model_impl, instrumentation):
+    def __init__(self, model_config, data_container, instrumentation):
         super(MLModelBase, self).__init__(instrumentation)
-        self._model_impl = model_impl
         self.model_config = model_config
+        self.data_container = data_container
         self._model_file_attribute = 0
         self._weights_file_attribute = 0
         self._tokenizer_file_attribute = 0
         self._history_file_attribute = 0
         self._tokenizer = None
-        self.data_container = None
 
-    @prperty
+    @property
     def name(self):
         return self.model_config.name
 
@@ -183,7 +183,14 @@ class MLModelBase(MLEntityBase):
     def predict(self, X, prediction_column = None, index_column = None):
         pass
 
-class MathModel(MLModelBase):
+
+class MLSingleModelBase(MLModelBase):
+    def __init__(self, model_config, instrumentation):
+        super(MLSingleModelBase, self).__init__(model_config, instrumentation)
+        from rembrandtml.factories import ModelFactory, ModelImplFactory
+        self._model_impl = ModelImplFactory.create(model_config, instrumentation)
+
+class MathModel(MLSingleModelBase):
     def __init__(self, model_config):
         super(MathModel, self).__init__(model_config)
         self.model_config = model_config
@@ -199,9 +206,9 @@ class MathModel(MLModelBase):
         print(np.mean(batch_maes))
         return batch_maes
 
-class MLModel(MLModelBase):
-    def __init__(self, model_config, model_impl, instrumentation):
-        super(MLModel, self).__init__(model_config, model_impl, instrumentation)
+class MLModel(MLSingleModelBase):
+    def __init__(self, model_config, instrumentation):
+        super(MLModel, self).__init__(model_config, instrumentation)
 
     # Requires a DataContainer because we might need to know the data shape to initialize layers
     def build_model(self, data_container):
@@ -334,17 +341,24 @@ class EnsembleModelBase(MLModelBase):
     """
     Handles common functionality of all type of ensemble models, such as estimator validation, data slicing, and looping over estimators
     """
-    def __init__(self, model_config, instrumentation):
-        super(EnsembleModelBase, self).__init__(model_config, instrumentation)
+    def __init__(self, model_config, data_provider, instrumentation):
+        super(EnsembleModelBase, self).__init__(model_config, data_provider, instrumentation)
         self.validate_estimators()
         self.build_estimators()
+        from rembrandtml.factories import ModelImplFactory
+        self._model_impl = ModelImplFactory.create(model_config, instrumentation)
+
 
     def validate_estimators(self):
         if self.model_config.estimators is None:
             raise TypeError(f'{self.__class__.__name__} is an ensembles model.  All ensemble models must be configured with estimators.')
 
     def build_estimators(self):
-        for model_config in self.model_config.estimators:
+        from rembrandtml.factories import ModelFactory
+        for model_config in self.model_config.ensemble_config.estimator_configs:
+            pass #self.estimators[model_config.name] = ModelFactory.create(model_config, data_provider, instrumentation)
 
 
-
+class VotingModel(EnsembleModelBase):
+    def __init__(self, model_config, data_provider, instrumentation):
+        super(VotingModel, self).__init__(model_config, data_provider, instrumentation)

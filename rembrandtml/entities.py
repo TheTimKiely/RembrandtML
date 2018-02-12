@@ -8,7 +8,7 @@ class MLEntityBase(object):
     Provided instrumentation functionality to all subclasses
     """
     def __init__(self, instrumentation):
-        self.Base_Directory = os.path.abspath(os.path.join(os.getcwd(), '..'))
+        #self.Base_Directory = os.path.abspath(os.path.join(os.getcwd(), '..'))
         self.instrumentation = instrumentation
 
     def unique_file_name(self, file_property, attribute_property):

@@ -2,10 +2,10 @@ import os, unittest
 import numpy as np
 import pandas as pd
 
-from rembrandtml.configuration import DataConfig, ModelConfig, ContextConfig
+from rembrandtml.configuration import DataConfig, ModelConfig, ContextConfig, RunConfig
 from rembrandtml.factories import ContextFactory
 from rembrandtml.models import ModelType
-from rembrandtml.test.rml_testing import RmlTest, TestConfig
+from rembrandtml.test.rml_testing import RmlTest
 
 
 class KaggleTests(unittest.TestCase, RmlTest):
@@ -24,19 +24,13 @@ class KaggleTests(unittest.TestCase, RmlTest):
 
     def create_submission(self, index_name, index_values, prediction, file_name):
         submission = pd.DataFrame({
-            self.test_config.index_name: index_values,
-            self.test_config.prediction_column: prediction
+            self.run_config.index_name: index_values,
+            self.run_config.prediction_column: prediction
         })
         submission.to_csv(file_name, index=False)
 
-    def get_kaggle_file_path(self, dataset_name, file_name):
-        base_directory = os.path.abspath(os.path.join(os.getcwd(), '..'))
-        dir = os.path.abspath(os.path.join(base_directory, '..'))
-        dir = os.path.join(dir, 'data', 'kaggle', dataset_name)
-        return os.path.join(dir, file_name)
-
     def run_test(self, data_config, model_config, log_file = None, submit = False):
-        context_config = ContextConfig(model_config, data_config)
+        context_config = ContextConfig(model_config)
         context = ContextFactory.create(context_config)
         features = ('Has_Cabin', 'Deck', 'Family_Size', 'Alone', 'Port', 'Pclass',
                     'Sex', 'Age_Class', 'SibSp', 'Parch', 'Fare', 'Embarked')
@@ -58,21 +52,21 @@ class KaggleTests(unittest.TestCase, RmlTest):
             self.log_score(score, context_config, features, log_file)
 
         if submit:
-            prediction_file = self.get_kaggle_file_path(data_config.dataset_name, 'test.csv')
+            prediction_file = self.get_data_file_path('kaggle', data_config.dataset_name, 'test.csv')
             X_pred = context.model.data_container.get_prediction_data(features, prediction_file)
             prediction = context.predict(X_pred)
-            index_values = context.model.data_container.get_column_values(prediction_file, self.test_config.index_name)
-            self.create_submission(self.test_config.prediction_index,
+            index_values = context.model.data_container.get_column_values(prediction_file, self.run_config.index_name)
+            self.create_submission(self.run_config.prediction_index,
                                    index_values, prediction.values, f'submission_{model_config.name}.csv')
 
 
     def test_tune_titanic_competition(self):
-        self.test_config = TestConfig('ScikitLearn Random Forest')
+        self.run_config = RunConfig('ScikitLearn Random Forest')
         dataset_name = 'titanic'
-        dataset_file_path = self.get_kaggle_file_path(dataset_name, 'train.csv')
+        dataset_file_path = self.get_data_file_path('kaggle', dataset_name, 'train.csv')
         data_config = DataConfig('pandas', dataset_name, dataset_file_path)
         data_config.parameters = {'create_alone_column': True, 'use_age_times_class': True, 'use_fare_per_person': True}
-        model_config = ModelConfig(self.test_config.model_name, 'sklearn', ModelType.RANDOM_FOREST_CLASSIFIER)
+        model_config = ModelConfig(self.run_config.model_name, 'sklearn', ModelType.RANDOM_FOREST_CLASSIFIER, data_config)
         model_config.model_type = ModelType.RANDOM_FOREST_CLASSIFIER
         model_parameters = {'criterion': ('gini', 'entropy'), 'min_samples_leaf': range(1, 5), 'min_samples_split': range(2, 15),
                                    'n_estimators': (2, 5, 40, 200), 'max_features': (2, 3, None, 'auto'),
@@ -93,15 +87,15 @@ class KaggleTests(unittest.TestCase, RmlTest):
             os.remove(log_file)
 
         dataset_name = 'titanic'
-        self.test_config = TestConfig('ScikitLearn Logistic Regression', log_file)
-        self.test_config.prediction_column = 'Survived'
-        self.test_config.prediction_index = 1
-        self.test_config.index_name = 'PassengerId'
+        self.run_config = RunConfig('ScikitLearn Logistic Regression', log_file)
+        self.run_config.prediction_column = 'Survived'
+        self.run_config.prediction_index = 1
+        self.run_config.index_name = 'PassengerId'
 
 
-        dataset_file_path = self.get_kaggle_file_path(dataset_name, 'train.csv')
+        dataset_file_path = self.get_data_file_path('kaggle', dataset_name, 'train.csv')
         data_config = DataConfig('pandas', dataset_name, dataset_file_path)
-        model_config = ModelConfig(self.test_config.model_name, 'sklearn', ModelType.LOGISTIC_REGRESSION)
+        model_config = ModelConfig(self.run_config.model_name, 'sklearn', ModelType.LOGISTIC_REGRESSION, data_config)
         #self.run_test(data_config, model_config, log_file, True)
 
         model_config.model_type = ModelType.RANDOM_FOREST_CLASSIFIER
@@ -110,7 +104,7 @@ class KaggleTests(unittest.TestCase, RmlTest):
                                    'random_state': 1, 'n_jobs':-1}
         model_config.parameters = {'criterion': 'entropy', 'min_samples_leaf': 1, 'min_samples_split': 10, 'n_estimators': 1500, 'oob_score': True}
         model_config.name = 'ScikitLearn Random Forest'
-        self.test_config.model_name = model_config.name
+        self.run_config.model_name = model_config.name
         self.run_test(data_config, model_config, submit=True)
         model_config.parameters = {}
 

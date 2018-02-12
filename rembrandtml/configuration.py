@@ -65,7 +65,7 @@ class InstrumentationConfig(object):
         self.verbosity = Verbosity.code_to_verbosity(verbosity_code)
 
 class ContextConfig(object):
-    def __init__(self, model_config, data_config, mode = RunMode.TRAIN, verbosity = Verbosity.QUIET, layers = 4, nodes = 16, epochs = 10, batch_size = 32):
+    def __init__(self, model_config, mode = RunMode.TRAIN, verbosity = Verbosity.QUIET, layers = 4, nodes = 16, epochs = 10, batch_size = 32):
         self._verbosity = verbosity
         # Properties probably aren't necessary, so experimenting with public fields
         self.Layers = layers
@@ -77,7 +77,6 @@ class ContextConfig(object):
         self.ValidationDir = ''
         self.Mode = mode
         self.model_config = model_config
-        self.data_config = data_config
         self.instrumentation_config = None
 
     @property
@@ -109,10 +108,11 @@ class RunConfig(object):
 
 
 class ModelConfig(object):
-    def __init__(self, name, framework_name, model_type):
+    def __init__(self, name, framework_name, model_type, data_config):
         self.name = name
         self.model_type = model_type
         self.framework_name = framework_name
+        self.data_config = data_config
         self._metrics = []
         self._layers = []
         self.LayerCount = 1
@@ -175,9 +175,14 @@ class ModelConfig(object):
         self._layers = layers
 
 
+class EnsembleConfig(object):
+    def __init__(self, estimator_configs):
+        self.estimator_configs = estimator_configs
+
 class EnsembleModelConfig(ModelConfig):
-    def __init__(self, name, framework_name, model_type, estimators):
-        super(EnsembleModelConfig, self).__init__(name, framework_name, model_type, estimators)
-        self.estimators = estimators
+    def __init__(self, name, framework_name, model_type, data_config, ensemble_config):
+        super(EnsembleModelConfig, self).__init__(name, framework_name, model_type, data_config)
+        self.estimators = []
+        self.ensemble_config = ensemble_config
 
 

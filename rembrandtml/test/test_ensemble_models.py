@@ -19,26 +19,19 @@ class TestEnsembleModels(TestCase, RmlTest):
         self.run_config.dataset_file_path = self.get_data_file_path('kaggle', self.run_config.dataset_name, 'train.csv')
         self.run_config.log_file = 'scores.txt'
 
-    def init_data_config(self):
-        data_config = DataConfig('pandas', self.run_config.dataset_name, self.run_config.dataset_file_path)
-        return data_config
-
-    def init_model_config(self):
-        model_config = DataConfig()
-        return model_config
-
     def test_voting_sklearn_estimators_error(self):
-        data_config = self.init_data_config()
-        data_config = DataConfig('pandas', self.run_config.dataset_name, self.run_config.dataset_file_path)
+        try:
+            data_config = self.init_data_config()
+            data_config = DataConfig('pandas', self.run_config.dataset_name, self.run_config.dataset_file_path)
 
-        estimator_configs = ('one', 'two', 'three')
-        ensemble_config = EnsembleConfig(estimator_configs)
-        model_config = EnsembleModelConfig(self.run_config.model_name, 'sklearn', ModelType.VOTING_CLASSIFIER, data_config, ensemble_config)
-        context_config = ContextConfig(model_config, data_config)
-        context = ContextFactory.create(context_config)
-
-
-
+            ensemble_config = EnsembleConfig(estimator_configs)
+            model_config = EnsembleModelConfig(self.run_config.model_name, 'sklearn', ModelType.VOTING_CLASSIFIER, data_config, ensemble_config)
+            context_config = ContextConfig(model_config, data_config)
+            context = ContextFactory.create(context_config)
+        except TypeError as err:
+            error_string = 'All ensemble models must be configured with estimators'
+            if error_string not in err.args[0]:
+                self.fail(f'Didn\'t find expected error: {error_string}')
 
     def test_voting_sklearn(self):
         if os.path.isfile(self.run_config.log_file):

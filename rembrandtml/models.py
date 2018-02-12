@@ -350,7 +350,7 @@ class EnsembleModelBase(MLModelBase):
 
 
     def validate_estimators(self):
-        if self.model_config.estimators is None:
+        if self.model_config.estimators is None or len(self.model_config.estimators) < 1:
             raise TypeError(f'{self.__class__.__name__} is an ensembles model.  All ensemble models must be configured with estimators.')
 
     def build_estimators(self):

@@ -3,12 +3,12 @@ A Machine Learning and Deep Learning instructional model of robust coding practi
 
 This model includes entities and an API to make ML tasks easier and more efficient.
 
-How to use:
-1. Find a test that covers an aspect of ML and a framework that you want to learn about
-	There are lots of examples that demonstrate
-		How to load scikit-learn data
-		How to load data from a csv file using Pandas
-		How to use Linear Regression using both scikit-learn and TensorFlow
+###How to use:
+1. Work through the [Quickstart](Quickstart.md)
+1. Find a test that covers an aspect of ML and a framework that you want to learn about.  There are lots of examples that demonstrate
+    * How to load scikit-learn data
+    * How to load data from a csv file using Pandas
+	* How to use Linear Regression using both scikit-learn and TensorFlow
 2. Call the test from a test runner or test_runner.py
 3. Step through the code in a debugger
 
@@ -48,5 +48,7 @@ For example, training data and label data is accessed very differently with a sc
 The implementation of ensemble models is a good example of test-first development.
 1. The first step is create a series of test to ensure proper initialization.
     1. See TestEnsembleModels as an example
-    2. Testing error conditions is important to ensure bothe that proper validation is happening and that errors are being properly reported. 
+    2. Testing error conditions is important to ensure bothe that proper validation is happening and that errors are being properly reported.
+        * This is a good time to think about what your assumptions are about the state of the data and the code.  Add a few tests to verify those asumption.  This will make troubleshooting much easier in the future.
+        * See TestEnsembleModels.test_voting_sklearn_estimators_error() 
 2. Next, implement each piece of functionality to that the tests pass.

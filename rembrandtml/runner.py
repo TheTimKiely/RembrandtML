@@ -10,4 +10,6 @@ def main(params):
 
 
 if __name__ == '__main__'
-    main(sys.argv[1:])
+    params = sys.argv[1:]
+    main()
+

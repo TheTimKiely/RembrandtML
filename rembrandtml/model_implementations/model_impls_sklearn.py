@@ -9,6 +9,22 @@ from rembrandtml.models import ModelType
 from rembrandtml.plotting import Plotter
 
 class MLModelSkLearn(MLModelImplementation):
+    """
+    from sklearn.metrics import roc_auc_score
+    r_a_score = roc_auc_score(Y_train, y_scores)
+    print("ROC-AUC-Score:", r_a_score)
+
+    from sklearn.metrics import roc_curve
+    # compute true positive rate and false positive rate
+    false_positive_rate, true_positive_rate, thresholds = roc_curve(Y_train, y_scores)
+
+    from sklearn.metrics import precision_recall_curve
+    # getting the probabilities of our predictions
+    y_scores = random_forest.predict_proba(X_train)
+    y_scores = y_scores[:,1]
+
+    precision, recall, threshold = precision_recall_curve(Y_train, y_scores)
+    """
     def __init__(self, model_config, instrumentation):
         super(MLModelSkLearn, self).__init__(model_config, instrumentation)
         if model_config.model_type == ModelType.KNN:
@@ -48,6 +64,7 @@ class MLModelSkLearn(MLModelImplementation):
             #importances.plot.bar()
             if self._model.oob_score:
                 score.metrics['oob'] = self._model.oob_score_
+            score.metrics['importances'] = self._model.feature_importances_
 
     def tune(self, X, y, tuning_parameters, model_parameters):
         from sklearn.model_selection import GridSearchCV

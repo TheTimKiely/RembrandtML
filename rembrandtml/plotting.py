@@ -54,6 +54,21 @@ class Plotter(object):
 
     def plot_bar(self, xlabel, ylabel, data):
         sns.barplot(xlabel, ylabel, data)
+        #sns.barplot(x='Age', y='Survived', data=average_age)
+
+    #train[[u'Survived', u'Pclass', u'Sex', u'Age', u'Parch', u'Fare', u'Embarked', u'FamilySize', u'Title']]
+    def plot_pairplot(self, features):
+        g = sns.pairplot(features, hue='Survived', palette='seismic', size=1.2, diag_kind='kde',
+                         diag_kws=dict(shade=True), plot_kws=dict(s=10))
+        g.set(xticklabels=[])
+
+    #train.astype(float).corr()
+    def plot_heatmap(self, correlations):
+        colormap = plt.cm.RdBu
+        plt.figure(figsize=(14, 12))
+        plt.title('Pearson Correlation of Features', y=1.05, size=15)
+        sns.heatmap(correlations, linewidths=0.1, vmax=1.0,
+                    square=True, cmap=colormap, linecolor='white', annot=True)
 
     def plot_model_complexity(neighbors, train_accuracy, test_accuracy):
             # Generate plot
@@ -113,6 +128,26 @@ class Plotter(object):
         ax = sns.distplot(men[men['Survived'] == 0].Age.dropna(), bins=40, label=not_survived, ax=axes[1], kde=False)
         ax.legend()
         _ = ax.set_title('Male')
+
+    def plot_precision_and_recall(precision, recall, threshold):
+        plt.plot(threshold, precision[:-1], "r-", label="precision", linewidth=5)
+        plt.plot(threshold, recall[:-1], "b", label="recall", linewidth=5)
+        plt.xlabel("threshold", fontsize=19)
+        plt.legend(loc="upper right", fontsize=19)
+        plt.ylim([0, 1])
+
+    def plot_precision_vs_recall(precision, recall):
+        plt.plot(recall, precision, "g--", linewidth=2.5)
+        plt.ylabel("recall", fontsize=19)
+        plt.xlabel("precision", fontsize=19)
+        plt.axis([0, 1.5, 0, 1.5])
+
+    def plot_roc_curve(false_positive_rate, true_positive_rate, label=None):
+        plt.plot(false_positive_rate, true_positive_rate, linewidth=2, label=label)
+        plt.plot([0, 1], [0, 1], 'r', linewidth=4)
+        plt.axis([0, 1, 0, 1])
+        plt.xlabel('False Positive Rate (FPR)', fontsize=16)
+        plt.ylabel('True Positive Rate (TPR)', fontsize=16)
 
     def plot(self, X, y, color = 'blue', linewidth=2):
         plt.plot(X, y, color=color, linewidth=linewidth)

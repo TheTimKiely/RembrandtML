@@ -1,0 +1,5 @@
+('Has_Cabin', 'Deck', 'Family_Size', 'Alone', 'Port', 'Pclass', 'Sex', 'Age_Class', 'SibSp', 'Parch', 'Ticket', 'Fare', 'Embarked') ScikitLearn Random Forest {'criterion': 'entropy', 'min_samples_leaf': 1, 'min_samples_split': 10, 'n_estimators': 1500, 'oob_score': True} Name:ScikitLearn Random Forest Model Type: ModelType.RANDOM_FOREST_CLASSIFIER Framework:sklearn
+	Score: R2 Value: 0.8059701492537313
+	Metrics: {'oob': 0.8186195826645265, 'importances': array([ 0.02900985,  0.06466099,  0.05502007,  0.01294906,  0.04060167,
+        0.30297895,  0.08497715,  0.09161943,  0.03322594,  0.02746869,
+        0.2574882 ])}

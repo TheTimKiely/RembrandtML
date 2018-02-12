@@ -57,7 +57,6 @@ class DataConfig(object):
         self.framework_name = framework_name
         self.dataset_name = dataset_name
         self.sample_size = sample_size
-        self.parameters = {}
         self.dataset_file_path = file_path
         self.file_separator = ','
 
@@ -96,6 +95,17 @@ class ContextConfig(object):
     @property
     def Epochs(self):
         return self._epochs
+
+class RunConfig(object):
+    """
+    Container for variables and collections associated with the root task.
+    """
+    def __init__(self, model_name, log_file = None):
+        self.model_name = model_name
+        self.log_file = log_file
+        self.prediction_column = None
+        self.prediction_index = None
+        self.index_name = None
 
 
 class ModelConfig(object):
@@ -163,5 +173,11 @@ class ModelConfig(object):
     @layers.setter
     def layers(self, layers):
         self._layers = layers
+
+
+class EnsembleModelConfig(ModelConfig):
+    def __init__(self, name, framework_name, model_type, estimators):
+        super(EnsembleModelConfig, self).__init__(name, framework_name, model_type, estimators)
+        self.estimators = estimators
 
 

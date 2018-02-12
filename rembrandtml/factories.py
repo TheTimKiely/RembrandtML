@@ -5,7 +5,7 @@ from rembrandtml.model_implementations.model_impls_cntk import MLModelImplementa
 from rembrandtml.model_implementations.model_impls_keras import MLModelImplementationKeras
 from rembrandtml.model_implementations.model_impls_sklearn import MLModelSkLearn
 from rembrandtml.model_implementations.model_impls_tensorflow import MLModelTensorflow
-from rembrandtml.models import MLModel, MathModel, ModelType
+from rembrandtml.models import MLModel, MathModel, ModelType, StackedModel
 from rembrandtml.nnmodels import ConvolutionalNeuralNetwork, RecurrentNeuralNetwork, LstmRNN, GruNN
 from rembrandtml.utils import Instrumentation
 
@@ -22,7 +22,7 @@ class ContextFactory(object):
         logger = MLLogger(config.instrumentation_config)
         instrumentation = Instrumentation(config.instrumentation_config, logger)
         data_container = DataContainerFactory.create(config.data_config, instrumentation)
-        model = ModelFactory.create('SkLearnKnn', config.model_config, data_container, instrumentation)
+        model = ModelFactory.create(config.model_config, data_container, instrumentation)
         context = MLContext(model, instrumentation, config)
         return context
 
@@ -50,7 +50,7 @@ class ModelImplFactory(object):
 
 class ModelFactory(object):
     @staticmethod
-    def create(name, model_config, data_container, instrumentation):
+    def create(model_config, data_container, instrumentation):
         '''
         Factory method for creating ML models.
         This method first creates a DataContainer from the parameters specified in ContextConfig.DataConfig.
@@ -61,9 +61,9 @@ class ModelFactory(object):
         # I'm not sure if a DataContain should be in __init__ for the models.
         # So, for now, we'll set the property
         if(model_config.model_type == ModelType.CNN):
-            network = ConvolutionalNeuralNetwork(name,model_config, instrumentation)
+            network = ConvolutionalNeuralNetwork(model_config, instrumentation)
         elif(model_config.model_type == ModelType.MATH):
-            network = MathModel( name,model_config)
+            network = MathModel(model_config)
         elif model_config.model_type == ModelType.LINEAR_REGRESSION or \
                 model_config.model_type == ModelType.SIMPLE_CLASSIFICATION or \
                 model_config.model_type == ModelType.MULTIPLE_CLASSIFICATION or \
@@ -76,15 +76,20 @@ class ModelFactory(object):
                 model_config.model_type == ModelType.SVC or \
                 model_config.model_type == ModelType.DECISTION_TREE_CLASSIFIER:
             model_impl = ModelImplFactory.create(model_config, instrumentation)
-            network = MLModel(name, model_config, model_impl, instrumentation)
+            network = MLModel(model_config, model_impl, instrumentation)
         elif model_config.model_type == ModelType.RNN:
-            network = RecurrentNeuralNetwork( name,model_config, instrumentation)
+            network = RecurrentNeuralNetwork(model_config, instrumentation)
         #elif(ml_config.model_type == 'DvsC'):
         #    network = ConvnetDogsVsCats( name,ml_config)
         elif model_config.model_type == ModelType.LSTM:
-            network = LstmRNN( name,model_config, instrumentation)
+            network = LstmRNN(model_config, instrumentation)
         elif model_config.model_type ==  ModelType.GRU:
-            network = GruNN( name,model_config, instrumentation)
+            network = GruNN(model_config, instrumentation)
+        elif model_config.model_type == ModelType.STACKED:
+            network = StackedModel( model_config, None, instrumentation)
+        elif model_config.model_type == ModelType.VOTING_CLASSIFIER:
+            model_class = 'VotingModel'
+
         else:
             raise TypeError(f'Network type {model_config.model_type} is not defined.')
         network.data_container = data_container

@@ -1,12 +1,5 @@
 import pandas as pd
 
-class TestConfig(object):
-    def __init__(self, model_name, log_file = None):
-        self.model_name = model_name
-        self.log_file = log_file
-        self.prediction_column = None
-        self.prediction_index = None
-        self.index_name = None
 
 class RmlTest(object):
     def __init__(self):

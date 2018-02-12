@@ -14,11 +14,21 @@ How to use:
 
 #More advanced software engineer techniques:
 ###    Dependency Injection
-        A logger and time are used by all custom types in the project.  These services are provided to each object through the Instrumentation singleton.
+A logger and time are used by all custom types in the project.  These services are provided to each object through the Instrumentation singleton.
 ###    Custom Errors
-        While it is a trivial savings a keystrokes, the custom FunctionNotImplementedError demonstrates how to extend Errors for customized functionality.
+While it is a trivial savings a keystrokes, the custom FunctionNotImplementedError demonstrates how to extend Errors for customized functionality.
 ###	Design Patterns
-		The DataProvider classes give an example of the Template Patterns
-			The abstract base class defines the algorithm of retrieving data from a dataset.
-			Each concrete subclass overrides methods when customized functionality is required.
-			For example, training data and label data is accessed very differently with a scikit-learn Bunch compared to a Pandas DataFrame.  The scikit-learn Bunch object stores the label data(y) in ndarray accessible through the 'target' key in the Bunch.  If the data was loaded from a csv into a Pandas DataFrame, the label data needs to be accessed by feature name and removed from the training data explicitly.
+The DataProvider classes give an example of the Template Patterns
+
+The abstract base class defines the algorithm of retrieving data from a dataset.
+
+Each concrete subclass overrides methods when customized functionality is required.
+
+For example, training data and label data is accessed very differently with a scikit-learn Bunch compared to a Pandas DataFrame.  The scikit-learn Bunch object stores the label data(y) in ndarray accessible through the 'target' key in the Bunch.  If the data was loaded from a csv into a Pandas DataFrame, the label data needs to be accessed by feature name and removed from the training data explicitly.
+
+## Test-First Development
+The implementation of ensemble models is a good example of test-first development.
+1. The first step is create a series of test to ensure proper initialization.
+  a.See TestEnsembleModels as an example
+  b.Testing error conditions is important to ensure bothe that proper validation is happening and that errors are being properly reported. 
+2. Next, implement each piece of functionality to that the tests pass.

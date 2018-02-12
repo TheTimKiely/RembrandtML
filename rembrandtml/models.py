@@ -22,15 +22,16 @@ class ModelType(Enum):
     RNN = 13
     LSTM = 14
     GRU = 15
+    VOTING_CLASSIFIER = 16
+    STACKED = 17
 
 class MLModelBase(MLEntityBase):
     """
     The MLModel represents the type of model, e.g. Linear Regression, K Nearest Neighbor, etc.
     The private field, _model_impl is the selected framework's implementation of that model.
     """
-    def __init__(self, name, model_config, model_impl, instrumentation):
+    def __init__(self, model_config, model_impl, instrumentation):
         super(MLModelBase, self).__init__(instrumentation)
-        self.name = name
         self._model_impl = model_impl
         self.model_config = model_config
         self._model_file_attribute = 0
@@ -39,6 +40,10 @@ class MLModelBase(MLEntityBase):
         self._history_file_attribute = 0
         self._tokenizer = None
         self.data_container = None
+
+    @prperty
+    def name(self):
+        return self.model_config.name
 
     @property
     def Model(self):
@@ -179,8 +184,8 @@ class MLModelBase(MLEntityBase):
         pass
 
 class MathModel(MLModelBase):
-    def __init__(self, name, model_config):
-        super(MathModel, self).__init__(name, model_config)
+    def __init__(self, model_config):
+        super(MathModel, self).__init__(model_config)
         self.model_config = model_config
 
     def evaluate(self, data_container):
@@ -195,9 +200,8 @@ class MathModel(MLModelBase):
         return batch_maes
 
 class MLModel(MLModelBase):
-    def __init__(self, name, model_config, model_impl, instrumentation):
-        super(MLModel, self).__init__(name,model_config, model_impl, instrumentation)
-
+    def __init__(self, model_config, model_impl, instrumentation):
+        super(MLModel, self).__init__(model_config, model_impl, instrumentation)
 
     # Requires a DataContainer because we might need to know the data shape to initialize layers
     def build_model(self, data_container):
@@ -226,7 +230,7 @@ class MLModel(MLModelBase):
         """
         self.validate_fit_call();
 
-        if self.data_container.X_train != None:
+        if self.data_container.X_train is not None:
             if train:
                 X = self.data_container.X_train
                 y = self.data_container.y_train
@@ -250,7 +254,7 @@ class MLModel(MLModelBase):
         :return: The path of the saved file if 'save' was 'True'
         """
         X, y = self.get_data_from_data_container()
-        self.log(f'Running fit with implementation: {type(self._model_impl)} X: {X.shape} y: {y.shape}')
+        self.log(f'Running fit with implementation: {self._model_impl.__class__.__name__} X: {X.shape} y: {y.shape}')
         self._model_impl.fit(X, y, validate)
 
 
@@ -325,6 +329,22 @@ class MLModel(MLModelBase):
     def predict(self, X):
         prediction = self._model_impl.predict(X)
         return prediction
+
+class EnsembleModelBase(MLModelBase):
+    """
+    Handles common functionality of all type of ensemble models, such as estimator validation, data slicing, and looping over estimators
+    """
+    def __init__(self, model_config, instrumentation):
+        super(EnsembleModelBase, self).__init__(model_config, instrumentation)
+        self.validate_estimators()
+        self.build_estimators()
+
+    def validate_estimators(self):
+        if self.model_config.estimators is None:
+            raise TypeError(f'{self.__class__.__name__} is an ensembles model.  All ensemble models must be configured with estimators.')
+
+    def build_estimators(self):
+        for model_config in self.model_config.estimators:
 
 
 

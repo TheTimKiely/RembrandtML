@@ -75,7 +75,7 @@ class MLContext(object):
         self.instrumentation = instrumentation
         self.instrumentation.timer.start()
 
-    def prepare_data(self, features=None, target_feature=None):
+    def prepare_data(self, features=None, target_feature=None, use_cache=False):
         self.log(f'Preparing data with {str(self.model.data_container)}')
         self.model.data_container.prepare_data(features, target_feature)
         self.log(f'Finished preparing data with {str(self.model.data_container)}')

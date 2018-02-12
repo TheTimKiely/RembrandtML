@@ -46,7 +46,7 @@ class DataProviderBase(MLEntityBase):
             raise TypeError(
                 f'The dataset: {self.data_config.dataset_name} is not supported in the framework: {self.framework_name}')
 
-    def get_prediction_data(self, prediction_file):
+    def  get_prediction_data(self, prediction_file):
         raise FunctionNotImplementedError(self.__class__.name, 'get_prediction_data')
 
     def prepare_data_sklearn(self, features, sample_size):

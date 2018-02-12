@@ -23,6 +23,9 @@ class DataContainer(MLEntityBase):
         self.train_generator = None
         self.val_generator = None
         self.test_generator = None
+        self.X = None
+        self.X_columns = None
+        self.y = None
         self.X_train = None
         self.X_test = None
         self.X_val = None
@@ -40,8 +43,8 @@ class DataContainer(MLEntityBase):
         else:
             raise TypeError(f'The specified framework, {framework_name}, is not supported as a DataProvider.')
 
-    def get_prediction_data(self, prediction_file):
-        return self.data_provider.get_prediction_data(prediction_file)
+    def get_prediction_data(self, features, prediction_file):
+        return self.data_provider.get_prediction_data(features, prediction_file)
 
     def build_generator(self, data, lookback, delay, min_index, max_index, shuffle, batch_size, step):
         if(max_index is None):
@@ -99,7 +102,7 @@ class DataContainer(MLEntityBase):
         :return:
         """
         self.log(f'Preparing data from dataset: {self.config.dataset_name} using {self.data_provider.name}')
-        self.X, self.y = self.data_provider.prepare_data(features, target_feature)
+        self.X_columns, self.X, self.y = self.data_provider.prepare_data(features, target_feature)
         if split:
             self.split(features)
 

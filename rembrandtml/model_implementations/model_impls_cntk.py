@@ -11,7 +11,7 @@ from rembrandtml.model_implementations.model_impls import MLModelImplementation
 class MLModelImplementationCntk(MLModelImplementation):
     def __init__(self, model_config, instrumentation):
         super(MLModelImplementationCntk, self).__init__(model_config, instrumentation)
-        self._model = models.Sequential()
+        self._model = C.softmax
         #self._model.add(layers.Dense(18, activation='relu', input_shape=(10000,)))
 
     def fit(self, X, y, validate=False):

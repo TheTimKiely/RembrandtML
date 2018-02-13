@@ -21,7 +21,6 @@ class TestEnsembleModels(TestCase, RmlTest):
 
     def test_voting_sklearn_estimators_error(self):
         try:
-            data_config = self.init_data_config()
             data_config = DataConfig('pandas', self.run_config.dataset_name, self.run_config.dataset_file_path)
 
             ensemble_config = EnsembleConfig(estimator_configs)

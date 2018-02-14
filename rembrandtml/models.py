@@ -5,7 +5,9 @@ import numpy as np
 from rembrandtml.core import FunctionNotImplementedError
 from rembrandtml.entities import MLEntityBase
 
-
+_model_names = ('math', 'linreg', 'cls', 'mltcls', 'knn', 'logreg', 'sgd', 'rndf', 'nbay', 'pcpt', 'svc'
+                                                                                                  'dtree', 'cnn', 'rnn',
+               'lstm', 'gru', 'hvote', 'stckd')
 class ModelType(Enum):
     MATH = 0
     LINEAR_REGRESSION = 1
@@ -26,6 +28,9 @@ class ModelType(Enum):
     VOTING_CLASSIFIER = 16
     STACKED = 17
 
+    def __str__(self):
+        return _model_names[self.value]
+
 class MLModelBase(MLEntityBase):
     """
     The MLModel represents the type of model, e.g. Linear Regression, K Nearest Neighbor, etc.
@@ -44,6 +49,10 @@ class MLModelBase(MLEntityBase):
     @property
     def name(self):
         return self.model_config.name
+
+    @property
+    def coefficients(self):
+        return self._model_impl.coefficients
 
     @property
     def Model(self):
@@ -180,13 +189,13 @@ class MLModelBase(MLEntityBase):
     def tune(self, parameters):
         raise FunctionNotImplementedError(self.__class__.__name__, 'tune')
 
-    def predict(self, X, prediction_column = None, index_column = None):
+    def predict(self, X, wih_probabilities, prediction_column = None, index_column = None):
         pass
 
 
 class MLSingleModelBase(MLModelBase):
-    def __init__(self, model_config, instrumentation):
-        super(MLSingleModelBase, self).__init__(model_config, instrumentation)
+    def __init__(self, model_config, data_container, instrumentation):
+        super(MLSingleModelBase, self).__init__(model_config, data_container, instrumentation)
         from rembrandtml.factories import ModelFactory, ModelImplFactory
         self._model_impl = ModelImplFactory.create(model_config, instrumentation)
 
@@ -207,8 +216,8 @@ class MathModel(MLSingleModelBase):
         return batch_maes
 
 class MLModel(MLSingleModelBase):
-    def __init__(self, model_config, instrumentation):
-        super(MLModel, self).__init__(model_config, instrumentation)
+    def __init__(self, model_config, data_container, instrumentation):
+        super(MLModel, self).__init__(model_config, data_container, instrumentation)
 
     # Requires a DataContainer because we might need to know the data shape to initialize layers
     def build_model(self, data_container):
@@ -333,8 +342,8 @@ class MLModel(MLSingleModelBase):
         score = self._model_impl.evaluate(X, y)
         return score
 
-    def predict(self, X):
-        prediction = self._model_impl.predict(X)
+    def predict(self, X, with_probabilities):
+        prediction = self._model_impl.predict(X, with_probabilities)
         return prediction
 
 class EnsembleModelBase(MLModelBase):

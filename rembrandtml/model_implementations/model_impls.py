@@ -20,3 +20,7 @@ class MLModelImplementation(MLEntityBase):
         for i, item in enumerate(sequence):
             results[i, item] = 1
         return results
+
+    @property
+    def coefficients(self):
+        return self._model.coefficients

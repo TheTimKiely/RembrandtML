@@ -7,17 +7,29 @@ from rembrandtml.data_providers.data_provider import DataProviderBase
 class SkLearnDataProvider(DataProviderBase):
     def __init__(self, data_config, instrumentation):
         super(SkLearnDataProvider, self).__init__('sklearn', data_config, instrumentation)
+        self.dataset_map = {'boston': datasets.load_boston(), 'iris': datasets.load_iris(), 'diabetes': datasets.load_diabetes()}
 
     def prepare_data(self, features=None, target_feature=None, sample_size=None):
         dataset = None
-        if self.dataset_name == 'mnist-original':
+        if self.data_config.dataset_name.lower() in self.dataset_map.keys():
+            dataset = self.get_dataset(self.data_config.dataset_name, features, target_feature)
+        elif self.data_config.dataset_name == 'mnist-original':
             dataset = self.get_dataset_mnist()
-        elif self.dataset_name.lower() == 'boston':
+        elif self.data_config.dataset_name.lower() == 'boston':
             dataset = self.get_dataset_boston(features, target_feature)
-        elif self.dataset_name[0:6].lower() == 'kaggle':
+        elif self.data_config.dataset_name[0:6].lower() == 'kaggle':
             dataset = self.get_dataset_kaggle(features, target_feature)
         else:
-            raise TypeError(f'The dataset {self.dataset_name} is not supported for {self.name}')
+            error = f'The dataset {self.data_config.dataset_name} is not supported for {self.name}.'
+            raise TypeError(error)
+        return dataset
+
+    def get_dataset(self, name, features, target_feature):
+        data = self.dataset_map[name]
+        X_columns = data.feature_names
+        X = data.data
+        y = data.target
+        dataset = (X_columns, X, y)
         return dataset
 
     def get_dataset_mnist(self):

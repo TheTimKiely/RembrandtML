@@ -1,9 +1,12 @@
+import random
+
 import numpy as np
 import  pandas as pd
-from sklearn import  linear_model, ensemble
+from sklearn import linear_model, ensemble, model_selection
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import cross_val_score
 
-from rembrandtml.core import Score, ScoreType, TuningResults, Prediction
+from rembrandtml.core import Score, ScoreType, TuningResults, Prediction, StateError
 from rembrandtml.model_implementations.model_impls import MLModelImplementation
 from rembrandtml.models import ModelType
 from rembrandtml.plotting import Plotter
@@ -55,6 +58,13 @@ class MLModelSkLearn(MLModelImplementation):
             raise TypeError(f'The model type {self.model_config.model_type} is not suppored for the framework: {self.model_config.framework_name}')
 
 
+    @property
+    def coefficients(self):
+        if hasattr(self._model, 'coef_'):
+            return self._model.coef_
+        else:
+            raise StateError('Coefficients are not available because the model has not yet been trained.')
+
     def fit(self, X, y, validate=False):
         self._model.fit(X, y)
 
@@ -66,8 +76,8 @@ class MLModelSkLearn(MLModelImplementation):
             #importances = importances.sort_values('importance', ascending=False).set_index('feature')
             #importances.plot.bar()
             if self._model.oob_score:
-                score.metrics['oob'] = self._model.oob_score_
-            score.metrics['importances'] = self._model.feature_importances_
+                score.values['oob'] = self._model.oob_score_
+            score.values['importances'] = self._model.feature_importances_
 
     def tune(self, X, y, tuning_parameters, model_parameters):
         from sklearn.model_selection import GridSearchCV
@@ -78,10 +88,26 @@ class MLModelSkLearn(MLModelImplementation):
         tuning_results = TuningResults(self.model_config.name, grid.best_params_)
         return tuning_results
 
+    def evaluate_metrics(self, X, y, metrics):
+        values = {}
+        for metric in metrics:
+            name, value = self.evaluate_metric(X, y, metric)
+            values[metric] = value
+        return values
+
+    def evaluate_metric(self, X, y, metric):
+        kfolds = model_selection.KFold(n_splits=10, random_state=random.randint(1, 100))
+        value = cross_val_score(self._model, X, y, cv=kfolds, scoring = metric)
+        return (metric, value)
+
+
     def evaluate(self, X, y):
         self.validate_trained()
-        value = self._model.score(X, y)
-        score = Score(self.model_config, ScoreType.R2, value)
+        score_value = self._model.score(X, y)
+        metrics = (str(ScoreType.ACCURACY), 'neg_log_loss', 'roc_auc')
+        values = self.evaluate_metrics(X, y, metrics)
+        values[str(ScoreType.R2)] = score_value
+        score = Score(self.model_config, values)
         self.customize_score(score)
         return score
 
@@ -109,8 +135,35 @@ class MLModelSkLearn(MLModelImplementation):
         plotter.plot_model_complexity(neighbors, train_accuracy, test_accuracy)
         plotter.show();
 
-    def predict(self, X):
+    def predict(self, X, with_probabilities):
         self.validate_trained()
+        if with_probabilities:
+            y_pred = self._model.predict_proba(X)
+        else:
+            y_pred = self._model.predict(X)
+        prediction = Prediction(self.model_config.name, y_pred)
+        return prediction
+
+class MLModelSkLearnLinReg(MLModelSkLearn):
+    def __init__(self, model_config, instrumentation):
+        super(MLModelSkLearnLinReg, self).__init__(model_config, instrumentation)
+
+    def evaluate(self, X, y):
+        self.validate_trained()
+
+
+        value = self._model.score(X, y)
+
+        values = {}
+        metrics = ('neg_mean_absolute_error', 'neg_mean_squared_error', 'r2')
+        values = self.evaluate_metrics(X, y, metrics)
+        score = Score(self.model_config, values)
+        self.customize_score(score)
+        return score
+
+    def predict(self, X, with_probabilities):
+        self.validate_trained()
+        # SkLearn LinearRegression does not support propbabilities
         y_pred = self._model.predict(X)
         prediction = Prediction(self.model_config.name, y_pred)
         return prediction

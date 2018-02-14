@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn.model_selection import train_test_split
 
 from rembrandtml.entities import MLEntityBase
 from rembrandtml.core import FunctionNotImplementedError
@@ -12,6 +11,7 @@ class DataProviderBase(MLEntityBase):
         self.data_config = data_config
 
     def split(self, X, y, test_size=0.3, random_state=42):
+        from sklearn.model_selection import train_test_split
         X_train, X_test, y_train, y_test =  train_test_split(X, y, test_size=test_size, random_state=random_state)
         return ((X_train, y_train), (X_test, y_test))
 
@@ -20,6 +20,10 @@ class DataProviderBase(MLEntityBase):
         raise FunctionNotImplementedError(self.__class__.__name__, 'get_column_values')
 
     def get_dataset(self):
+        """
+        Loads a dataset, consisting of features(X), feature names(X_columns), and labels(y).
+        :return: A tuple of X_columns, X, y
+        """
         pass
 
     def prepare_data(self, features=None, target_feature=None, sample_size=None):

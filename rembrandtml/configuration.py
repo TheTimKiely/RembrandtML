@@ -53,7 +53,7 @@ class Verbosity(Enum):
 
 
 class DataConfig(object):
-    def __init__(self, framework_name, dataset_name, file_path, sample_size = -1):
+    def __init__(self, framework_name, dataset_name, file_path=None, sample_size = -1):
         self.framework_name = framework_name
         self.dataset_name = dataset_name
         self.sample_size = sample_size

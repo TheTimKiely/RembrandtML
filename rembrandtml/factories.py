@@ -3,7 +3,7 @@ from rembrandtml.data import DataContainer
 from rembrandtml.entities import MLLogger
 from rembrandtml.model_implementations.model_impls_cntk import MLModelImplementationCntk
 from rembrandtml.model_implementations.model_impls_keras import MLModelImplementationKeras
-from rembrandtml.model_implementations.model_impls_sklearn import MLModelSkLearn
+from rembrandtml.model_implementations.model_impls_sklearn import MLModelSkLearn, MLModelSkLearnLinReg
 from rembrandtml.model_implementations.model_impls_tensorflow import MLModelTensorflow
 from rembrandtml.models import MLModel, MathModel, ModelType, VotingModel
 from rembrandtml.nnmodels import ConvolutionalNeuralNetwork, RecurrentNeuralNetwork, LstmRNN, GruNN
@@ -33,18 +33,18 @@ class DataContainerFactory(object):
         return data_container
 
 class ModelImplFactory(object):
+    model_impl_map = {'sklearn-logreg': MLModelSkLearn, 'sklearn-linreg': MLModelSkLearnLinReg,
+                      'tensorflow': MLModelTensorflow, 'keras': MLModelImplementationKeras,
+                      'cntk': MLModelImplementationCntk}
     @staticmethod
     def create(model_config, instrumentation):
-        if  model_config.framework_name == 'sklearn':
-            model_impl = MLModelSkLearn(model_config, instrumentation)
-        elif model_config.framework_name == 'tensorflow':
-            model_impl = MLModelTensorflow(model_config, instrumentation)
-        elif model_config.framework_name == 'keras':
-            model_impl = MLModelImplementationKeras(model_config, instrumentation)
-        elif model_config.framework_name == 'cntk':
-            model_impl = MLModelImplementationCntk(model_config, instrumentation)
-        else:
+        key = f'{model_config.framework_name}-{model_config.model_type}'
+        if key not in ModelImplFactory.model_impl_map.keys():
             raise TypeError(f'The requested framework, {model_config.framework_name}, is not implemented.')
+
+        ctor = ModelImplFactory.model_impl_map[key]
+        model_impl = ctor(model_config, instrumentation)
+
         return model_impl
 
 
@@ -93,6 +93,7 @@ class ModelFactory(object):
 class ModelBuilder(object):
     @staticmethod
     def build_model(cls, model_parameters):
+        from rembrandtml.model_implementations.model_impls_keras import MLModelImplementationKeras
         model = models.Sequential()
         for i in range(len(model_parameters.layers)):
             layer_params = model_parameters.layers[i]

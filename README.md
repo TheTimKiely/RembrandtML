@@ -1,9 +1,19 @@
-# RembrandtML
-A Machine Learning and Deep Learning instructional model of robust coding practices.
+# RembrandtML   &nbsp;&nbsp;&nbsp;&nbsp;<img src="https://raw.githubusercontent.com/TheTimKiely/RembrandtML/master/Rembrandt.jpg" height="200" >
+RembrandtML is an **intuitive machine learning API**.
 
-This model includes entities and an API to make ML tasks easier and more efficient.
+It can be used as an **instructional model** of robust coding practices applied to ML tasks.
 
-###How to use:
+The project intends to make the ML workflow easier to understand and implement by **abstracting common ML concepts and tasks** into entities which can be easily manipulated in code.
+
+### Key features include:
+1. Test-first development is modeled.
+1. The flexible, modular design makes modifying and adding implementations easy.
+1. The code is fully instrumented for comprehensive logging and time measurement.
+1. Methods to tune model hyperparameters.
+1. Plotting accuracy scores of many configurations for comparison.
+1. Feature management makes it simple to add and remove features to tune the model.
+
+### Getting Started:
 1. Work through the [Quickstart](Quickstart.md)
 1. Find a test that covers an aspect of ML and a framework that you want to learn about.  There are lots of examples that demonstrate
     * How to load scikit-learn data
@@ -18,7 +28,7 @@ A logger and time are used by all custom types in the project.  These services a
 ###    Custom Errors
 While it is a trivial savings a keystrokes, the custom FunctionNotImplementedError demonstrates how to extend Errors for customized functionality.
 ###	Design Patterns
-The DataProvider classes give an example of the Template Patterns
+The DataProvider classes give an example of the Template Patterns.
 
 The abstract base class defines the algorithm of retrieving data from a dataset.
 
@@ -31,7 +41,7 @@ For example, training data and label data is accessed very differently with a sc
 2. Create ModelConfig
 3. Create ContextConfig
 4. Create Context using ContextFactory.create(context_config)
-### Initialization Implementation
+## Initialization Implementation
 1. ContextFactor.create() instantiates
     1. Logger
     2. Instrumentation
@@ -49,6 +59,6 @@ The implementation of ensemble models is a good example of test-first developmen
 1. The first step is create a series of test to ensure proper initialization.
     1. See TestEnsembleModels as an example
     2. Testing error conditions is important to ensure bothe that proper validation is happening and that errors are being properly reported.
-        * This is a good time to think about what your assumptions are about the state of the data and the code.  Add a few tests to verify those asumption.  This will make troubleshooting much easier in the future.
+        * This is a good time to think about what your assumptions are about the state of the data and the code.  Add a few tests to verify those assumption.  This will make troubleshooting much easier in the future.
         * See TestEnsembleModels.test_voting_sklearn_estimators_error() 
 2. Next, implement each piece of functionality to that the tests pass.

@@ -171,7 +171,7 @@ class PandasDataProvider(DataProviderBase):
         :param path: The platform-agnostic path to the data file to be loaded
         :param features: An interable of features to be used from the dataset.  If 'None', all features will be used
         :param target_feature: The name of the column that contains label data.
-        :return:
+        :return: A tuple of X_columns, X, y
         """
 
         df = pd.read_csv(file_name, sep=self.data_config.file_separator)

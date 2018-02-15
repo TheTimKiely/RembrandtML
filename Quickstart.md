@@ -1,7 +1,7 @@
 # RembrandtML Quickstart
 
-The Quickstart is found in the module test_quickstarts:
-<img src="https://raw.githubusercontent.com/TheTimKiely/RembrandtML/master/images/QuickstartsModule.PNG" style="height: 100" />
+The Quickstart is found in the module test_quickstarts:<p>
+<img src="https://raw.githubusercontent.com/TheTimKiely/RembrandtML/master/images/QuickstartsModule.PNG" height="250" />
 
 This file can be run as a test or as a standalone application.
 

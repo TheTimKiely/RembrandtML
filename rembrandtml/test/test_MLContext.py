@@ -1,7 +1,7 @@
 import unittest
 
 from rembrandtml.configuration import ContextConfig, DataConfig, ModelConfig, Verbosity
-from rembrandtml.core import MLContext
+from rembrandtml.core import RMLContext
 from rembrandtml.factories import ContextFactory
 from rembrandtml.models import ModelType
 from rembrandtml.test.rml_testing import RmlTest
@@ -33,7 +33,7 @@ class TestClassifiers(unittest.TestCase, RmlTest):
         # Create ContextConfig that describes context features, such as logging and instrumentation
         config = ContextConfig(model_config, data_config, Verbosity.DEBUG)
 
-        # Instantiate the MLContext
+        # Instantiate the RMLContext
         ctxt = ContextFactory.create(config)
 
         #Prepare the data
@@ -56,7 +56,7 @@ class TestClassifiers(unittest.TestCase, RmlTest):
         # Create ContextConfig that describes context features, such as logging and instrumentation
         config = ContextConfig(model_config, data_config, Verbosity.DEBUG)
 
-        # Instantiate the MLContext
+        # Instantiate the RMLContext
         ctxt = ContextFactory.create(config)
 
         # Prepare the data

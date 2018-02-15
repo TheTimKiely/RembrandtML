@@ -1,4 +1,4 @@
-from rembrandtml.core import MLContext
+from rembrandtml.core import RMLContext
 from rembrandtml.data import DataContainer
 from rembrandtml.entities import MLLogger
 from rembrandtml.model_implementations.model_impls_cntk import MLModelImplementationCntk
@@ -16,14 +16,14 @@ class ContextFactory(object):
         '''
         Factory method to instantiate a new machine learning context
         :param MLCnfig:
-        :return: MLContext
+        :return: RMLContext
         '''
 
         logger = MLLogger(config.instrumentation_config)
         instrumentation = Instrumentation(config.instrumentation_config, logger)
         data_container = DataContainerFactory.create(config.model_config.data_config, instrumentation)
         model = ModelFactory.create(config.model_config, data_container, instrumentation)
-        context = MLContext(model, instrumentation, config)
+        context = RMLContext(model, instrumentation, config)
         return context
 
 class DataContainerFactory(object):

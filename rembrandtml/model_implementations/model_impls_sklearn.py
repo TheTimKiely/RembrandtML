@@ -105,7 +105,7 @@ class MLModelSkLearn(MLModelImplementation):
         values = {}
         for metric in metrics:
             name, value = self.evaluate_metric(X, y, str(metric))
-            values[metric] = value
+            values[f'cv:{str(metric)}'] = value
         return values
 
     def evaluate_metric(self, X, y, metric):
@@ -116,9 +116,10 @@ class MLModelSkLearn(MLModelImplementation):
 
     def evaluate(self, X, y):
         self.validate_trained()
-        values = self.evaluate_metrics(X, y, self.metrics)
         score_value = self._model.score(X, y)
-        values[str(self.score_type)] = score_value
+        values = {str(self.score_type): score_value}
+        cv_values = self.evaluate_metrics(X, y, self.metrics)
+        values.update(cv_values)
         score = Score(self.model_config, values, self.score_notes)
         self.customize_score(score)
         return score

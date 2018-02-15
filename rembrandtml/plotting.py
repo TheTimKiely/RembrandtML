@@ -149,6 +149,65 @@ class Plotter(object):
         plt.xlabel('False Positive Rate (FPR)', fontsize=16)
         plt.ylabel('True Positive Rate (TPR)', fontsize=16)
 
+
+    def make_meshgrid(self, x, y, h=.02):
+        """Create a mesh of points to plot in
+
+        Parameters
+        ----------
+        x: data to base x-axis meshgrid on
+        y: data to base y-axis meshgrid on
+        h: stepsize for meshgrid, optional
+
+        Returns
+        -------
+        xx, yy : ndarray
+        """
+        x_min, x_max = x.min() - 1, x.max() + 1
+        y_min, y_max = y.min() - 1, y.max() + 1
+        xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+                             np.arange(y_min, y_max, h))
+        return xx, yy
+
+    def plot_contours(self, ax, clf, xx, yy, **params):
+        """Plot the decision boundaries for a classifier.
+
+        Parameters
+        ----------
+        ax: matplotlib axes object
+        clf: a classifier
+        xx: meshgrid ndarray
+        yy: meshgrid ndarray
+        params: dictionary of params to pass to contourf, optional
+        """
+        Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+        Z = Z.values.reshape(xx.shape)
+        out = ax.contourf(xx, yy, Z, **params)
+        return out
+
+    def plot_contour(self, context):
+        """
+        Draws a contour plot with the classifier's decision boundaries
+        :param context: An RMLContext object with a trained model.
+        :return:
+        """
+        import matplotlib.pyplot as plt
+        X0 = context.model.data_container.X_test[:, 0]
+        X1 = context.model.data_container.X_test[:, 1]
+        xx, yy = self.make_meshgrid(X0, X1)
+        y = context.model.data_container.y_test
+        fig, ax = plt.subplots(1,1)
+        self.plot_contours(ax, context, xx, yy,cmap=plt.cm.coolwarm, alpha=0.8)
+        ax.scatter(X0, X1, c=y, cmap=plt.cm.coolwarm, s=20, edgecolors='k')
+        ax.set_xlim(xx.min(), xx.max())
+        ax.set_ylim(yy.min(), yy.max())
+        ax.set_xlabel(context.model.data_container.X_columns[0])
+        ax.set_ylabel(context.model.data_container.X_columns[1])
+        ax.set_xticks(())
+        ax.set_yticks(())
+        ax.set_title(f'{context.model.data_container.config.dataset_name} {context.model.model_config.name}')
+
+
     def plot(self, X, y, color = 'blue', linewidth=2):
         plt.plot(X, y, color=color, linewidth=linewidth)
 
@@ -182,27 +241,11 @@ class MetricsPlotter(Plotter):
                 series = self.build_series(epochs, series_data, metrics.SeriesStyles[i], f'{metrics.Name} {series_name}')
                 self.add_series(series)
 
-        '''        
-        loss = history['loss']
-        val_loss = history['val_loss']
-        epochs = range(1, len(loss) + 1)
-
-        loss_series = self.build_series(epochs, loss, 'bo', 'Training Loss')
-        self.add_series(loss_series)
-        val_loss_series = self.build_series(epochs, val_loss, 'b', 'Validation Loss')
-        self.add_series(val_loss_series)
-        plt.clf()
-        acc = history['acc']
-        val_acc = history['val_acc']
-        acc_series = self.build_series(epochs, acc, 'ro', 'Training Score')
-        self.add_series(acc_series)
-        val_acc_series = self.build_series(epochs, val_acc, 'r', 'Validation Score')
-        self.add_series(val_acc_series)
-        '''
         plt.title('Training & Validation Loss')
         plt.xlabel('Epochs')
         plt.ylabel('Loss')
         plt.legend()
+
 
     def add_series(self, series_data):
         plt.plot(series_data.x_data, series_data.y_data, series_data.series_style, label=series_data.series_label)

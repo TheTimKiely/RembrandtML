@@ -77,14 +77,14 @@ class Prediction(object):
         return str
 
 
-class MLContext(object):
+class RMLContext(object):
     """The RMLContext object is an organizing structure to group the data, model, and plotter that are used in common ML tasks.
     It provides a collection of DataContainers, MLModels, and DataContainers to that that comparing entities becomes easy.
-    The MLContext also holds singletons, such as Instrumentation and Timer.
+    The RMLContext also holds singletons, such as Instrumentation and Timer.
     """
 
     def __init__(self, model, instrumentation, config):
-        super(MLContext, self).__init__()
+        super(RMLContext, self).__init__()
         self.config = config
         self.plotter = Plotter()
         self.model = model

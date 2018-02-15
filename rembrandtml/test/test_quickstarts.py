@@ -56,11 +56,11 @@ class Classifier_Quickstart(object):
         ax.scatter(X0, X1, c=y, cmap=plt.cm.coolwarm, s=20, edgecolors='k')
         ax.set_xlim(xx.min(), xx.max())
         ax.set_ylim(yy.min(), yy.max())
-        ax.set_xlabel('Sepal length')
-        ax.set_ylabel('Sepal width')
+        ax.set_xlabel(context.model.data_container.X_columns[0])
+        ax.set_ylabel(context.model.data_container.X_columns[1])
         ax.set_xticks(())
         ax.set_yticks(())
-        ax.set_title('Title')
+        ax.set_title(context.model.data_container.config.dataset_name)
 
         plt.show()
         '''
@@ -93,7 +93,10 @@ class Classifier_Quickstart(object):
         context = ContextFactory.create(context_config)
 
         # 4. Prepare the data.
-        context.prepare_data(features=('sepal length (cm)', 'sepal width (cm)'))
+        # Use only two features for plotting
+        features = ('sepal length (cm)', 'sepal width (cm)')
+        features = ('petal length (cm)', 'petal width (cm)')
+        context.prepare_data(features=None)
 
         # 5. Train the model.
         context.train()
@@ -104,8 +107,6 @@ class Classifier_Quickstart(object):
 
         # 7. Make predictions.
         predictions = context.predict(context.model.data_container.X_test, True)
-        print(f'Predictions - {predictions}')
-        print(context.model.data_container.y_test)
         # df = pd.DataFrame({'Prediction': [[max(i) for i in predictions.values]], 'Predictions': [predictions.values], 'Labels:': [context.model.data_container.y_test]})
         results = zip(context.model.data_container.y_test, np.argmax(predictions.values, axis=1), predictions.values)
         for result in results:
@@ -170,8 +171,8 @@ class Regression_Quickstart(object):
 
 
 if __name__ == '__main__':
-    #quickstart = Classifier_Quickstart()
-    #quickstart.run_logistic_regression()
+    quickstart = Classifier_Quickstart()
+    quickstart.run_logistic_regression(plot=False)
 
-    quickstart = Regression_Quickstart()
-    quickstart.run_linear_regression(plot=True)
+    #quickstart = Regression_Quickstart()
+    #quickstart.run_linear_regression(plot=True)

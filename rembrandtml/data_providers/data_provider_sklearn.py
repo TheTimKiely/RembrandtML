@@ -26,8 +26,19 @@ class SkLearnDataProvider(DataProviderBase):
 
     def get_dataset(self, name, features, target_feature):
         data = self.dataset_map[name]
-        X_columns = data.feature_names
-        X = data.data
+
+        if features:
+            # ScikitLearn uses an ndarray, so we need indexes
+            pairs = [(i, f) for i, f in enumerate(data.feature_names) if f in features]
+            indeces = [i[0] for i in pairs]
+            columns = [i[1] for i in pairs]
+            X = data.data[:,indeces]
+            #X = data.data[:, np.newaxis, indeces]
+            X_columns = columns
+        else:
+            X_columns = data.feature_names
+            X = data.data
+
         y = data.target
         dataset = (X_columns, X, y)
         return dataset

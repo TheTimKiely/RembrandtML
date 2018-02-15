@@ -2,7 +2,8 @@ import os, dill
 from enum import Enum
 import numpy as np
 
-from rembrandtml.core import FunctionNotImplementedError
+from rembrandtml.configuration import RunMode
+from rembrandtml.core import FunctionNotImplementedError, StateError, ParameterError
 from rembrandtml.entities import MLEntityBase
 
 _model_names = ('math', 'linreg', 'cls', 'mltcls', 'knn', 'logreg', 'sgd', 'rndf', 'nbay', 'pcpt', 'svc'
@@ -53,6 +54,11 @@ class MLModelBase(MLEntityBase):
     @property
     def coefficients(self):
         return self._model_impl.coefficients
+
+
+    @property
+    def intercepts(self):
+        return self._model_impl.intercepts
 
     @property
     def Model(self):
@@ -234,11 +240,11 @@ class MLModel(MLSingleModelBase):
                            metrics=self.model_config.ModelConfig.metrics)
 
     def tune(self, tuning_parameters, parameters):
-        X, y = self.get_data_from_data_container(train=False)
+        X, y = self.get_data_from_data_container(RunMode.PREDICT)
         results = self._model_impl.tune(X, y, tuning_parameters, parameters)
         return results
 
-    def get_data_from_data_container(self, train=True):
+    def get_data_from_data_container(self, mode = RunMode.TRAIN):
         """
         Retrieves X and y data from the DataContainer.
         :param train: Specifies which data tensors to retrun.  Default is 'True'.  If 'False', test tensors are returned
@@ -246,16 +252,17 @@ class MLModel(MLSingleModelBase):
         """
         self.validate_fit_call();
 
-        if self.data_container.X_train is not None:
-            if train:
-                X = self.data_container.X_train
-                y = self.data_container.y_train
-            else:
-                X = self.data_container.X_test
-                y = self.data_container.y_test
-        else:
+        if mode == RunMode.TRAIN:
+            X = self.data_container.X_train
+            y = self.data_container.y_train
+        elif mode == RunMode.PREDICT:
+            X = self.data_container.X_test
+            y = self.data_container.y_test
+        elif mode == RunMode.EVALUATE:
             X = self.data_container.X
             y = self.data_container.y
+        else:
+            raise ParameterError(f'The requested RunMode, {mode.name}, is not supported.')
         return X, y
 
     def fit(self, regularize=True, validate=False, weights_file=None, model_file=None, save=False):
@@ -338,7 +345,7 @@ class MLModel(MLSingleModelBase):
         #    self.log(f'X and y were not passed as parameters.  Using DataContainer.')
         #    loss = self.Model.evaluate_generator(self.data_container.val_generator, steps=self.data_container.val_steps)
         #else:
-        X, y = self.get_data_from_data_container(train=False)
+        X, y = self.get_data_from_data_container(RunMode.EVALUATE)
         score = self._model_impl.evaluate(X, y)
         return score
 

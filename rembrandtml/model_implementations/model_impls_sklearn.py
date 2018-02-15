@@ -30,6 +30,11 @@ class MLModelSkLearn(MLModelImplementation):
     """
     def __init__(self, model_config, instrumentation):
         super(MLModelSkLearn, self).__init__(model_config, instrumentation)
+        # Standard metrics for LogisticRegression
+        self.metrics = (ScoreType.ACCURACY,)
+        # The ScikitLearn metric returned from score() for LogisticRegression
+        self.score_type = ScoreType.ACCURACY
+        self.score_notes = 'ScikitLearn Implementation: All scorer objects follow the convention that higher return values are better than lower return values.'
         if model_config.model_type == ModelType.KNN:
             self._model = KNeighborsClassifier()
         elif model_config.model_type == ModelType.LOGISTIC_REGRESSION:
@@ -65,6 +70,14 @@ class MLModelSkLearn(MLModelImplementation):
         else:
             raise StateError('Coefficients are not available because the model has not yet been trained.')
 
+    @property
+    def intercepts(self):
+        if hasattr(self._model, 'intercept_'):
+            return self._model.intercept_
+        else:
+            raise StateError('Intercepts are not available because the model has not yet been trained.')
+
+
     def fit(self, X, y, validate=False):
         self._model.fit(X, y)
 
@@ -91,7 +104,7 @@ class MLModelSkLearn(MLModelImplementation):
     def evaluate_metrics(self, X, y, metrics):
         values = {}
         for metric in metrics:
-            name, value = self.evaluate_metric(X, y, metric)
+            name, value = self.evaluate_metric(X, y, str(metric))
             values[metric] = value
         return values
 
@@ -103,11 +116,10 @@ class MLModelSkLearn(MLModelImplementation):
 
     def evaluate(self, X, y):
         self.validate_trained()
+        values = self.evaluate_metrics(X, y, self.metrics)
         score_value = self._model.score(X, y)
-        metrics = (str(ScoreType.ACCURACY), 'neg_log_loss', 'roc_auc')
-        values = self.evaluate_metrics(X, y, metrics)
-        values[str(ScoreType.R2)] = score_value
-        score = Score(self.model_config, values)
+        values[str(self.score_type)] = score_value
+        score = Score(self.model_config, values, self.score_notes)
         self.customize_score(score)
         return score
 
@@ -147,19 +159,8 @@ class MLModelSkLearn(MLModelImplementation):
 class MLModelSkLearnLinReg(MLModelSkLearn):
     def __init__(self, model_config, instrumentation):
         super(MLModelSkLearnLinReg, self).__init__(model_config, instrumentation)
-
-    def evaluate(self, X, y):
-        self.validate_trained()
-
-
-        value = self._model.score(X, y)
-
-        values = {}
-        metrics = ('neg_mean_absolute_error', 'neg_mean_squared_error', 'r2')
-        values = self.evaluate_metrics(X, y, metrics)
-        score = Score(self.model_config, values)
-        self.customize_score(score)
-        return score
+        self.metrics = (ScoreType.MAE, ScoreType.MSE , ScoreType.R2)
+        self.score_type = ScoreType.R2
 
     def predict(self, X, with_probabilities):
         self.validate_trained()

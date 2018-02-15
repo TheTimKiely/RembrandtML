@@ -26,9 +26,10 @@ class ScoreType(Enum):
         return score_names[self.value]
 
 class Score(object):
-    def __init__(self, model_config, values = {}):
+    def __init__(self, model_config, values = {}, notes = ''):
         self.values = values
         self._model_config = model_config
+        self.notes = notes
 
     def __gt__(self, other):
         return self.value[self.values.keys()[0]] > other.value[self.values.keys()[0]]
@@ -55,6 +56,8 @@ class Score(object):
         str = f'Name: {self.model_name} Model Type: {self.model_type} Framework:{self.model_framework}\n\t'
         for metric in self.values:
             str += f'{metric}: {self.values[metric]}\n\t'
+        if self.notes:
+            str += f'Notes: {self.notes}'
         return str
 
 
@@ -112,6 +115,10 @@ class MLContext(object):
         self.log(f'Finished training model: {str(self.model)}')
 
     def evaluate(self):
+        """
+
+        :return: Score object populated with metrics specific to each model type
+        """
         self.log(f'Evaluating model: {str(self.model)}')
         score = self.model.evaluate()
         self.log(f'Finished evaluating model: {str(self.model)}')
@@ -146,6 +153,10 @@ class MLContext(object):
         split_string = self.time_to_string(*self.instrumentation.timer.get_split())
         instr_msg = f'{start_string} Split: {split_string}: {msg}'
         self.instrumentation.logger.log(instr_msg, verbosity)
+
+class ParameterError(RuntimeError):
+    def __init__(self, msg):
+        super(StateError, self).__init__(self, msg)
 
 class StateError(RuntimeError):
     def __init__(self, msg):

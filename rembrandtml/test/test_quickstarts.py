@@ -61,8 +61,8 @@ class Regression_Quickstart(object):
         #dataset = 'iris'
         #data_file = os.path.abspath(os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'data', 'gapminder', 'gm_2008_region.csv')))
         #data_config = DataConfig('pandas', dataset, data_file)
-        #data_config = DataConfig('sklearn', 'diabetes')
-        data_config = DataConfig('sklearn', 'ca-housing')
+        data_config = DataConfig('sklearn', 'diabetes')
+        #data_config = DataConfig('sklearn', 'ca-housing')
 
         # 2. Define the model.
         model_config = ModelConfig('Sklearn LinReg', framework, ModelType.LINEAR_REGRESSION, data_config)
@@ -75,7 +75,7 @@ class Regression_Quickstart(object):
         # To make this example clear, we'll use only 1 feature
         features = ('bmi')
         #features=('MedInc')
-        features = None
+        #features = None
         # Set features to None or do not pass it as a parameter to prepare_data() if you'd like to train the model against all features.
         context.prepare_data(features=features)
 

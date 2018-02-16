@@ -147,14 +147,15 @@ class MLModelTensorflow(MLModelImplementation):
                 sess.run(training_op)
 
             best_theta = theta.eval()
+            self.score.values[ScoreType.MSE] = mse.eval()
 
         return best_theta
 
     def fit(self, X, y, validate=False):
         #self.fit_normal_equation(X, y)
         self.log('Fitting with tensorflow using gradient descent.', Verbosity.DEBUG)
-        #self.theta = self.fit_gradient_descent(X, y)
-        self.theta = self.fit_gradient_autodif(X, y)
+        self.theta = self.fit_gradient_descent(X, y)
+        #self.theta = self.fit_gradient_autodif(X, y)
 
     def fit_normal_eq(self, X, y, validate=False):
         m, n = X.shape

@@ -70,30 +70,35 @@ class Timer(object):
     def __init__(self):
         self.start_time = None
         self.splits = []
+        self.last_split = None
 
     def start(self):
         self.start_time = time.time()
+        self.last_split = self.start_time
 
     def get_start(self):
         if self.start_time == None:
             raise TypeError('The time has not yet been started.  It must be started to get the elapsed time.')
         return self.start_time
 
-    def split_time(self, seconds):
+    def split_units(self, seconds):
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
         return (h, m, s)
 
     def get_elapsed(self):
-        return self.split_time(time.time() - self.start_time)
+        return self.split_units(time.time() - self.start_time)
 
     def start_split(self, name):
         self.splits.append(Split(name, time.time()))
 
     def get_split(self, name = None):
-        if name == None:
-            return self.split_time((time.time() - self.start_time))
-        if self.splits[name] == None:
+        if name is None:
+            now = time.time()
+            split = self.split_units((now - self.last_split))
+            self.last_split = now
+            return split
+        if self.splits[name] is None:
             raise KeyError(f'The Split {name} has not been created.')
         return self.splits[name].StartTime
 

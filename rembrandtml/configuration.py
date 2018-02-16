@@ -26,6 +26,11 @@ class Verbosity(Enum):
         else:
             raise TypeError(f'Undefined verbosity code: {code}')
 
+    # We have to define __hash__ because
+    # we define __eq__ (http://docs.python.org/3.1/reference/datamodel.html#object.hash)
+    def __hash__(self):
+        return super(Verbosity, self).__hash__()
+
     def __eq__(self, other):
         if self.__class__ is other.__class__:
             return self.value == other.value

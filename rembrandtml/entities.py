@@ -52,6 +52,9 @@ class MLLogger(object):
         BOLD = '\033[1m'
         UNDERLINE = '\033[4m'
 
+    verbosity_color = {Verbosity.SILENT: Colors.FAIL, Verbosity.QUIET: Colors.BOLD,
+                       Verbosity.DEBUG: Colors.HEADER, Verbosity.NOISY: Colors.OKBLUE}
+
     def __init__(self, instrumentation_config = None):
         if instrumentation_config:
             self.instrumentation_config = instrumentation_config
@@ -59,6 +62,6 @@ class MLLogger(object):
             self.instrumentation_config = InstrumentationConfig('d')
 
     def log(self, msg, verbosity = Verbosity.DEBUG):
-        if (verbosity > self.instrumentation_config.verbosity):
+        if verbosity > self.instrumentation_config.verbosity:
             return
-        print(MLLogger.Colors.OKBLUE + msg + MLLogger.Colors.ENDC)
+        print(self.verbosity_color[verbosity] + msg + MLLogger.Colors.ENDC)

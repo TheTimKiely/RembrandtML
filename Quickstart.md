@@ -22,6 +22,13 @@ The entrypoint of the Quickstart is Quickstart.run().
 7. Make predictions.
     * Compare the predictions, returned in the array Prediction.values, with the actual labels in DataContainer.y_test.
 
+### Change the implementation with 1 line of code
+Notice that linear regression quickstart has an optional parameter to select the ML framework that the model will use.
+If you pass 'tensorflow' in this parameter, the model will be built to use a TensorFlow implementation.
+```python
+    quickstart.run_linear_regression(plot=True, framework='tensorflow')
+```
+
 ### Other keys aspects of real-world ML tasks are:
 1. Evaluating the model.
 2. Tuning the model.

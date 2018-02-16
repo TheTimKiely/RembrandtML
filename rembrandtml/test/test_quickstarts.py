@@ -56,15 +56,16 @@ class Regression_Quickstart(object):
     def __init__(self):
         pass
 
-    def run_linear_regression(self, plot=False):
+    def run_linear_regression(self, plot=False, framework='sklearn'):
         # 1. Define the datasource.
         #dataset = 'iris'
         #data_file = os.path.abspath(os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'data', 'gapminder', 'gm_2008_region.csv')))
         #data_config = DataConfig('pandas', dataset, data_file)
-        data_config = DataConfig('sklearn', 'diabetes')
+        #data_config = DataConfig('sklearn', 'diabetes')
+        data_config = DataConfig('sklearn', 'ca-housing')
 
         # 2. Define the model.
-        model_config = ModelConfig('Sklearn LinReg', 'sklearn', ModelType.LINEAR_REGRESSION, data_config)
+        model_config = ModelConfig('Sklearn LinReg', framework, ModelType.LINEAR_REGRESSION, data_config)
 
         # 3. Create the Context.
         context_config = ContextConfig(model_config)
@@ -73,8 +74,10 @@ class Regression_Quickstart(object):
         # 4. Prepare the data.
         # To make this example clear, we'll use only 1 feature
         features = ('bmi')
+        #features=('MedInc')
+        features = None
         # Set features to None or do not pass it as a parameter to prepare_data() if you'd like to train the model against all features.
-        context.prepare_data(features)
+        context.prepare_data(features=features)
 
         # 5. Train the model.
         context.train()
@@ -102,10 +105,9 @@ class Regression_Quickstart(object):
             plt.title(f'{context.model.data_container.config.dataset_name} {context.model.model_config.name}')
             plt.show()
 
-
 if __name__ == '__main__':
     #quickstart = Classifier_Quickstart()
     #quickstart.run_logistic_regression(plot=True)
 
     quickstart = Regression_Quickstart()
-    quickstart.run_linear_regression(plot=True)
+    quickstart.run_linear_regression(plot=True, framework='tensorflow')

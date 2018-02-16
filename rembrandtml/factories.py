@@ -34,13 +34,13 @@ class DataContainerFactory(object):
 
 class ModelImplFactory(object):
     model_impl_map = {'sklearn-logreg': MLModelSkLearn, 'sklearn-linreg': MLModelSkLearnLinReg,
-                      'tensorflow': MLModelTensorflow, 'keras': MLModelImplementationKeras,
+                      'tensorflow-linreg': MLModelTensorflow, 'keras': MLModelImplementationKeras,
                       'cntk': MLModelImplementationCntk}
     @staticmethod
     def create(model_config, instrumentation):
         key = f'{model_config.framework_name}-{model_config.model_type}'
         if key not in ModelImplFactory.model_impl_map.keys():
-            raise TypeError(f'The requested framework, {model_config.framework_name}, is not implemented.')
+            raise TypeError(f'The requested framework, {key}, is not implemented.')
 
         ctor = ModelImplFactory.model_impl_map[key]
         model_impl = ctor(model_config, instrumentation)

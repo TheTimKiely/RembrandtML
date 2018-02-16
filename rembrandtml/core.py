@@ -26,7 +26,7 @@ class ScoreType(Enum):
         return score_names[self.value]
 
 class Score(object):
-    def __init__(self, model_config, values = {}, notes = ''):
+    def __init__(self, model_config, values={}, notes=''):
         self.values = values
         self._model_config = model_config
         self.notes = notes

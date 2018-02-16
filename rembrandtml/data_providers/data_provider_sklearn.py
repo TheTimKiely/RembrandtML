@@ -7,7 +7,8 @@ from rembrandtml.data_providers.data_provider import DataProviderBase
 class SkLearnDataProvider(DataProviderBase):
     def __init__(self, data_config, instrumentation):
         super(SkLearnDataProvider, self).__init__('sklearn', data_config, instrumentation)
-        self.dataset_map = {'boston': datasets.load_boston(), 'iris': datasets.load_iris(), 'diabetes': datasets.load_diabetes()}
+        self.dataset_map = {'boston': datasets.load_boston(), 'iris': datasets.load_iris(),
+                            'diabetes': datasets.load_diabetes(), 'ca-housing': datasets.fetch_california_housing()}
 
     def prepare_data(self, features=None, target_feature=None, sample_size=None):
         dataset = None

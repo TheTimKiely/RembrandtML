@@ -41,7 +41,7 @@ class Classifier_Quickstart(object):
     def __init__(self):
         pass
 
-    def run_binary_logistic_regression(self, plot):
+    def run_binary_logistic_regression(self, plot = False):
         # 1. Define the datasource.
         #dataset = 'iris'
         #data_file = os.path.abspath(os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'data', 'gapminder', 'gm_2008_region.csv')))
@@ -59,7 +59,16 @@ class Classifier_Quickstart(object):
         # Use only two features for plotting
         #features = ('sepal length (cm)', 'sepal width (cm)')
         features = ('petal length (cm)', 'petal width (cm)')
-        context.prepare_data(features=features)
+
+        # override data management to turn multiclassification problem into binary classification
+        from sklearn import datasets
+        iris = datasets.load_iris()
+        X = iris["data"][:, 3:]  # petal width
+        y = (iris["target"] == 2).astype(np.int)
+        context.model.data_container.X = X
+        context.model.data_container.y = y
+        context.model.data_container.split()
+        #context.prepare_data(features=features)
 
         # 5. Train the model.
         context.train()
@@ -75,14 +84,14 @@ class Classifier_Quickstart(object):
         for result in results:
             print(f'Label: {result[0]} Prediction: {result[1]} Model Output: {result[2]}')
 
-
         # Plot outputs
-        # The ROC curve is for 1 class only, so we'll plot each class separately
-        fpr, tpr, th = roc_curve(context.model.data_container.y_test, predictions.values)
-        roc_auc = auc(fpr, tpr)
-        plotter = Plotter()
-        plotter.plot_roc_curve(fpr, tpr)
-        plotter.show()
+        if plot:
+            # The ROC curve is for 1 class only, so we'll plot each class separately
+            fpr, tpr, th = roc_curve(context.model.data_container.y_test, np.argmax(predictions.values, axis=1))
+            roc_auc = auc(fpr, tpr)
+            plotter = Plotter()
+            plotter.plot_roc_curve(fpr, tpr, roc_auc)
+            plotter.show()
 
 
     def run_multiclass_logistic_regression(self, plot):
@@ -180,10 +189,11 @@ class Regression_Quickstart(object):
             plt.show()
 
 if __name__ == '__main__':
-    quickstart = DataAnalysis_Quickstart()
-    quickstart.run_basic_plots()
+    #quickstart = DataAnalysis_Quickstart()
+    #quickstart.run_basic_plots()
 
-    #quickstart = Classifier_Quickstart()
+    quickstart = Classifier_Quickstart()
+    quickstart.run_binary_logistic_regression(plot=True)
     #quickstart.run_multiclass_logistic_regression(plot=True)
 
     #quickstart = Regression_Quickstart()

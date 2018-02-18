@@ -86,7 +86,6 @@ class RMLContext(object):
     def __init__(self, model, instrumentation, config):
         super(RMLContext, self).__init__()
         self.config = config
-        self.plotter = Plotter()
         self.model = model
         # Start the timer to that we can log elapsed times
         self.instrumentation = instrumentation

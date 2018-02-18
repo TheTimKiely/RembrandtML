@@ -161,12 +161,15 @@ class Plotter(object):
         plt.xlabel("precision", fontsize=19)
         plt.axis([0, 1.5, 0, 1.5])
 
-    def plot_roc_curve(true_positive_rate, false_positive_rate, label=None):
+    def plot_roc_curve(self, false_positive_rate, true_positive_rate, auc = None, label=None):
+        if auc:
+            label = 'AUC = %0.2f' % auc
         plt.plot(false_positive_rate, true_positive_rate, linewidth=2, label=label)
         plt.plot([0, 1], [0, 1], 'r', linewidth=4)
         plt.axis([0, 1, 0, 1])
         plt.xlabel('False Positive Rate (FPR)', fontsize=16)
         plt.ylabel('True Positive Rate (TPR)', fontsize=16)
+        plt.legend(loc='lower right')
         '''
         plt.title('ROC Curve')
         plt.plot(fpr, tpr, 'b',

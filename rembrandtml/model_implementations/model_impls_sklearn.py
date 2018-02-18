@@ -13,7 +13,7 @@ from sklearn.linear_model import LogisticRegression, Perceptron
 from rembrandtml.core import Score, ScoreType, TuningResults, Prediction, StateError
 from rembrandtml.model_implementations.model_impls import MLModelImplementation
 from rembrandtml.models import ModelType
-from rembrandtml.plotting import Plotter
+from rembrandtml.visualization import Visualizer
 
 class MLModelSkLearn(MLModelImplementation):
     """
@@ -220,9 +220,9 @@ class MLModelSkLearn(MLModelImplementation):
             # Compute accuracy on the testing set
             test_accuracy[i] = knn.score(self.data_container.X_test, self.data_container.y_test)
 
-        plotter = Plotter()
-        plotter.plot_model_complexity(neighbors, train_accuracy, test_accuracy)
-        plotter.show();
+        vis = Visualizer()
+        vis.plot_model_complexity(neighbors, train_accuracy, test_accuracy)
+        vis.show();
 
     def predict(self, X, with_probabilities):
         self.validate_trained()

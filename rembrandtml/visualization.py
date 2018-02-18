@@ -19,9 +19,10 @@ class PlotData:
 
 class SeriesData:
     def __init__(self):
-        self._x_label = None;
+        self._x_label = None
 
-class Plotter(object):
+
+class Visualizer(object):
     def __init__(self):
         self.Style = None#'ggplot'
         self.figure_num = 0
@@ -248,7 +249,7 @@ class Plotter(object):
     def clear(self):
         plt.clf()
 
-class MetricsPlotter(Plotter):
+class MetricsVisualizer(Visualizer):
     def __init__(self):
         self.Style = 'ggplot'
 

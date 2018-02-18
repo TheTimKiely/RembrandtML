@@ -5,7 +5,7 @@ from rembrandtml.configuration import RunConfig, ContextConfig, DataConfig, Mode
     EnsembleConfig
 from rembrandtml.factories import ModelFactory, ContextFactory
 from rembrandtml.models import ModelType
-from rembrandtml.plotting import Plotter
+from rembrandtml.visualization import Visualizer
 from rembrandtml.test.rml_testing import RmlTest
 
 

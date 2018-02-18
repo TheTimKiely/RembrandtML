@@ -3,7 +3,7 @@ import pandas as pd
 
 from rembrandtml.configuration import Verbosity
 from rembrandtml.entities import MLEntityBase
-from rembrandtml.plotting import Plotter
+from rembrandtml.visualization import Visualizer
 from rembrandtml.utils import Instrumentation
 
 score_names = ('loss', 'accuracy', 'r2', 'Precision', 'Recall', 'F1',
@@ -78,7 +78,7 @@ class Prediction(object):
 
 
 class RMLContext(object):
-    """The RMLContext object is an organizing structure to group the data, model, and plotter that are used in common ML tasks.
+    """The RMLContext object is an organizing structure to group the data, model, and Visualizer that are used in common ML tasks.
     It provides a collection of DataContainers, MLModels, and DataContainers to that that comparing entities becomes easy.
     The RMLContext also holds singletons, such as Instrumentation and Timer.
     """

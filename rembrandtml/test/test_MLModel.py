@@ -3,7 +3,7 @@ import numpy as np
 from rembrandtml.configuration import ContextConfig, DataConfig, ModelConfig, Verbosity
 from rembrandtml.factories import ModelFactory
 from rembrandtml.models import ModelType
-from rembrandtml.plotting import Plotter
+from rembrandtml.visualization import Visualizer
 
 # ToDo make data-driven test
 # @ddt
@@ -52,10 +52,10 @@ class TestMLModel(TestCase):
         X_test = model.data_container.X_test
         y_test = model.data_container.y_test
         prediction = model.predict(model.data_container.X_test)
-        plotter = Plotter()
-        plotter.plot_scatter(X_test, y_test, color='blue')
-        plotter.plot(X_test, prediction, color='black')
-        plotter.show()
+        vis = Visualizer()
+        vis.plot_scatter(X_test, y_test, color='blue')
+        vis.plot(X_test, prediction, color='black')
+        vis.show()
         #model.plot()
 
         features = (['AveBedrms', 'Population'])
@@ -90,10 +90,10 @@ class TestMLModel(TestCase):
         max_x = max(X_test)
         X_test_space = np.linspace(min_x, max_x).reshape(-1, 1)
         prediction = model.predict(X_test_space)
-        plotter = Plotter()
-        plotter.plot_scatter(X_test, y_test, color='blue')
-        plotter.plot(X_test_space, prediction, color='black')
-        plotter.show()
+        vis = Visualizer()
+        vis.plot_scatter(X_test, y_test, color='blue')
+        vis.plot(X_test_space, prediction, color='black')
+        vis.show()
         # model.plot()
 
         features = (['RM', 'CRIM'])
@@ -105,8 +105,8 @@ class TestMLModel(TestCase):
         score = model.evaluate(X_test, y_test)
         print(f'score: {score}')
         prediction = model.predict(X_test)
-        plotter = Plotter()
-        plotter.clear()
+        vis = Visualizer()
+        vis.clear()
         X_test = model.data_container.X
         y_test = model.data_container.y
 
@@ -124,10 +124,10 @@ class TestMLModel(TestCase):
         max_x = max(X_test)
         X_test_space = np.linspace(min_x, max_x).reshape(-1, 1)
         prediction = model.predict(X_test_space)
-        plotter = Plotter()
-        plotter.plot_scatter(X_test, y_test, color='blue')
-        plotter.plot(X_test_space, prediction, color='black')
-        plotter.show()
+        vis = Visualizer()
+        vis.plot_scatter(X_test, y_test, color='blue')
+        vis.plot(X_test_space, prediction, color='black')
+        vis.show()
         #model.plot()
 
         features = (['RM', 'CRIM'])
@@ -136,14 +136,14 @@ class TestMLModel(TestCase):
         X_test = model.data_container.X_test
         y_test = model.data_container.y_test
         prediction_2_features = model.predict(X_test)
-        plotter.clear()
+        vis.clear()
         X_test = model.data_container.X
         y_test = model.data_container.y
         return
         # ToDo figure out how to plot 3D
-        plotter.plot_scatter(X_test[:,0],X_test[:,1], y_test, color='blue')
-        plotter.plot(X_test_space, prediction, color='black')
-        plotter.show()
+        vis.plot_scatter(X_test[:,0],X_test[:,1], y_test, color='blue')
+        vis.plot(X_test_space, prediction, color='black')
+        vis.show()
 
         #model.plot()
 

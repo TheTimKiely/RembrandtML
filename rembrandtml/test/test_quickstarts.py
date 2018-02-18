@@ -5,7 +5,7 @@ from sklearn.metrics import roc_curve, auc
 from rembrandtml.configuration import DataConfig, ModelConfig, ContextConfig
 from rembrandtml.factories import ContextFactory
 from rembrandtml.models import ModelType
-from rembrandtml.plotting import Plotter
+from rembrandtml.visualization import Visualizer
 
 class DataAnalysis_Quickstart(object):
 
@@ -29,13 +29,13 @@ class DataAnalysis_Quickstart(object):
 
         # plot distributions
         df = pd.DataFrame(context.model.data_container.X, columns=context.model.data_container.X_columns)
-        plotter = Plotter()
-        plotter.plot_distributions(df, context.model.data_container.y)
+        vis = Visualizer()
+        vis.plot_distributions(df, context.model.data_container.y)
 
 
         # plot correlations
-        plotter.plot_heatmap(df.corr())
-        plotter.show()
+        vis.plot_heatmap(df.corr())
+        vis.show()
 
 class Classifier_Quickstart(object):
     def __init__(self):
@@ -89,9 +89,9 @@ class Classifier_Quickstart(object):
             # The ROC curve is for 1 class only, so we'll plot each class separately
             fpr, tpr, th = roc_curve(context.model.data_container.y_test, np.argmax(predictions.values, axis=1))
             roc_auc = auc(fpr, tpr)
-            plotter = Plotter()
-            plotter.plot_roc_curve(fpr, tpr, roc_auc)
-            plotter.show()
+            vis = Visualizer()
+            vis.plot_roc_curve(fpr, tpr, roc_auc)
+            vis.show()
 
 
     def run_multiclass_logistic_regression(self, plot):
@@ -130,9 +130,9 @@ class Classifier_Quickstart(object):
 
         # The contour plot will only be correct if 1 features is used!!!
         if plot:
-            plotter = Plotter()
-            plotter.plot_contour(context)
-            plotter.show()
+            vis = Visualizer()
+            vis.plot_contour(context)
+            vis.show()
 
 
 class Regression_Quickstart(object):

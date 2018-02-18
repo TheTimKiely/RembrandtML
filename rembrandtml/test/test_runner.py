@@ -38,7 +38,8 @@ def test_kaggle():
 
 def test_ensemble_models():
     tests= TestEnsembleModels()
-    tests.test_voting_sklearn_estimators_error()
+    #tests.test_voting_sklearn_estimators_error()
+    tests.test_voting_sklearn()
 
 def main(params):
     test_ensemble_models()

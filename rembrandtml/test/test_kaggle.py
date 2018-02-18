@@ -29,37 +29,6 @@ class KaggleTests(unittest.TestCase, RmlTest):
         })
         submission.to_csv(file_name, index=False)
 
-    def run_test(self, data_config, model_config, log_file = None, submit = False):
-        context_config = ContextConfig(model_config)
-        context = ContextFactory.create(context_config)
-        features = ('Has_Cabin', 'Deck', 'Family_Size', 'Alone', 'Port', 'Pclass',
-                    'Sex', 'Age_Class', 'SibSp', 'Parch', 'Fare', 'Embarked')
-        features = ('Has_Cabin', 'Deck', 'Family_Size', 'Port', 'Sex', 'Age_Class', 'SibSp', 'Fare', 'Embarked')
-        #features = ('Deck', 'Family_Size', 'Pclass', 'Sex', 'Age_Class')
-        context.prepare_data(features = features, target_feature='Survived')
-        context.train()
-        score = context.evaluate()
-        self.results = self.results.append(pd.DataFrame({'Model': [model_config.name], 'Score': [score],
-                                                         'Model Parameters': [model_config.parameters],
-                                                         'Data Features': [features]}))
-
-        if 'importances' in score.metrics.keys():
-            df = pd.DataFrame({'feature': context.model.data_container.X_columns, 'importance': np.round(score.metrics['importances'], 3)})
-            importances = df.sort_values('importance', ascending=False).set_index('feature')
-            importances.plot.bar()
-
-        if log_file:
-            self.log_score(score, context_config, features, log_file)
-
-        if submit:
-            prediction_file = self.get_data_file_path('kaggle', data_config.dataset_name, 'test.csv')
-            X_pred = context.model.data_container.get_prediction_data(features, prediction_file)
-            prediction = context.predict(X_pred)
-            index_values = context.model.data_container.get_column_values(prediction_file, self.run_config.index_name)
-            self.create_submission(self.run_config.prediction_index,
-                                   index_values, prediction.values, f'submission_{model_config.name}.csv')
-
-
     def test_tune_titanic_competition(self):
         self.run_config = RunConfig('ScikitLearn Random Forest')
         dataset_name = 'titanic'
@@ -105,12 +74,15 @@ class KaggleTests(unittest.TestCase, RmlTest):
         model_config.parameters = {'criterion': 'entropy', 'min_samples_leaf': 1, 'min_samples_split': 10, 'n_estimators': 1500, 'oob_score': True}
         model_config.name = 'ScikitLearn Random Forest'
         self.run_config.model_name = model_config.name
-        self.run_test(data_config, model_config, submit=True)
+
+        context = ContextFactory.create(ContextConfig(model_config))
+        self.run_test(context, submit=True)
         model_config.parameters = {}
 
         model_config.model_type = ModelType.VOTING_CLASSIFIER
         model_config.name = 'SkLearn Voting'
-        self.run_test(data_config, model_config)
+        context = ContextFactory.create(ContextConfig(model_config))
+        #self.run_test(context)
 
         '''
         #model_config.model_type = ModelType.STACKED

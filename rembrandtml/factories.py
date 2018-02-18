@@ -34,6 +34,7 @@ class DataContainerFactory(object):
 
 class ModelImplFactory(object):
     model_impl_map = {'sklearn-logreg': MLModelSkLearn, 'sklearn-linreg': MLModelSkLearnLinReg,
+                      'sklearn-hvote': MLModelSkLearn, 'sklearn-rndf': MLModelSkLearn,
                       'tensorflow-linreg': MLModelTensorflow, 'keras': MLModelImplementationKeras,
                       'cntk': MLModelImplementationCntk}
     @staticmethod

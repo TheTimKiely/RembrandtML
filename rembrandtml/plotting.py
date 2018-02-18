@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from matplotlib import  cm
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -22,7 +23,12 @@ class SeriesData:
 
 class Plotter(object):
     def __init__(self):
-        self.Style = 'ggplot'
+        self.Style = None#'ggplot'
+        self.figure_num = 0
+        plt.figure(self.figure_num)
+
+    def increment_figure(self):
+        plt.figure(self.figure_num + 1)
 
     def plot(self, x, y):
         plt.plot(x, y)
@@ -62,6 +68,18 @@ class Plotter(object):
                          diag_kws=dict(shade=True), plot_kws=dict(s=10))
         g.set(xticklabels=[])
 
+    def plot_distributions(self, df, y):
+        pd.scatter_matrix(df, c=y, figsize=[8, 8], s=150, marker='D')
+        self.increment_figure()
+
+    def plot_correlations(self, correlations, size=11):
+        fig, ax = plt.subplots(figsize=(size, size))
+        ax.matshow(correlations)
+        plt.xticks(range(len(correlations.columns)), correlations.columns)
+        plt.yticks(range(len(correlations.columns)), correlations.columns)
+        plt.legend()
+        self.increment_figure()
+
     #train.astype(float).corr()
     def plot_heatmap(self, correlations):
         colormap = plt.cm.RdBu
@@ -69,6 +87,7 @@ class Plotter(object):
         plt.title('Pearson Correlation of Features', y=1.05, size=15)
         sns.heatmap(correlations, linewidths=0.1, vmax=1.0,
                     square=True, cmap=colormap, linecolor='white', annot=True)
+        self.increment_figure()
 
     def plot_model_complexity(neighbors, train_accuracy, test_accuracy):
             # Generate plot
@@ -142,12 +161,24 @@ class Plotter(object):
         plt.xlabel("precision", fontsize=19)
         plt.axis([0, 1.5, 0, 1.5])
 
-    def plot_roc_curve(false_positive_rate, true_positive_rate, label=None):
+    def plot_roc_curve(true_positive_rate, false_positive_rate, label=None):
         plt.plot(false_positive_rate, true_positive_rate, linewidth=2, label=label)
         plt.plot([0, 1], [0, 1], 'r', linewidth=4)
         plt.axis([0, 1, 0, 1])
         plt.xlabel('False Positive Rate (FPR)', fontsize=16)
         plt.ylabel('True Positive Rate (TPR)', fontsize=16)
+        '''
+        plt.title('ROC Curve')
+        plt.plot(fpr, tpr, 'b',
+                 label='AUC = %0.2f' % roc_auc)
+        plt.legend(loc='lower right')
+        plt.plot([0, 1], [0, 1], 'r--')
+        #plt.xlim([0, 1])
+        #plt.ylim([0, 1])
+        plt.ylabel('True Positive Rate')
+        plt.xlabel('False Positive Rate')
+        plt.show()
+        '''
 
 
     def make_meshgrid(self, x, y, h=.02):

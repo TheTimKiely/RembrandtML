@@ -33,6 +33,9 @@ class PandasDataProvider(DataProviderBase):
     def preprocess_titanic_data(self, df, features):
         import  re
 
+        if features is None:
+            raise
+
         title_na = 0
         fare_na = 0
 

@@ -6,9 +6,8 @@ from rembrandtml.configuration import RunMode
 from rembrandtml.core import FunctionNotImplementedError, StateError, ParameterError
 from rembrandtml.entities import MLEntityBase
 
-_model_names = ('math', 'linreg', 'cls', 'mltcls', 'knn', 'logreg', 'sgd', 'rndf', 'nbay', 'pcpt', 'svc'
-                                                                                                  'dtree', 'cnn', 'rnn',
-               'lstm', 'gru', 'hvote', 'stckd')
+_model_names = ('math', 'linreg', 'cls', 'mltcls', 'knn', 'logreg', 'sgd', 'rndf', 'nbay', 'pcpt', 'svc',
+                'dtree', 'cnn', 'rnn', 'lstm', 'gru', 'hvote', 'stckd')
 class ModelType(Enum):
     MATH = 0
     LINEAR_REGRESSION = 1
@@ -183,21 +182,60 @@ class MLModelBase(MLEntityBase):
         pass
 
     def fit(self, save=False):
-        pass
+        """
+
+        :param X: The feature dataset to fit against
+        :param y: The labels to fit against
+        :param features: A tuple of the features to be included in X.  If X and y are not supplied, this parameter will be used to retrieve data from the DataContainer
+        :param weights_file:
+        :param model_file:
+        :param save: A boolean indicating whether or not to save the fitted model to a file
+        :return: The path of the saved file if 'save' was 'True'
+        """
+        X, y = self.get_data_from_data_container()
+        self.log(f'Running fit with implementation: {self._model_impl.__class__.__name__} X: {X.shape} y: {y.shape}')
+        self._model_impl.fit(X, y)
+
 
     def train(self):
         pass
 
-    def evaluate(self, X, y):
-        pass
+    def get_data_from_data_container(self, mode = RunMode.TRAIN):
+        """
+        Retrieves X and y data from the DataContainer.
+        :param train: Specifies which data tensors to retrun.  Default is 'True'.  If 'False', test tensors are returned
+        :return: X and y tensors
+        """
+        self.validate_fit_call();
+
+        if mode == RunMode.TRAIN:
+            X = self.data_container.X_train
+            y = self.data_container.y_train
+        elif mode == RunMode.EVALUATE:
+            X = self.data_container.X_test
+            y = self.data_container.y_test
+        else:
+            raise ParameterError(f'The requested RunMode, {mode.name}, is not supported.')
+        return X, y
+
+    def evaluate(self):
+        score = None
+        #if X == None:
+        #    self.log(f'X and y were not passed as parameters.  Using DataContainer.')
+        #    loss = self.Model.evaluate_generator(self.data_container.val_generator, steps=self.data_container.val_steps)
+        #else:
+        X, y = self.get_data_from_data_container(RunMode.EVALUATE)
+        score = self._model_impl.evaluate(X, y)
+        return score
+
 
 
     def tune(self, parameters):
         raise FunctionNotImplementedError(self.__class__.__name__, 'tune')
 
-    def predict(self, X, wih_probabilities, prediction_column = None, index_column = None):
-        pass
-
+    def predict(self, X, with_probabilities):
+        prediction = self._model_impl.predict(X, with_probabilities)
+        return prediction
 
 class MLSingleModelBase(MLModelBase):
     def __init__(self, model_config, data_container, instrumentation):
@@ -244,28 +282,8 @@ class MLModel(MLSingleModelBase):
         results = self._model_impl.tune(X, y, tuning_parameters, parameters)
         return results
 
-    def get_data_from_data_container(self, mode = RunMode.TRAIN):
-        """
-        Retrieves X and y data from the DataContainer.
-        :param train: Specifies which data tensors to retrun.  Default is 'True'.  If 'False', test tensors are returned
-        :return: X and y tensors
-        """
-        self.validate_fit_call();
 
-        if mode == RunMode.TRAIN:
-            X = self.data_container.X_train
-            y = self.data_container.y_train
-        elif mode == RunMode.PREDICT:
-            X = self.data_container.X_test
-            y = self.data_container.y_test
-        elif mode == RunMode.EVALUATE:
-            X = self.data_container.X
-            y = self.data_container.y
-        else:
-            raise ParameterError(f'The requested RunMode, {mode.name}, is not supported.')
-        return X, y
-
-    def fit(self, regularize=True, validate=False, weights_file=None, model_file=None, save=False):
+    def fit_gen(self, regularize=True, validate=False, weights_file=None, model_file=None, save=False):
         """
 
         :param X: The feature dataset to fit against
@@ -339,28 +357,14 @@ class MLModel(MLSingleModelBase):
         self.data_container = data_container
         self.log('Added DataContainer')
 
-    def evaluate(self):
-        score = None
-        #if X == None:
-        #    self.log(f'X and y were not passed as parameters.  Using DataContainer.')
-        #    loss = self.Model.evaluate_generator(self.data_container.val_generator, steps=self.data_container.val_steps)
-        #else:
-        X, y = self.get_data_from_data_container(RunMode.EVALUATE)
-        score = self._model_impl.evaluate(X, y)
-        return score
-
-    def predict(self, X, with_probabilities):
-        prediction = self._model_impl.predict(X, with_probabilities)
-        return prediction
-
 class EnsembleModelBase(MLModelBase):
     """
     Handles common functionality of all type of ensemble models, such as estimator validation, data slicing, and looping over estimators
     """
     def __init__(self, model_config, data_provider, instrumentation):
         super(EnsembleModelBase, self).__init__(model_config, data_provider, instrumentation)
-        self.validate_estimators()
-        self.build_estimators()
+        #self.validate_estimators()
+        #self.build_estimators()
         from rembrandtml.factories import ModelImplFactory
         self._model_impl = ModelImplFactory.create(model_config, instrumentation)
 

@@ -4,7 +4,7 @@ from rembrandtml.entities import MLLogger
 from rembrandtml.model_implementations.model_impls_cntk import MLModelImplementationCntk
 from rembrandtml.model_implementations.model_impls_keras import MLModelImplementationKeras
 from rembrandtml.model_implementations.model_impls_sklearn import MLModelSkLearn, MLModelSkLearnLinReg
-from rembrandtml.model_implementations.model_impls_tensorflow import MLModelTensorflow
+from rembrandtml.model_implementations.model_impls_tensorflow import MLModelTensorflow, MLModelTensorflowCNN
 from rembrandtml.models import MLModel, MathModel, ModelType, VotingModel
 from rembrandtml.nnmodels import ConvolutionalNeuralNetwork, RecurrentNeuralNetwork, LstmRNN, GruNN
 from rembrandtml.utils import Instrumentation
@@ -35,7 +35,8 @@ class DataContainerFactory(object):
 class ModelImplFactory(object):
     model_impl_map = {'sklearn-logreg': MLModelSkLearn, 'sklearn-linreg': MLModelSkLearnLinReg,
                       'sklearn-hvote': MLModelSkLearn, 'sklearn-rndf': MLModelSkLearn,
-                      'tensorflow-linreg': MLModelTensorflow, 'keras': MLModelImplementationKeras,
+                      'tensorflow-linreg': MLModelTensorflow, 'tensorflow-cnn': MLModelTensorflowCNN,
+                      'keras': MLModelImplementationKeras,
                       'cntk': MLModelImplementationCntk}
     @staticmethod
     def create(model_config, instrumentation):

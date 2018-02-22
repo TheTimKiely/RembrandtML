@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 
 
@@ -92,7 +93,7 @@ class LoggingConfig(object):
         self.logger_configs = logger_configs
 
 class InstrumentationConfig(object):
-    def __init__(self, console_verbosity, logging_config = None):
+    def __init__(self, console_verbosity='d', logging_config=None):
         """
         Configuration data for the instrumentation system, which included logging, instrumentation, and auditing.
         :param console_verbosity: The logging level for messages to the console.  This parameter can be a Verbosity enum
@@ -107,7 +108,11 @@ class InstrumentationConfig(object):
         self.logging_config = logging_config
 
 class ContextConfig(object):
-    def __init__(self, model_config, mode = RunMode.TRAIN, verbosity = Verbosity.QUIET, layers = 4, nodes = 16, epochs = 10, batch_size = 32):
+    def __init__(self, model_config, mode = RunMode.TRAIN, verbosity = Verbosity.QUIET, base_dir = None, layers = 4, nodes = 16, epochs = 10, batch_size = 32):
+        if not base_dir:
+            self.base_dir = os.getcwd()
+        else:
+            self.base_dir = base_dir
         self._verbosity = verbosity
         # Properties probably aren't necessary, so experimenting with public fields
         self.Layers = layers

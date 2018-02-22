@@ -11,19 +11,8 @@ from rembrandtml.models import MLModel
 
 
 class NeuralNetwork(MLModel):
-    def __init__(self, ml_config, data_container, instrumentation):
-        super(NeuralNetwork, self).__init__(ml_config, data_container, instrumentation)
-        self._layers = ml_config.Layers
-        self._nodes = ml_config.Nodes
-        self._epochs = ml_config.Epochs
-        self.X_train = None
-        self.y_train = None
-        self.X_val = None
-        self.y_val = None
-        self.X_test = None
-        self.y_test = None
-        #self.ModelParam = ModelConfig()
-        #self.Data_Directory2 = os.path.abspath(os.path.join(os.getcwd(), os.path.join('..', '..', '..', 'data')))
+    def __init__(self, model_config, data_container, instrumentation):
+        super(NeuralNetwork, self).__init__(model_config, data_container, instrumentation)
 
 
     @staticmethod

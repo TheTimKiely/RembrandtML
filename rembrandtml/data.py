@@ -6,6 +6,7 @@ import numpy as np
 from rembrandtml.data_providers.data_provider_keras import KerasDataProvider
 from rembrandtml.data_providers.data_provider_pandas import PandasDataProvider
 from rembrandtml.data_providers.data_provider_sklearn import SkLearnDataProvider
+from rembrandtml.data_providers.data_provider_tensorflow import TensorflowDataProvider
 from rembrandtml.entities import MLEntityBase
 
 
@@ -13,6 +14,9 @@ class DataContainer(MLEntityBase):
     """
     DataContainer manages the structures that hold training and target data.
     """
+    data_containers = {'sklearn': SkLearnDataProvider, 'pandas': PandasDataProvider,
+                       'keras': KerasDataProvider, 'tensorflow': TensorflowDataProvider}
+
     def __init__(self, data_config, instrumentation):
         super(DataContainer, self).__init__(instrumentation)
         self.data_provider = self.get_data_provider(data_config)
@@ -34,14 +38,11 @@ class DataContainer(MLEntityBase):
         self.y_val = None
 
     def get_data_provider(self, data_config):
-        if data_config.framework_name == 'sklearn':
-            return SkLearnDataProvider(data_config, self.instrumentation)
-        elif data_config.framework_name == 'keras':
-            return KerasDataProvider(data_config, self.instrumentation)
-        elif data_config.framework_name == 'pandas':
-            return PandasDataProvider(data_config, self.instrumentation)
-        else:
+        if data_config.framework_name not in self.data_containers:
             raise TypeError(f'The specified framework, {framework_name}, is not supported as a DataProvider.')
+
+        ctor = self.data_containers[data_config.framework_name]
+        return ctor(data_config, self.instrumentation)
 
     def get_prediction_data(self, features, prediction_file):
         return self.data_provider.get_prediction_data(features, prediction_file)

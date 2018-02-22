@@ -1,5 +1,5 @@
 import time, getopt
-
+import logging
 from rembrandtml.configuration import ModelConfig, ContextConfig, DataConfig, InstrumentationConfig
 
 
@@ -110,3 +110,16 @@ class Instrumentation(object):
         else:
             self.config = instrumentation_config
         self.logger = logger
+        if instrumentation_config.logging_config:
+            for logger_config in instrumentation_config.logging_config.logger_configs:
+                pylogger = logging.getLogger(logger_config.name)
+                pylogger.setLevel(logger_config.level)
+                for path, level in logger_config.handlers:
+                    handler = logging.FileHandler(path)
+                    handler.setLevel(level)
+                    formatter = logging.Formatter(logger_config.formatter)
+                    handler.setFormatter(formatter)
+                    pylogger.addHandler(handler)
+                self.logger.pyloggers.append(pylogger)
+
+

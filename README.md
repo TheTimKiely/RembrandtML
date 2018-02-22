@@ -8,6 +8,7 @@ The project intends to make the ML workflow easier to understand and implement b
 ### Key features include:
 1. Test-first development is modeled.
 1. The flexible, modular design makes modifying and adding implementations easy.
+1. Logical default values making it easy to get started.
 1. The code is fully instrumented for comprehensive logging and time measurement.
 1. Methods to tune model hyperparameters.
 1. Plotting accuracy scores of many configurations for comparison.

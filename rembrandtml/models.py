@@ -259,6 +259,8 @@ class MathModel(MLSingleModelBase):
         print(np.mean(batch_maes))
         return batch_maes
 
+
+
 class MLModel(MLSingleModelBase):
     def __init__(self, model_config, data_container, instrumentation):
         super(MLModel, self).__init__(model_config, data_container, instrumentation)

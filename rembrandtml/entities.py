@@ -60,8 +60,24 @@ class MLLogger(object):
             self.instrumentation_config = instrumentation_config
         else:
             self.instrumentation_config = InstrumentationConfig('d')
+        self.pyloggers = []
 
     def log(self, msg, verbosity = Verbosity.DEBUG):
         if verbosity > self.instrumentation_config.verbosity:
             return
         print(self.verbosity_color[verbosity] + msg + MLLogger.Colors.ENDC)
+        self.write_to_loggers(msg, verbosity)
+
+
+    def write_to_loggers(self, msg, verbosity):
+        for pylogger in self.pyloggers:
+            if verbosity == Verbosity.QUIET:
+                pylogger.error(msg)
+            elif verbosity == verbosity.SILENT:
+                pylogger.critical(msg)
+            elif verbosity == verbosity.NOISY:
+                pylogger.debug(msg)
+            elif verbosity == verbosity.DEBUG:
+                pylogger.info(msg)
+            elif verbosity == verbosity.WARNINGS:
+                pylogger.warn(msg)

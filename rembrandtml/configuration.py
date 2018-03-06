@@ -108,11 +108,12 @@ class InstrumentationConfig(object):
         self.logging_config = logging_config
 
 class ContextConfig(object):
-    def __init__(self, model_config, mode = RunMode.TRAIN, verbosity = Verbosity.QUIET, base_dir = None, layers = 4, nodes = 16, epochs = 10, batch_size = 32):
+    def __init__(self, model_configs, data_config, mode = RunMode.TRAIN, verbosity = Verbosity.QUIET, base_dir = None, layers = 4, nodes = 16, epochs = 10, batch_size = 32):
         if not base_dir:
             self.base_dir = os.getcwd()
         else:
             self.base_dir = base_dir
+        self.data_config = data_config
         self._verbosity = verbosity
         # Properties probably aren't necessary, so experimenting with public fields
         self.Layers = layers
@@ -123,8 +124,12 @@ class ContextConfig(object):
         self.TestDir = ''
         self.ValidationDir = ''
         self.Mode = mode
-        self.model_config = model_config
+        if isinstance(model_configs, ModelConfig):
+            self.model_configs = [model_configs]
+        else:
+            self.model_configs = list(model_configs)
         self.instrumentation_config = None
+        self.visualization_config = None
 
     @property
     def Verbosity(self):
@@ -153,13 +158,26 @@ class RunConfig(object):
         self.prediction_index = None
         self.index_name = None
 
+class VisualizationConfig(object):
+    """
+    Container for visualization settings, such as plot size and plot style, e.g. ggplot
+    """
+    def __init__(self, size=(6, 6), style=None):
+        self.size = size
+        self.style = style
 
 class ModelConfig(object):
-    def __init__(self, name, framework_name, model_type, data_config):
+    def __init__(self, name, framework_name, model_type):
+        """
+        Metadata for instantiating a model.
+        :param name:
+        :param framework_name:
+        :param model_type:
+        :param data_config:
+        """
         self.name = name
         self.model_type = model_type
         self.framework_name = framework_name
-        self.data_config = data_config
         self._metrics = []
         self._layers = []
         self.LayerCount = 1

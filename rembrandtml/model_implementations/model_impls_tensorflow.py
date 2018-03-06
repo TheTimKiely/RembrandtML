@@ -342,13 +342,15 @@ def cnn_model_fn(features, labels, mode):
 
 def main(unused_argv):
     # Load training and eval data
+    train_size = 100
+    test_size = 20
     mnist = tf.contrib.learn.datasets.load_dataset("mnist")
-    train_data = mnist.train.images # Returns np.array
-    train_labels = np.asarray(mnist.train.labels, dtype=np.int32)
-    eval_data = mnist.test.images # Returns np.array
-    eval_labels = np.asarray(mnist.test.labels, dtype=np.int32)
+    train_data = mnist.train.images[:train_size,:] # Returns np.array
+    train_labels = np.asarray(mnist.train.labels[:train_size], dtype=np.int32)
+    eval_data = mnist.test.images[:test_size,:] # Returns np.array
+    eval_labels = np.asarray(mnist.test.labels[:test_size], dtype=np.int32)
 
-    tf.logging.set_verbosity(tf.logging.INFO)
+    tf.logging.set_verbosity(tf.logging.WARN)
 
     # Create the Estimator
     mnist_classifier = tf.estimator.Estimator(

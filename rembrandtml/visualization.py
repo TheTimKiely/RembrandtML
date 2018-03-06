@@ -4,6 +4,8 @@ from matplotlib import  cm
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from rembrandtml.configuration import VisualizationConfig
+
 
 class PlottingData(object):
     def __init__(self, name, history, series_styles=('b','r')):
@@ -23,10 +25,12 @@ class SeriesData:
 
 
 class Visualizer(object):
-    def __init__(self):
-        self.Style = None#'ggplot'
+    def __init__(self, config=None):
+        if config == None:
+            config = VisualizationConfig()
+        self.config = config
         self.figure_num = 0
-        plt.figure(self.figure_num)
+        plt.figure(self.figure_num, figsize=self.config.size)
 
     def increment_figure(self):
         plt.figure(self.figure_num + 1)
@@ -38,8 +42,8 @@ class Visualizer(object):
         plt.savefig(name)
 
     def show(self):
-        if self.Style:
-            plt.style.use(self.Style)
+        if self.config.style:
+            plt.style.use(self.config.style)
         plt.show()
 
     def display_plot(self, alpha_space, cv_scores, cv_scores_std):
@@ -164,7 +168,11 @@ class Visualizer(object):
 
     def plot_roc_curve(self, false_positive_rate, true_positive_rate, auc = None, label=None):
         if auc:
-            label = 'AUC = %0.2f' % auc
+            if label:
+                label = f'{label} AUC = %0.2f' % auc
+            else:
+                label = 'AUC = %0.2f' % auc
+        plt.title('ROC Curve')
         plt.plot(false_positive_rate, true_positive_rate, linewidth=2, label=label)
         plt.plot([0, 1], [0, 1], 'r', linewidth=4)
         plt.axis([0, 1, 0, 1])

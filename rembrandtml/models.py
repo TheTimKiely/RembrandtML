@@ -3,7 +3,7 @@ from enum import Enum
 import numpy as np
 
 from rembrandtml.configuration import RunMode
-from rembrandtml.core import FunctionNotImplementedError, StateError, ParameterError
+from rembrandtml.core import FunctionNotImplementedError
 from rembrandtml.entities import MLEntityBase
 
 _model_names = ('math', 'linreg', 'cls', 'mltcls', 'knn', 'logreg', 'sgd', 'rndf', 'nbay', 'pcpt', 'svc',
@@ -36,10 +36,9 @@ class MLModelBase(MLEntityBase):
     The MLModel represents the type of model, e.g. Linear Regression, K Nearest Neighbor, etc.
     The private field, _model_impl is the selected framework's implementation of that model.
     """
-    def __init__(self, model_config, data_container, instrumentation):
+    def __init__(self, model_config, instrumentation):
         super(MLModelBase, self).__init__(instrumentation)
         self.model_config = model_config
-        self.data_container = data_container
         self._model_file_attribute = 0
         self._weights_file_attribute = 0
         self._tokenizer_file_attribute = 0
@@ -157,7 +156,7 @@ class MLModelBase(MLEntityBase):
         self._tokenizer = tokenizer
         with open(self.TokenizerFile, 'wb') as file_handle:
             dill.dump(self._tokenizer, file_handle, protocol=dill.HIGHEST_PROTOCOL)
-
+    '''
     def validate_fit_call(self):
         if self._model_impl == None:
             raise TypeError(f'{self.name}: The model implementation has not been initialized')
@@ -165,15 +164,11 @@ class MLModelBase(MLEntityBase):
             self.log(f'{self.name}: X_train is not populated, using X.')
             if self.data_container.X is None:
                 raise TypeError(f'{self.name}: Training data has not been prepared.  Both X_train and X and empty.')
-
+    '''
         #if self.data_container == None:
         #    raise AttributeError('This model had no DataContainer, please call build_model(data_container) first.')
         #if self.data_container.train_generator == None:
         #    raise AttributeError('This model does not have a training generator.  Please check your configuration')
-
-
-    def prepare_data(self):
-        pass
 
     def build_model(self):
         pass
@@ -181,7 +176,7 @@ class MLModelBase(MLEntityBase):
     def load_from_file(self, file_name = None):
         pass
 
-    def fit(self, save=False):
+    def fit(self, X, y, save=False):
         """
 
         :param X: The feature dataset to fit against
@@ -192,7 +187,6 @@ class MLModelBase(MLEntityBase):
         :param save: A boolean indicating whether or not to save the fitted model to a file
         :return: The path of the saved file if 'save' was 'True'
         """
-        X, y = self.get_data_from_data_container()
         self.log(f'Running fit with implementation: {self._model_impl.__class__.__name__} X: {X.shape} y: {y.shape}')
         self._model_impl.fit(X, y)
 
@@ -200,31 +194,12 @@ class MLModelBase(MLEntityBase):
     def train(self):
         pass
 
-    def get_data_from_data_container(self, mode = RunMode.TRAIN):
-        """
-        Retrieves X and y data from the DataContainer.
-        :param train: Specifies which data tensors to retrun.  Default is 'True'.  If 'False', test tensors are returned
-        :return: X and y tensors
-        """
-        self.validate_fit_call();
-
-        if mode == RunMode.TRAIN:
-            X = self.data_container.X_train
-            y = self.data_container.y_train
-        elif mode == RunMode.EVALUATE:
-            X = self.data_container.X_test
-            y = self.data_container.y_test
-        else:
-            raise ParameterError(f'The requested RunMode, {mode.name}, is not supported.')
-        return X, y
-
-    def evaluate(self):
+    def evaluate(self, X, y):
         score = None
         #if X == None:
         #    self.log(f'X and y were not passed as parameters.  Using DataContainer.')
         #    loss = self.Model.evaluate_generator(self.data_container.val_generator, steps=self.data_container.val_steps)
         #else:
-        X, y = self.get_data_from_data_container(RunMode.EVALUATE)
         score = self._model_impl.evaluate(X, y)
         return score
 
@@ -238,10 +213,23 @@ class MLModelBase(MLEntityBase):
         return prediction
 
 class MLSingleModelBase(MLModelBase):
-    def __init__(self, model_config, data_container, instrumentation):
-        super(MLSingleModelBase, self).__init__(model_config, data_container, instrumentation)
+    def __init__(self, model_config, instrumentation):
+        super(MLSingleModelBase, self).__init__(model_config, instrumentation)
         from rembrandtml.factories import ModelFactory, ModelImplFactory
         self._model_impl = ModelImplFactory.create(model_config, instrumentation)
+
+class MLSimpleModel(MLSingleModelBase):
+    def __init__(self, model_config, instrumentation):
+        super(MLSimpleModel, self).__init__(model_config, instrumentation)
+
+    def fit(self):
+        pass
+
+    def evaluate(self):
+        pass
+
+    def predict(self, X):
+        pass
 
 class MathModel(MLSingleModelBase):
     def __init__(self, model_config):
@@ -262,8 +250,8 @@ class MathModel(MLSingleModelBase):
 
 
 class MLModel(MLSingleModelBase):
-    def __init__(self, model_config, data_container, instrumentation):
-        super(MLModel, self).__init__(model_config, data_container, instrumentation)
+    def __init__(self, model_config, instrumentation):
+        super(MLModel, self).__init__(model_config, instrumentation)
 
     # Requires a DataContainer because we might need to know the data shape to initialize layers
     def build_model(self, data_container):

@@ -2,12 +2,13 @@ import os
 import numpy as np
 #from keras.preprocessing.text import Tokenizer
 #from keras.preprocessing.sequence import pad_sequences
-
+from rembrandtml.configuration import RunMode
 from rembrandtml.data_providers.data_provider_keras import KerasDataProvider
 from rembrandtml.data_providers.data_provider_pandas import PandasDataProvider
 from rembrandtml.data_providers.data_provider_sklearn import SkLearnDataProvider
 from rembrandtml.data_providers.data_provider_tensorflow import TensorflowDataProvider
 from rembrandtml.entities import MLEntityBase
+from rembrandtml.core import ParameterError
 
 
 class DataContainer(MLEntityBase):
@@ -43,6 +44,23 @@ class DataContainer(MLEntityBase):
 
         ctor = self.data_containers[data_config.framework_name]
         return ctor(data_config, self.instrumentation)
+
+    def get_data(self, mode = RunMode.TRAIN):
+        """
+        Retrieves X and y data from the DataContainer.
+        :param train: Specifies which data tensors to retrun.  Default is 'True'.  If 'False', test tensors are returned
+        :return: X and y tensors
+        """
+        if mode == RunMode.TRAIN:
+            X = self.X_train
+            y = self.y_train
+        elif mode == RunMode.EVALUATE:
+            X = self.X_test
+            y = self.y_test
+        else:
+            raise ParameterError(f'The requested RunMode, {mode.name}, is not supported.')
+        return X, y
+
 
     def get_prediction_data(self, features, prediction_file):
         return self.data_provider.get_prediction_data(features, prediction_file)

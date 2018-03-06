@@ -3,7 +3,8 @@ from rembrandtml.data import DataContainer
 from rembrandtml.entities import MLLogger
 from rembrandtml.model_implementations.model_impls_cntk import MLModelImplementationCntk
 from rembrandtml.model_implementations.model_impls_keras import MLModelImplementationKeras
-from rembrandtml.model_implementations.model_impls_sklearn import MLModelSkLearn, MLModelSkLearnLinReg
+from rembrandtml.model_implementations.model_impls_sklearn import MLModelSkLearn, MLModelSkLearnLinReg, \
+    MLModelSkLearnSVC
 from rembrandtml.model_implementations.model_impls_tensorflow import MLModelTensorflow, MLModelTensorflowCNN
 from rembrandtml.models import MLModel, MathModel, ModelType, VotingModel
 from rembrandtml.nnmodels import ConvolutionalNeuralNetwork, RecurrentNeuralNetwork, LstmRNN, GruNN
@@ -15,15 +16,17 @@ class ContextFactory(object):
     def create(config):
         '''
         Factory method to instantiate a new machine learning context
-        :param MLCnfig:
+        :param ContextConfig:
         :return: RMLContext
         '''
 
         logger = MLLogger(config.instrumentation_config)
         instrumentation = Instrumentation(config.instrumentation_config, logger)
-        data_container = DataContainerFactory.create(config.model_config.data_config, instrumentation)
-        model = ModelFactory.create(config.model_config, data_container, instrumentation)
-        context = RMLContext(model, instrumentation, config)
+        data_container = DataContainerFactory.create(config.data_config, instrumentation)
+        models = {}
+        for model_config in config.model_configs:
+            models[model_config.name] = ModelFactory.create(model_config, data_container, instrumentation)
+        context = RMLContext(models, data_container, instrumentation, config)
         return context
 
 class DataContainerFactory(object):
@@ -34,6 +37,7 @@ class DataContainerFactory(object):
 
 class ModelImplFactory(object):
     model_impl_map = {'sklearn-logreg': MLModelSkLearn, 'sklearn-linreg': MLModelSkLearnLinReg,
+                      'sklearn-svc': MLModelSkLearnSVC,
                       'sklearn-hvote': MLModelSkLearn, 'sklearn-rndf': MLModelSkLearn,
                       'tensorflow-linreg': MLModelTensorflow, 'tensorflow-cnn': MLModelTensorflowCNN,
                       'keras': MLModelImplementationKeras,
@@ -70,8 +74,8 @@ class ModelFactory(object):
                  ModelType.VOTING_CLASSIFIER: VotingModel}
 
     @staticmethod
-    def instantiate_class(model_class, model_config, data_container, instrumentation):
-        cls = model_class(model_config, data_container, instrumentation)
+    def instantiate_class(model_class, model_config, instrumentation):
+        cls = model_class(model_config, instrumentation)
         return cls
 
     @staticmethod
@@ -88,7 +92,7 @@ class ModelFactory(object):
         if model_config.model_type not in ModelFactory.ModelsMap:
             raise TypeError(f'Network type {model_config.model_type} is not defined.')
 
-        network = ModelFactory.instantiate_class(model_class=ModelFactory.ModelsMap[model_config.model_type], model_config=model_config, data_container=data_container, instrumentation=instrumentation)
+        network = ModelFactory.instantiate_class(model_class=ModelFactory.ModelsMap[model_config.model_type], model_config=model_config, instrumentation=instrumentation)
         network.data_container = data_container
         return network
 

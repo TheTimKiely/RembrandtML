@@ -1,7 +1,7 @@
 from enum import Enum
 import pandas as pd
 
-from rembrandtml.configuration import Verbosity
+from rembrandtml.configuration import Verbosity, RunMode
 from rembrandtml.entities import MLEntityBase
 from rembrandtml.visualization import Visualizer
 from rembrandtml.utils import Instrumentation
@@ -78,15 +78,18 @@ class Prediction(object):
 
 
 class RMLContext(object):
-    """The RMLContext object is an organizing structure to group the data, model, and Visualizer that are used in common ML tasks.
-    It provides a collection of DataContainers, MLModels, and DataContainers to that that comparing entities becomes easy.
+    """The RMLContext object is an organizing structure to group the data, models, and Visualizer
+    that are used in common ML tasks.
+    To support easy experiementation with different model and dataset configurations, the RMLContext manages the data
+    and passes that data to any models that it also manages.
     The RMLContext also holds singletons, such as Instrumentation and Timer.
     """
 
-    def __init__(self, model, instrumentation, config):
+    def __init__(self, models, data_container, instrumentation, config):
         super(RMLContext, self).__init__()
         self.config = config
-        self.model = model
+        self.models = models
+        self.data_container = data_container
         # Start the timer to that we can log elapsed times
         self.instrumentation = instrumentation
         self.instrumentation.timer.start()
@@ -101,27 +104,49 @@ class RMLContext(object):
         :return:
         """
         self.log(f'Preparing data with {self.model.data_container.__class__.__name__}')
-        self.model.data_container.prepare_data(features, target_feature)
+        self.data_container.prepare_data(features, target_feature)
         self.log(f'Finished preparing data with {self.model.data_container.__class__.__name__}')
 
-    def train(self):
+    def train_model(self, model):
+        X, y = self.data_container.get_data()
+        self.log(f'Training model: {model.name}')
+        model.fit(X, y)
+        self.log(f'Finished training model: {model.name}')
+
+    def train(self, model_name=None):
         """
         Trains the model against the training set in the model's DataContainer.  If split() has been called, DataContainer.X_train will be populated and that training set will be used.  Otherwise, the DataContainer.X will be used.
         :return:
         """
-        self.log(f'Training model: {str(self.model)}')
-        self.model.fit()
-        self.log(f'Finished training model: {str(self.model)}')
+        if model_name:
+            model = self.models[model_name]
+            self.train_model(model)
+        else:
+            for key in self.models:
+                model = self.models[key]
+                self.train_model(model)
 
-    def evaluate(self):
-        """
-
-        :return: Score object populated with metrics specific to each model type
-        """
-        self.log(f'Evaluating model: {str(self.model)}')
-        score = self.model.evaluate()
-        self.log(f'Finished evaluating model: {str(self.model)}')
+    def evaluate_model(self, model):
+        self.log(f'Evaluating model: {model.name}')
+        X, y = self.data_container.get_data(RunMode.EVALUATE)
+        score = model.evaluate(X, y)
+        self.log(f'Finished evaluating model: {model.name}')
         return score
+
+    def evaluate(self, model_name=None):
+        """
+
+        :return: A dictionary of Score objects populated with metrics specific to each model
+        """
+        scores = {}
+        if model_name:
+            model = self.models[model_name]
+            scores[model.name] = self.evaluate_model(model)
+        else:
+            for key in self.models:
+                model = self.models[key]
+                scores[model.name] = self.evaluate_model(model)
+        return scores
 
     def tune(self, tuning_parameters, model_parameters):
         """
@@ -135,11 +160,24 @@ class RMLContext(object):
         return results
 
 
-    def predict(self, X, with_probabilities=False):
-        self.log(f'Predicting: {self.model.name}')
-        prediction = self.model.predict(X, with_probabilities)
-        self.log(f'Finished predicting: {self.model.name}')
+    def predict_model(self, X, model, with_probabilities=False):
+        self.log(f'Predicting: {model.name}')
+        prediction = model.predict(X, with_probabilities)
+        self.log(f'Finished predicting: {model.name}')
         return prediction
+
+    def predict(self, X, model_name=None, with_probabilities=False):
+        predictions = {}
+        if model_name:
+            model = self.models[model_name]
+            predictions[model.name] = self.predict_model(X, model, with_probabilities)
+        else:
+            for key in self.models:
+                model = self.models[key]
+                predictions[model.name] = self.predict_model(X, model, with_probabilities)
+        return predictions
+
+
 
     def plot(self, model_name = '', data_container_name = '', plotter_name = ''):
         pass

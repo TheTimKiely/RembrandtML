@@ -245,3 +245,16 @@ class MLModelSkLearnLinReg(MLModelSkLearn):
         y_pred = self._model.predict(X)
         prediction = Prediction(self.model_config.name, y_pred)
         return prediction
+
+class MLModelSkLearnSVC(MLModelSkLearn):
+    def __init__(self, model_config, instrumentation):
+        super(MLModelSkLearnSVC, self).__init__(model_config, instrumentation)
+        self.metrics = (ScoreType.MAE, ScoreType.MSE , ScoreType.R2)
+        self.score_type = ScoreType.R2
+
+    def predict(self, X, with_probabilities):
+        self.validate_trained()
+        # SkLearn SVC does not support propbabilities
+        y_pred = self._model.predict(X)
+        prediction = Prediction(self.model_config.name, y_pred)
+        return prediction

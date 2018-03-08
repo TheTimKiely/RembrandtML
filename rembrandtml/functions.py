@@ -268,15 +268,30 @@ def load_dataset():
     data_dir = os.path.join(os.getcwd(), '..', 'data')
     train_path = os.path.join(data_dir, 'train_catvnoncat.h5')
     test_path = os.path.join(data_dir, 'test_catvnoncat.h5')
+    data_name_train = "train_set_x"
+    labels_name_train = "train_set_y"
+    data_name_test = "test_set_x"
+    labels_name_test = "test_set_y"
+    classes_name = "list_classes"
+
+    train_path = 'D:\code\ML\RembrandtML\data\hab_train.h5'
+    test_path = 'D:\code\ML\RembrandtML\data\hab_test.h5'
+    data_name_train = "data"
+    labels_name_train = "labels"
+    data_name_test = "data"
+    labels_name_test = "labels"
+    classes_name = "classes"
+
     train_dataset = h5py.File(train_path, "r")
-    train_set_x_orig = np.array(train_dataset["train_set_x"][:])  # your train set features
-    train_set_y_orig = np.array(train_dataset["train_set_y"][:])  # your train set labels
+
+    train_set_x_orig = np.array(train_dataset[data_name_train][:])  # your train set features
+    train_set_y_orig = np.array(train_dataset[labels_name_train][:])  # your train set labels
 
     test_dataset = h5py.File(test_path, "r")
-    test_set_x_orig = np.array(test_dataset["test_set_x"][:])  # your test set features
-    test_set_y_orig = np.array(test_dataset["test_set_y"][:])  # your test set labels
+    test_set_x_orig = np.array(test_dataset[data_name_test][:])  # your test set features
+    test_set_y_orig = np.array(test_dataset[labels_name_test][:])  # your test set labels
 
-    classes = np.array(test_dataset["list_classes"][:])  # the list of classes
+    classes = np.array(test_dataset[classes_name][:])  # the list of classes
 
     train_set_y_orig = train_set_y_orig.reshape((1, train_set_y_orig.shape[0]))
     test_set_y_orig = test_set_y_orig.reshape((1, test_set_y_orig.shape[0]))
@@ -295,6 +310,17 @@ m_test = test_set_x_orig.shape[0]
 num_px = train_set_x_orig.shape[2]
 train_set_x_flatten = train_set_x_orig.reshape(train_set_x_orig.shape[0], -1).T
 test_set_x_flatten = test_set_x_orig.reshape(test_set_x_orig.shape[0], -1).T
+
+
+
+# Example of a picture
+index = 25
+example = train_set_x_orig[index]
+plt.imshow(train_set_x_orig[index])
+#plt.show()
+#print ("y = " + str(Y_train[:, index]) + ", it's a '" + classes[np.squeeze(Y_train[:, index])].decode("utf-8") +
+#       "' picture.")
+
 
 X_train = train_set_x_flatten/255.
 X_test = test_set_x_flatten/255.
@@ -320,10 +346,13 @@ d = {"costs": costs,
      "learning_rate": learning_rate,
      "num_iterations": num_iterations}
 
-index = 1
+index = 3
 plt.imshow(X_test[:,index].reshape((num_px, num_px, 3)))
 print("y = " + str(Y_test[0,index]) + ", you predicted that it is a \"" +
       classes[int(d["Y_prediction_test"][0,index])].decode("utf-8") +  "\" picture.")
+plt.show()
+import sys
+sys.exit()
 
 costs = np.squeeze(d['costs'])
 plt.clf()
@@ -340,12 +369,6 @@ for img_name in imgs:
     pred = predict(d['W'], d['b'], my_image)
     print(f'Prediction: {img_name}: {pred}')
 
-
-# Example of a picture
-index = 25
-example = train_set_x_orig[index]
-plt.imshow(train_set_x_orig[index])
-print ("y = " + str(Y_train[:, index]) + ", it's a '" + classes[np.squeeze(train_set_y[:, index])].decode("utf-8") +  "' picture.")
 
 w, b, X, Y = np.array([[1.],[2.]]), 2., np.array([[5., 6.5, 1.,2.,-1.],[2., 1.1, 3.,4.,-3.2]]), np.array([[1,0,1]])
 

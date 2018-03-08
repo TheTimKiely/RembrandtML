@@ -103,9 +103,9 @@ class RMLContext(object):
         :param use_cache:
         :return:
         """
-        self.log(f'Preparing data with {self.model.data_container.__class__.__name__}')
+        self.log(f'Preparing data with {self.data_container.__class__.__name__}')
         self.data_container.prepare_data(features, target_feature)
-        self.log(f'Finished preparing data with {self.model.data_container.__class__.__name__}')
+        self.log(f'Finished preparing data with {self.data_container.__class__.__name__}')
 
     def train_model(self, model):
         X, y = self.data_container.get_data()

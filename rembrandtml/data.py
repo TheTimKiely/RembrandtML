@@ -3,6 +3,7 @@ import numpy as np
 #from keras.preprocessing.text import Tokenizer
 #from keras.preprocessing.sequence import pad_sequences
 from rembrandtml.configuration import RunMode
+from rembrandtml.data_providers.data_provider_file import FileDataProvider
 from rembrandtml.data_providers.data_provider_keras import KerasDataProvider
 from rembrandtml.data_providers.data_provider_pandas import PandasDataProvider
 from rembrandtml.data_providers.data_provider_sklearn import SkLearnDataProvider
@@ -15,7 +16,8 @@ class DataContainer(MLEntityBase):
     """
     DataContainer manages the structures that hold training and target data.
     """
-    data_containers = {'sklearn': SkLearnDataProvider, 'pandas': PandasDataProvider,
+    data_containers = {'file': FileDataProvider,
+                       'sklearn': SkLearnDataProvider, 'pandas': PandasDataProvider,
                        'keras': KerasDataProvider, 'tensorflow': TensorflowDataProvider}
 
     def __init__(self, data_config, instrumentation):

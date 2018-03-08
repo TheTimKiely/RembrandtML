@@ -14,11 +14,23 @@ Authors:
     Tim Kiely <thetimkiely@gmail.com>
 '''
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(
-    name='RembrandtML',
-    version='0.1dev',
+    name='rembrandtml',
+    author='Tim Kiely',
+    classifiers=
+    [
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+        'Topic :: Software Development :: Libraries :: Application Frameworks',
+        'Programming Language :: Python :: 3.6',
+        'License :: OSI Approved :: Apache Software License'
+    ],
+    keywords='development machinelearning deeplearning',
+    python_requires='>=3',
+    version='0.1.2a1',
     packages=['rembrandtml',],
     license='Apache License 2.0',
     long_description=open('README.md').read(),

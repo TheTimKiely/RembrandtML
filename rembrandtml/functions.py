@@ -1,5 +1,6 @@
 import numpy as np
-
+from scipy import ndimage, misc
+from skimage import transform
 
 def sigmoid(x):
     """
@@ -184,7 +185,7 @@ def optimize(w, b, X, Y, num_iterations, learning_rate, print_cost=False):
         b = b - (learning_rate * db)
 
         # Record the costs
-        if i % 10 == 0:
+        if i % 100 == 0:
             costs.append(cost)
 
         # Print the cost every 100 training iterations
@@ -198,6 +199,19 @@ def optimize(w, b, X, Y, num_iterations, learning_rate, print_cost=False):
              "db": db}
 
     return params, grads, costs
+
+def prepare_image(img_name):
+    import os
+    from PIL import Image
+    img_path = os.path.join(os.getcwd(), '..', 'images', f'{img_name}.jpg')
+    img = Image.open(img_path)
+    img = img.resize((64, 64))
+    image = np.array(ndimage.imread(img_path, flatten=False))
+    # my_image = misc.imresize(image, size=(num_px,num_px)).reshape((1, num_px*num_px*3)).T
+    my_image = transform.resize(image, output_shape=(num_px, num_px))
+    my_image = my_image.reshape((1, num_px * num_px * 3))
+    my_image = my_image.T
+    return my_image
 
 
 def predict(w, b, X):
@@ -240,10 +254,8 @@ def initialize_with_zeros(dim):
     b -- initialized scalar (corresponds to the bias)
     """
 
-    ### START CODE HERE ### (≈ 1 line of code)
     w = np.zeros(shape=(dim, 1), dtype=np.float32)
     b = 0
-    ### END CODE HERE ###
 
     assert (w.shape == (dim, 1))
     assert (isinstance(b, float) or isinstance(b, int))
@@ -272,10 +284,9 @@ def load_dataset():
     return train_set_x_orig, train_set_y_orig, test_set_x_orig, test_set_y_orig, classes
 
 
-
 import matplotlib.pyplot as plt
 
-num_iterations = 200
+num_iterations = 2000
 learning_rate = 0.005
 print_cost = True
 train_set_x_orig, Y_train, test_set_x_orig, Y_test, classes = load_dataset()
@@ -304,7 +315,7 @@ print("test accuracy: {} %".format(100 - np.mean(np.abs(Y_pred_test - Y_test)) *
 d = {"costs": costs,
      "Y_prediction_test": Y_pred_test,
      "Y_prediction_train": Y_pred_train,
-     "w": w,
+     "W": w,
      "b": b,
      "learning_rate": learning_rate,
      "num_iterations": num_iterations}
@@ -320,7 +331,15 @@ plt.plot(costs)
 plt.ylabel('cost')
 plt.xlabel('iterations (per hundreds)')
 plt.title("Learning rate =" + str(d["learning_rate"]))
-plt.show()
+#plt.show()
+
+#make prediction
+imgs = ('Cat', 'Cat_Drawing', 'Cat_Cartoon', 'Cat_Felix', 'Dog', 'Dog_Drawing', 'Man', 'Woman', 'Man_Drawing', 'Woman_Drawing' )
+for img_name in imgs:
+    my_image = prepare_image(img_name)
+    pred = predict(d['W'], d['b'], my_image)
+    print(f'Prediction: {img_name}: {pred}')
+
 
 # Example of a picture
 index = 25

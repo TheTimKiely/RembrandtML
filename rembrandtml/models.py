@@ -189,6 +189,8 @@ class MLModelBase(MLEntityBase):
         """
         self.log(f'Running fit with implementation: {self._model_impl.__class__.__name__} X: {X.shape} y: {y.shape}')
         self._model_impl.fit(X, y)
+        if save:
+            self._model_impl.save(self.model_config.file_path)
 
 
     def train(self):

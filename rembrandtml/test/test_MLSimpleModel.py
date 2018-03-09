@@ -29,10 +29,11 @@ class TestMLSimpleModel(TestCase, RmlTest):
 
         # 2. Define the models.
         model_name = 'Math Binary Classifier'
+        model_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'models', 'hab.h5'))
         model_configs = []
         model_configs.append(NeuralNetworkConfig(model_name, framework_name,
-                                                 ModelType.SIMPLE_CLASSIFICATION,
-                                                 100, 0.005))
+                                                 ModelType.SIMPLE_CLASSIFICATION, model_file,
+                                                 10, 0.005))
 
         # 3. Create the Context.
         context_config = ContextConfig(model_configs, data_config)
@@ -43,7 +44,7 @@ class TestMLSimpleModel(TestCase, RmlTest):
         context.prepare_data()
 
         # 5. Train the model.
-        context.train()
+        context.train(save=True)
 
         # 6 Evaluate the model.
         #scores = context.evaluate()

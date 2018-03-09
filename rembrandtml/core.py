@@ -107,24 +107,24 @@ class RMLContext(object):
         self.data_container.prepare_data(features, target_feature, split)
         self.log(f'Finished preparing data with {self.data_container.__class__.__name__}')
 
-    def train_model(self, model):
+    def train_model(self, model, save):
         X, y = self.data_container.get_data()
         self.log(f'Training model: {model.name}')
-        model.fit(X, y)
+        model.fit(X, y, save)
         self.log(f'Finished training model: {model.name}')
 
-    def train(self, model_name=None):
+    def train(self, model_name=None, save=False):
         """
         Trains the model against the training set in the model's DataContainer.  If split() has been called, DataContainer.X_train will be populated and that training set will be used.  Otherwise, the DataContainer.X will be used.
         :return:
         """
         if model_name:
             model = self.models[model_name]
-            self.train_model(model)
+            self.train_model(model, save)
         else:
             for key in self.models:
                 model = self.models[key]
-                self.train_model(model)
+                self.train_model(model, save)
 
     def evaluate_model(self, model):
         self.log(f'Evaluating model: {model.name}')

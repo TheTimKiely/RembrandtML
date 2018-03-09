@@ -1,5 +1,6 @@
 import numpy as np
 from keras import models, layers, optimizers
+from rembrandtml.configuration import Verbosity
 
 from rembrandtml.core import Score, ScoreType, Prediction
 from rembrandtml.model_implementations.model_impls import MLModelImplementation
@@ -41,11 +42,18 @@ class MLModelImplementationKeras(MLModelImplementation):
         self._model.compile(optimizer=optimizers.RMSprop(lr=1e-4),
                       loss='binary_crossentropy',
                       metrics=['accuracy', 'binary_accuracy'])
-        self._model.fit(X, y,
-                    epochs=100,
+        history = self._model.fit(X, y,
+                    epochs=self.model_config.epochs,
                     batch_size=512
                         #,validation_data=(X_val, y_val)
                         )
+        acc_score = history.history['acc'][len(history.history['acc']) - 1]
+        self.log(f'Accuracy: {acc_score}')
+
+    def save(self, path):
+        self.log(f'Saving model to: {path}', verbosity=Verbosity.QUIET)
+        self._model.save(path)
+        self.log(f'Saved model to: {path}', verbosity=Verbosity.QUIET)
 
     def evaluate(self, X, y):
         X_test = self.vectorize_sequece(X)
@@ -57,5 +65,6 @@ class MLModelImplementationKeras(MLModelImplementation):
 
     def predict(self, X, with_probability):
         y_pred = self._model.predict(X)
+        y_pred_classes = self._model.predict_classes(X)
         prediction = Prediction(self.model_config.name, y_pred)
         return prediction

@@ -351,8 +351,6 @@ plt.imshow(X_test[:,index].reshape((num_px, num_px, 3)))
 print("y = " + str(Y_test[0,index]) + ", you predicted that it is a \"" +
       classes[int(d["Y_prediction_test"][0,index])].decode("utf-8") +  "\" picture.")
 plt.show()
-import sys
-sys.exit()
 
 costs = np.squeeze(d['costs'])
 plt.clf()

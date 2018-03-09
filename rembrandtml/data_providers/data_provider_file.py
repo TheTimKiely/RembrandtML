@@ -18,7 +18,7 @@ class FileDataProvider(DataProviderBase):
         dataset = None
         self.validate_files()
         dataset = h5py.File(self.data_config.data_file, "r")
-        X = np.array(dataset["data"][:])  # your train set features
+        X_raw = np.array(dataset["data"][:])  # your train set features
         y = np.array(dataset["labels"][:])  # your train set labels
 
         #y = y_orig.reshape((1, y_orig.shape[0]))
@@ -29,4 +29,9 @@ class FileDataProvider(DataProviderBase):
         '''
         classes = np.array(dataset["classes"][:])  # the list of classes
         columns = None
+
+        #ToDO: How to property handle image data!!!!
+        X_flatten = X_raw.reshape(X_raw.shape[0], -1)
+        X = X_flatten / 255.
+
         return columns, X, y

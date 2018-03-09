@@ -3,6 +3,7 @@ from rembrandtml.data import DataContainer
 from rembrandtml.entities import MLLogger
 from rembrandtml.model_implementations.model_impls_cntk import MLModelImplementationCntk
 from rembrandtml.model_implementations.model_impls_keras import MLModelImplementationKeras
+from rembrandtml.model_implementations.model_impls_math import MLModelMath
 from rembrandtml.model_implementations.model_impls_sklearn import MLModelSkLearn, MLModelSkLearnLinReg, \
     MLModelSkLearnSVC
 from rembrandtml.model_implementations.model_impls_tensorflow import MLModelTensorflow, MLModelTensorflowCNN
@@ -39,6 +40,7 @@ class ModelImplFactory(object):
     model_impl_map = {'sklearn-logreg': MLModelSkLearn, 'sklearn-linreg': MLModelSkLearnLinReg,
                       'sklearn-svc': MLModelSkLearnSVC,
                       'sklearn-hvote': MLModelSkLearn, 'sklearn-rndf': MLModelSkLearn,
+                      'simple-cls': MLModelMath,
                       'tensorflow-linreg': MLModelTensorflow, 'tensorflow-cnn': MLModelTensorflowCNN,
                       'keras': MLModelImplementationKeras,
                       'cntk': MLModelImplementationCntk}

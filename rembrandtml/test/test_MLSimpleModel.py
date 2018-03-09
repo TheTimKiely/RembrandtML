@@ -2,7 +2,7 @@ from unittest import TestCase
 import numpy as np
 from sklearn.metrics import roc_curve, auc
 
-from rembrandtml.configuration import DataConfig, ModelConfig, ContextConfig
+from rembrandtml.configuration import DataConfig, ModelConfig, ContextConfig, NeuralNetworkConfig
 from rembrandtml.factories import ContextFactory
 from rembrandtml.models import ModelType
 from rembrandtml.test.rml_testing import RmlTest
@@ -20,7 +20,9 @@ class TestMLSimpleModel(TestCase, RmlTest):
 
         # 2. Define the models.
         model_configs = []
-        model_configs.append(ModelConfig('Simple Binary Classifier', 'simple', ModelType.SIMPLE_CLASSIFICATION))
+        model_configs.append(NeuralNetworkConfig('Simple Binary Classifier', 'simple',
+                                                 ModelType.SIMPLE_CLASSIFICATION,
+                                                 2000, 0.01))
 
         # 3. Create the Context.
         context_config = ContextConfig(model_configs, data_config)
@@ -34,10 +36,10 @@ class TestMLSimpleModel(TestCase, RmlTest):
         context.train()
 
         # 6 Evaluate the model.
-        scores = context.evaluate()
-        print('Scores:')
-        for name, score in scores.items():
-            print(f'\n\tScore[{name}] - {score}')
+        #scores = context.evaluate()
+        #print('Scores:')
+        #for name, score in scores.items():
+        #    print(f'\n\tScore[{name}] - {score}')
 
         # 7. Make predictions.
         predictions = context.predict(context.data_container.X_test)
@@ -46,6 +48,13 @@ class TestMLSimpleModel(TestCase, RmlTest):
         #    results = zip(context.data_container.y_test, prediction.values)
         #    for result in results:
         #        print(f'Label: {result[0]} Prediction: {result[1]}')
+
+        # Print train/test Errors
+        # Predict test/train set examples
+        Y_pred_test = context.predict(context.data_container.X_test)
+        Y_pred_train = context.predict(context.data_container.X_test)
+        print("train accuracy: {} %".format(100 - np.mean(np.abs(Y_pred_train - context.data_container.Y_train)) * 100))
+        print("test accuracy: {} %".format(100 - np.mean(np.abs(Y_pred_test - context.data_container.Y_test)) * 100))
 
         # Plot outputs
         if plot:

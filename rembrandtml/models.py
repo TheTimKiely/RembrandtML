@@ -218,19 +218,6 @@ class MLSingleModelBase(MLModelBase):
         from rembrandtml.factories import ModelFactory, ModelImplFactory
         self._model_impl = ModelImplFactory.create(model_config, instrumentation)
 
-class MLSimpleModel(MLSingleModelBase):
-    def __init__(self, model_config, instrumentation):
-        super(MLSimpleModel, self).__init__(model_config, instrumentation)
-
-    def fit(self):
-        pass
-
-    def evaluate(self):
-        pass
-
-    def predict(self, X):
-        pass
-
 class MathModel(MLSingleModelBase):
     def __init__(self, model_config):
         super(MathModel, self).__init__(model_config)

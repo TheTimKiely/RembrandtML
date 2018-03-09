@@ -12,7 +12,9 @@ class FileDataProvider(DataProviderBase):
         if self.data_config.data_file is None:
             raise ParameterError('A test file must be configured in the DataConfig')
         if not os.path.isfile(self.data_config.data_file):
-            raise ParameterError(f'The configured data file, {self.data_config.data_file}, was not found.')
+            data_file = self.data_config.data_file
+            print(f'The configured data file, {data_file}, was not found.')
+            raise ParameterError(f'The configured data file, {data_file}, was not found.')
 
     def prepare_data(self, features=None, target_feature=None, sample_size=None):
         dataset = None

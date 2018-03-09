@@ -193,7 +193,7 @@ class RMLContext(object):
 
 class ParameterError(RuntimeError):
     def __init__(self, msg):
-        super(StateError, self).__init__(self, msg)
+        super(ParameterError, self).__init__(self, msg)
 
 class StateError(RuntimeError):
     def __init__(self, msg):

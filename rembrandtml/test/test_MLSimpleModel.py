@@ -1,3 +1,10 @@
+import os, sys
+
+sys.path.append(os.getcwd())
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
+sys.path.append(os.getcwd())
+print(f'sys.path: {sys.path}')
+
 from unittest import TestCase
 import numpy as np
 from sklearn.metrics import roc_curve, auc
@@ -76,10 +83,5 @@ class TestMLSimpleModel(TestCase, RmlTest):
 
 
 if __name__ == '__main__':
-    import os, sys
-    sys.path.append(os.getcwd())
-    sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
-    sys.path.append(os.getcwd())
-    print(f'sys.path: {sys.path}')
     tests = TestMLSimpleModel()
     tests.test_binary_classifier_keras()

@@ -1,7 +1,7 @@
 from rembrandtml.core import RMLContext
 from rembrandtml.data import DataContainer
 from rembrandtml.entities import MLLogger
-from rembrandtml.model_implementations.model_impls_cntk import MLModelImplementationCntk
+#from rembrandtml.model_implementations.model_impls_cntk import MLModelImplementationCntk
 from rembrandtml.model_implementations.model_impls_keras import MLModelImplementationKeras
 from rembrandtml.model_implementations.model_impls_math import MLModelMath
 from rembrandtml.model_implementations.model_impls_sklearn import MLModelSkLearn, MLModelSkLearnLinReg, \
@@ -42,8 +42,8 @@ class ModelImplFactory(object):
                       'sklearn-hvote': MLModelSkLearn, 'sklearn-rndf': MLModelSkLearn,
                       'math-cls': MLModelMath,
                       'tensorflow-linreg': MLModelTensorflow, 'tensorflow-cnn': MLModelTensorflowCNN,
-                      'keras-cls': MLModelImplementationKeras,
-                      'cntk': MLModelImplementationCntk}
+                      'keras-cls': MLModelImplementationKeras}
+                      #'cntk': MLModelImplementationCntk}
     @staticmethod
     def create(model_config, instrumentation):
         key = f'{model_config.framework_name}-{model_config.model_type}'

@@ -126,6 +126,9 @@ class DataContainer(MLEntityBase):
         self.X_columns, self.X, self.y = self.data_provider.prepare_data(features, target_feature)
         if split:
             self.split(features)
+        else:
+            self.X_train = self.X
+            self.y_train = self.y
 
 
     def get_column_values(self, file_path, column_name):

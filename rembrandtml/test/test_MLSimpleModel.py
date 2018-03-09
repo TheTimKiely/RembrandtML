@@ -10,7 +10,8 @@ from rembrandtml.visualization import Visualizer
 
 
 class TestMLSimpleModel(TestCase, RmlTest):
-    def test_binary_classifier(self, plot=False):
+
+    def run_binary_classifier(self, framework_name, plot=False):
         # 1. Define the datasource.
         # dataset = 'iris'
         # data_file = os.path.abspath(os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'data', 'gapminder', 'gm_2008_region.csv')))
@@ -19,10 +20,11 @@ class TestMLSimpleModel(TestCase, RmlTest):
                                  data_file='D:\code\ML\RembrandtML\data\hab_train.h5')
 
         # 2. Define the models.
+        model_name = 'Math Binary Classifier'
         model_configs = []
-        model_configs.append(NeuralNetworkConfig('Simple Binary Classifier', 'simple',
+        model_configs.append(NeuralNetworkConfig(model_name, framework_name,
                                                  ModelType.SIMPLE_CLASSIFICATION,
-                                                 2000, 0.01))
+                                                 100, 0.005))
 
         # 3. Create the Context.
         context_config = ContextConfig(model_configs, data_config)
@@ -52,9 +54,9 @@ class TestMLSimpleModel(TestCase, RmlTest):
         # Print train/test Errors
         # Predict test/train set examples
         Y_pred_test = context.predict(context.data_container.X_test)
-        Y_pred_train = context.predict(context.data_container.X_test)
-        print("train accuracy: {} %".format(100 - np.mean(np.abs(Y_pred_train - context.data_container.Y_train)) * 100))
-        print("test accuracy: {} %".format(100 - np.mean(np.abs(Y_pred_test - context.data_container.Y_test)) * 100))
+        Y_pred_train = context.predict(context.data_container.X_train)
+        print("train accuracy: {} %".format(100 - np.mean(np.abs(Y_pred_train[model_name] - context.data_container.y_train)) * 100))
+        print("test accuracy: {} %".format(100 - np.mean(np.abs(Y_pred_test[model_name] - context.data_container.y_test)) * 100))
 
         # Plot outputs
         if plot:
@@ -66,6 +68,13 @@ class TestMLSimpleModel(TestCase, RmlTest):
                 vis.plot_roc_curve(fpr, tpr, roc_auc, label=name)
             vis.show()
 
+    def test_binary_classifier_math(self, plot=False):
+        self.run_binary_classifier('math')
+
+    def test_binary_classifier_keras(self, plot=False):
+        self.run_binary_classifier('keras')
+
+
 if __name__ == '__main__':
     tests = TestMLSimpleModel()
-    tests.test_binary_classifier()
+    tests.test_binary_classifier_keras()

@@ -1,5 +1,6 @@
 import numpy as np
 
+from rembrandtml.configuration import Verbosity
 from rembrandtml.model_implementations.model_impls import MLModelImplementation
 
 
@@ -119,7 +120,7 @@ class MLModelMath(MLModelImplementation):
 
             # Print the cost every 100 training iterations
             if print_cost and i % 10 == 0:
-                print("Cost after iteration %i: %f" % (i, cost))
+                self.log("Cost after iteration %i: %f" % (i, cost), Verbosity.NOISY)
 
         params = {"w": w,
                   "b": b}
@@ -130,6 +131,9 @@ class MLModelMath(MLModelImplementation):
         return params, grads, costs
 
     def fit(self, X, y, validate=False):
+        # First flatten data!!!!
+        X_flatten = X.reshape(X.shape[0], -1)
+        X = X_flatten / 255.
 
         X = X.T
         y = y.reshape((1, y.shape[0]))
@@ -154,6 +158,10 @@ class MLModelMath(MLModelImplementation):
         Returns:
         Y_prediction -- a numpy array (vector) containing all predictions (0/1) for the examples in X
         '''
+        # First flatten data!!!!
+        X_flatten = X.reshape(X.shape[0], -1)
+        X = X_flatten / 255.
+
         X = X.T
         m = X.shape[1]
         Y_prediction = np.zeros((1, m))

@@ -31,7 +31,7 @@ class FileDataProvider(DataProviderBase):
         columns = None
 
         #ToDO: How to property handle image data!!!!
-        X_flatten = X_raw.reshape(X_raw.shape[0], -1)
-        X = X_flatten / 255.
+        #X_flatten = X_raw.reshape(X_raw.shape[0], -1)
+        #X = X_flatten / 255.
 
-        return columns, X, y
+        return columns, X_raw, y

@@ -1,7 +1,7 @@
 import numpy as np
 from keras import models, layers, optimizers
 
-from rembrandtml.core import Score, ScoreType
+from rembrandtml.core import Score, ScoreType, Prediction
 from rembrandtml.model_implementations.model_impls import MLModelImplementation
 
 
@@ -12,8 +12,8 @@ class MLModelImplementationKeras(MLModelImplementation):
         #self._model.add(layers.Dense(18, activation='relu', input_shape=(10000,)))
 
     def fit(self, X, y, validate=False):
-        X_train = self.vectorize_sequece(X)
-        y_train = np.asanyarray(y).astype('float32')
+        #X_train = self.vectorize_sequece(X)
+        #y_train = np.asanyarray(y).astype('float32')
         '''
         self._model.add(layers.Dense(2056, input_shape=(X.shape[1],), activation='relu'))
         self._model.add(layers.Dropout(0.1))
@@ -25,16 +25,23 @@ class MLModelImplementationKeras(MLModelImplementation):
         self._model.add(layers.Dropout(0.4))
         self._model.add(layers.Dense(1, activation='sigmoid'))
         '''
-        self._model.add(layers.Dense(6,input_shape=(X.shape[1],) , activation='relu'))
-        self._model.add(layers.Dense(8, activation='relu'))
-        self._model.add(layers.Dense(8, activation='relu'))
-        self._model.add(layers.Dense(8, activation='relu'))
+        self._model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=X.shape[1:]))
+        self._model.add(layers.MaxPooling2D((2, 2)))
+        self._model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        self._model.add(layers.MaxPooling2D((2,2)))
+        self._model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+        self._model.add(layers.MaxPooling2D((2,2)))
+        self._model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+        self._model.add(layers.MaxPooling2D((2,2)))
+        self._model.add(layers.Flatten())
+        self._model.add(layers.Dropout(0.5))
+        self._model.add(layers.Dense(512, activation='relu'))
         self._model.add(layers.Dense(1, activation='sigmoid'))
 
         self._model.compile(optimizer=optimizers.RMSprop(lr=1e-4),
                       loss='binary_crossentropy',
                       metrics=['accuracy', 'binary_accuracy'])
-        self._model.fit(X, y_train,
+        self._model.fit(X, y,
                     epochs=100,
                     batch_size=512
                         #,validation_data=(X_val, y_val)
@@ -47,3 +54,8 @@ class MLModelImplementationKeras(MLModelImplementation):
         score = Score(self.model_config, ScoreType.LOSS, loss)
         score.metrics['accuracy'] = acc
         return score
+
+    def predict(self, X, with_probability):
+        y_pred = self._model.predict(X)
+        prediction = Prediction(self.model_config.name, y_pred)
+        return prediction

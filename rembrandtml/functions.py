@@ -129,10 +129,13 @@ def propagate(w, b, X, Y):
     db -- gradient of the loss with respect to b, thus same shape as b
     """
 
+    print(f'X: {X.shape}\n\t{X[0,0]} ... {X[0,20]}')
     m = X.shape[1]
 
     A = sigmoid((w.T.dot(X)) + b)  # compute activation
+    print(f'A: {A[0,0]} .. {A[0,20]}')
     cost = -(np.sum((Y * np.log(A)) + (1 - Y) * np.log(1 - A))) / m  # compute cost
+    print(f'Cost: {cost}')
 
     dw = (np.dot(X, (A - Y).T)) / m
     db = np.sum(A - Y) / m
@@ -189,8 +192,8 @@ def optimize(w, b, X, Y, num_iterations, learning_rate, print_cost=False):
             costs.append(cost)
 
         # Print the cost every 100 training iterations
-        if print_cost and i % 10 == 0:
-            print("Cost after iteration %i: %f" % (i, cost))
+        #if print_cost and i % 10 == 0:
+        print("Cost after iteration %i: %f" % (i, cost))
 
     params = {"w": w,
               "b": b}
@@ -274,6 +277,7 @@ def load_dataset():
     labels_name_test = "test_set_y"
     classes_name = "list_classes"
 
+    '''
     train_path = 'D:\code\ML\RembrandtML\data\hab_train.h5'
     test_path = 'D:\code\ML\RembrandtML\data\hab_test.h5'
     data_name_train = "data"
@@ -281,7 +285,7 @@ def load_dataset():
     data_name_test = "data"
     labels_name_test = "labels"
     classes_name = "classes"
-
+    '''
     train_dataset = h5py.File(train_path, "r")
 
     train_set_x_orig = np.array(train_dataset[data_name_train][:])  # your train set features
@@ -301,7 +305,7 @@ def load_dataset():
 
 import matplotlib.pyplot as plt
 
-num_iterations = 2000
+num_iterations = 10
 learning_rate = 0.005
 print_cost = True
 train_set_x_orig, Y_train, test_set_x_orig, Y_test, classes = load_dataset()

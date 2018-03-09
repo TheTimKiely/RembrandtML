@@ -40,9 +40,9 @@ class ModelImplFactory(object):
     model_impl_map = {'sklearn-logreg': MLModelSkLearn, 'sklearn-linreg': MLModelSkLearnLinReg,
                       'sklearn-svc': MLModelSkLearnSVC,
                       'sklearn-hvote': MLModelSkLearn, 'sklearn-rndf': MLModelSkLearn,
-                      'simple-cls': MLModelMath,
+                      'math-cls': MLModelMath,
                       'tensorflow-linreg': MLModelTensorflow, 'tensorflow-cnn': MLModelTensorflowCNN,
-                      'keras': MLModelImplementationKeras,
+                      'keras-cls': MLModelImplementationKeras,
                       'cntk': MLModelImplementationCntk}
     @staticmethod
     def create(model_config, instrumentation):

@@ -94,7 +94,7 @@ class RMLContext(object):
         self.instrumentation = instrumentation
         self.instrumentation.timer.start()
 
-    def prepare_data(self, features=None, target_feature=None, use_cache=False):
+    def prepare_data(self, features=None, target_feature=None, use_cache=False, split=True):
         """
         Loads data from the configured DataProvider and splits the data into training and test sets.
         After this method is called, DataContainer.X_train, DataContainer.X_test, DataContainer.y_train, and DataContainer.y_test are populated.
@@ -104,7 +104,7 @@ class RMLContext(object):
         :return:
         """
         self.log(f'Preparing data with {self.data_container.__class__.__name__}')
-        self.data_container.prepare_data(features, target_feature)
+        self.data_container.prepare_data(features, target_feature, split)
         self.log(f'Finished preparing data with {self.data_container.__class__.__name__}')
 
     def train_model(self, model):

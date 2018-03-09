@@ -29,7 +29,8 @@ class TestMLSimpleModel(TestCase, RmlTest):
 
         # 2. Define the models.
         model_name = 'Math Binary Classifier'
-        model_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'models', 'hab.h5'))
+        file_name = 'hab_' + model_name.replace(' ', '') + '.h5'
+        model_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'models', file_name))
         model_configs = []
         model_configs.append(NeuralNetworkConfig(model_name, framework_name,
                                                  ModelType.SIMPLE_CLASSIFICATION, model_file,

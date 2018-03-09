@@ -23,7 +23,7 @@ class TestMLSimpleModel(TestCase, RmlTest):
         # dataset = 'iris'
         # data_file = os.path.abspath(os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'data', 'gapminder', 'gm_2008_region.csv')))
         # data_config = DataConfig('pandas', dataset, data_file)
-        data_file = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'data', 'hab_train.h5'))
+        data_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'data', 'hab_train.h5'))
         data_config = DataConfig('file', 'habs',
                                  data_file=data_file)
 

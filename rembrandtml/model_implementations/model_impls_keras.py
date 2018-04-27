@@ -50,10 +50,16 @@ class MLModelImplementationKeras(MLModelImplementation):
         acc_score = history.history['acc'][len(history.history['acc']) - 1]
         self.log(f'Accuracy: {acc_score}')
 
-    def save(self, path):
-        self.log(f'Saving model to: {path}', verbosity=Verbosity.QUIET)
-        self._model.save(path)
-        self.log(f'Saved model to: {path}', verbosity=Verbosity.QUIET)
+    def save(self, model_path, weights_path):
+        self.log(f'Saving model to: {model_path}', verbosity=Verbosity.QUIET)
+        #self._model.save(path)
+        with open(model_path, 'w') as fh:
+            fh.write(self._model.to_json())
+        self.log(f'Saved model to: {model_path}', verbosity=Verbosity.QUIET)
+
+        self.log(f'Saving model to: {weights_path}', verbosity=Verbosity.QUIET)
+        self._model.save_weights(weights_path)
+        self.log(f'Saved model to: {weights_path}', verbosity=Verbosity.QUIET)
 
     def evaluate(self, X, y):
         X_test = self.vectorize_sequece(X)

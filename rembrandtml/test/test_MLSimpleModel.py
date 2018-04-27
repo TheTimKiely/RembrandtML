@@ -28,12 +28,14 @@ class TestMLSimpleModel(TestCase, RmlTest):
                                  data_file=data_file)
 
         # 2. Define the models.
-        model_name = 'Math Binary Classifier'
-        file_name = 'hab_' + model_name.replace(' ', '') + '.h5'
-        model_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'models', file_name))
+        model_name = 'Keras Binary Classifier'
+        weights_file_name = 'hab_' + model_name.replace(' ', '') + '_weights.h5'
+        model_file_name = 'hab_' + model_name.replace(' ', '') + '_model.json'
+        model_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'models', model_file_name))
+        weights_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'models', weights_file_name))
         model_configs = []
         model_configs.append(NeuralNetworkConfig(model_name, framework_name,
-                                                 ModelType.SIMPLE_CLASSIFICATION, model_file,
+                                                 ModelType.SIMPLE_CLASSIFICATION, model_file, weights_file,
                                                  10, 0.005))
 
         # 3. Create the Context.
@@ -65,8 +67,10 @@ class TestMLSimpleModel(TestCase, RmlTest):
         # Predict test/train set examples
         Y_pred_test = context.predict(context.data_container.X_test)
         Y_pred_train = context.predict(context.data_container.X_train)
-        print("train accuracy: {} %".format(100 - np.mean(np.abs(Y_pred_train[model_name] - context.data_container.y_train)) * 100))
-        print("test accuracy: {} %".format(100 - np.mean(np.abs(Y_pred_test[model_name] - context.data_container.y_test)) * 100))
+        print("train accuracy: {} %".format(100 - np.mean(np.abs(Y_pred_train[model_name].values -
+                                                                 context.data_container.y_train)) * 100))
+        print("test accuracy: {} %".format(100 - np.mean(np.abs(Y_pred_test[model_name].values -
+                                                                context.data_container.y_test)) * 100))
 
         # Plot outputs
         if plot:

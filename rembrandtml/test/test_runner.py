@@ -8,7 +8,7 @@ from rembrandtml.test.test_kaggle import KaggleTests
 
 def testScatterPlot():
     tests = TestPlotter()
-    tests.test_plot_scatter()
+    tests.test_plot_scatter()   
 
 def testDataContainer():
     tests = TestDataContainer()

@@ -180,6 +180,13 @@ class ModelConfig(object):
         self._layers = layers
 
 
+class NeuralNetworkConfig(ModelConfig):
+    def __init__(self, name, framework_name, model_type, model_file_path, weights_file_path, epochs, learning_rate):
+        super(NeuralNetworkConfig, self).__init__(name, framework_name, model_type, model_file_path, weights_file_path)
+        self.learning_rate = learning_rate
+        self.epochs = epochs
+
+
 class EnsembleConfig(object):
     def __init__(self, estimator_configs):
         self.estimator_configs = estimator_configs

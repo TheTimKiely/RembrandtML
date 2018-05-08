@@ -1,4 +1,5 @@
-import os, dill
+import os
+import dill
 from enum import Enum
 import numpy as np
 

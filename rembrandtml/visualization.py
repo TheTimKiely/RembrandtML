@@ -232,7 +232,7 @@ class Visualizer(object):
         xx, yy = self.make_meshgrid(X0, X1)
         y = context.model.data_container.y_test
         fig, ax = plt.subplots(1,1)
-        self.plot_contours(ax, context, xx, yy,cmap=plt.cm.coolwarm, alpha=0.8)
+        self.plot_contours(ax, context, xx, yy, cmap=plt.cm.coolwarm, alpha=0.8)
         ax.scatter(X0, X1, c=y, cmap=plt.cm.coolwarm, s=20, edgecolors='k')
         ax.set_xlim(xx.min(), xx.max())
         ax.set_ylim(yy.min(), yy.max())

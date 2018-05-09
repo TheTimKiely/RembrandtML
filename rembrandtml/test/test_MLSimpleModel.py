@@ -30,13 +30,15 @@ class TestMLSimpleModel(TestCase, RmlTest):
         # 2. Define the models.
         model_name = 'Keras Binary Classifier'
         weights_file_name = 'hab_' + model_name.replace(' ', '') + '_weights.h5'
-        model_file_name = 'hab_' + model_name.replace(' ', '') + '_model.json'
+        model_arch_file_name = 'hab_' + model_name.replace(' ', '') + '_model.json'
+        model_file_name = 'hab_' + model_name.replace(' ', '') + '_model.h5'
+        model_arch_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'models', model_arch_file_name))
         model_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'models', model_file_name))
         weights_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'models', weights_file_name))
         model_configs = []
         model_configs.append(NeuralNetworkConfig(model_name, framework_name,
-                                                 ModelType.SIMPLE_CLASSIFICATION, model_file, weights_file,
-                                                 10, 0.005))
+                                                 ModelType.SIMPLE_CLASSIFICATION, model_file, model_arch_file, weights_file,
+                                                 1000, 0.005))
 
         # 3. Create the Context.
         context_config = ContextConfig(model_configs, data_config)

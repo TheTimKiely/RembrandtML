@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from keras import models, layers, optimizers
 from rembrandtml.configuration import Verbosity
@@ -50,14 +51,22 @@ class MLModelImplementationKeras(MLModelImplementation):
         acc_score = history.history['acc'][len(history.history['acc']) - 1]
         self.log(f'Accuracy: {acc_score}')
 
-    def save(self, model_path, weights_path):
+    def save(self, model_path, model_arch_path, weights_path):
+
+        if not os.path.exists(model_path):
+            self.log(f'Model path, {model_path}, doesn\'t exist.  Creating it.', verbosity=Verbosity.QUIET)
+            os.mkdir(os.path.dirname(model_path))
+
+
         self.log(f'Saving model to: {model_path}', verbosity=Verbosity.QUIET)
-        #self._model.save(path)
+        self._model.save(model_path)
+
+        self.log(f'Saving model architecture to: {model_arch_path}', verbosity=Verbosity.QUIET)
         with open(model_path, 'w') as fh:
             fh.write(self._model.to_json())
         self.log(f'Saved model to: {model_path}', verbosity=Verbosity.QUIET)
 
-        self.log(f'Saving model to: {weights_path}', verbosity=Verbosity.QUIET)
+        self.log(f'Saving weights to: {weights_path}', verbosity=Verbosity.QUIET)
         self._model.save_weights(weights_path)
         self.log(f'Saved model to: {weights_path}', verbosity=Verbosity.QUIET)
 

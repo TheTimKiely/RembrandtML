@@ -52,11 +52,10 @@ class MLModelImplementationKeras(MLModelImplementation):
         self.log(f'Accuracy: {acc_score}')
 
     def save(self, model_path, model_arch_path, weights_path):
-
-        if not os.path.exists(model_path):
-            self.log(f'Model path, {model_path}, doesn\'t exist.  Creating it.', verbosity=Verbosity.QUIET)
-            os.mkdir(os.path.dirname(model_path))
-
+        model_dir = os.path.dirname(model_path)
+        if not os.path.exists(model_dir):
+            self.log(f'Model path directory, {model_dir}, doesn\'t exist.  Creating it.', verbosity=Verbosity.QUIET)
+            os.mkdir(model_dir)
 
         self.log(f'Saving model to: {model_path}', verbosity=Verbosity.QUIET)
         self._model.save(model_path)

@@ -1,9 +1,18 @@
-import time, getopt
+import time
+import getopt
+import sys
 import logging
+import argparse
 from rembrandtml.configuration import ModelConfig, ContextConfig, DataConfig, InstrumentationConfig
 
 
-class CommandLineParser(object):
+class CommandLineParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.stderr.write('error: %s\n' % message)
+        self.print_help()
+        sys.exit(2)
+
+class CommandLineParserOLD(object):
     @staticmethod
     def print_usage():
         # Vebosity Codes: 's', 'q', 'd', 'n'

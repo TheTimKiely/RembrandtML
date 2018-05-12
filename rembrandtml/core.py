@@ -105,6 +105,7 @@ class RMLContext(object):
         """
         self.log(f'Preparing data with {self.data_container.__class__.__name__}')
         self.data_container.prepare_data(features, target_feature, split)
+        self.data_container.X = self.data_container.X / 255
         self.log(f'Finished preparing data with {self.data_container.__class__.__name__}')
 
     def train_model(self, model, save):

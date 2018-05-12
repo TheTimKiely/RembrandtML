@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+import numpy as np
 
 from rembrandtml.configuration import DataConfig, NeuralNetworkConfig, ContextConfig
 from rembrandtml.factories import ContextFactory

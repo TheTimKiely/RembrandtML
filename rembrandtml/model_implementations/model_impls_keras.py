@@ -45,7 +45,7 @@ class MLModelImplementationKeras(MLModelImplementation):
                       metrics=['accuracy', 'binary_accuracy'])
         history = self._model.fit(X, y,
                     epochs=self.model_config.epochs,
-                    batch_size=512
+                    batch_size=32
                         #,validation_data=(X_val, y_val)
                         )
         acc_score = history.history['acc'][len(history.history['acc']) - 1]

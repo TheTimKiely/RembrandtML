@@ -11,6 +11,7 @@ from rembrandtml.utils import CommandLineParser
 
 def parse_args(params):
     parser = argparse.ArgumentParser()
+    parser.add_argument('-b', '--batch_size', help='Training batch size')
     parser.add_argument('-d', '--data_file', help='Data file', required=True)
     parser.add_argument('-e', '--epochs', type=int, default=10, help='Number of epochs to run')
     parser.add_argument('-i', '--image_size', help='Size of training images.')
@@ -44,7 +45,7 @@ def main(params):
     model_configs = []
     model_configs.append(NeuralNetworkConfig(model_name, args.framework,
                                              ModelType.SIMPLE_CLASSIFICATION, model_file, model_arch_file, weights_file,
-                                             args.epochs, args.learning_rate))
+                                             args.batch_size, args.epochs, args.learning_rate))
 
     # 3. Create the Context.
     context_config = ContextConfig(model_configs, data_config)

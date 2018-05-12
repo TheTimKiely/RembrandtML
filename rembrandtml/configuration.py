@@ -167,7 +167,7 @@ class VisualizationConfig(object):
         self.style = style
 
 class ModelConfig(object):
-    def __init__(self, name, framework_name, model_type, model_file=None, model_arch_file=None, weights_file=None):
+    def __init__(self, name, framework_name, model_type, batch_size=32, model_file=None, model_arch_file=None, weights_file=None):
         """
         Metadata for instantiating a model.
         :param name:
@@ -177,6 +177,7 @@ class ModelConfig(object):
         """
         self.name = name
         self.model_type = model_type
+        self.batch_size = batch_size
         self.model_file = model_file
         self.model_arch_file = model_arch_file
         self.weights_file = weights_file
@@ -243,8 +244,10 @@ class ModelConfig(object):
         self._layers = layers
 
 class NeuralNetworkConfig(ModelConfig):
-    def __init__(self, name, framework_name, model_type, model_file_path, model_arch_file_path, weights_file_path, epochs, learning_rate):
-        super(NeuralNetworkConfig, self).__init__(name, framework_name, model_type, model_file_path, model_arch_file_path, weights_file_path)
+    def __init__(self, name, framework_name, model_type, model_file_path, model_arch_file_path, weights_file_path,
+                 batch_size, epochs, learning_rate):
+        super(NeuralNetworkConfig, self).__init__(name, framework_name, model_type, model_file_path,
+                                                  model_arch_file_path, weights_file_path, batch_size)
         self.learning_rate = learning_rate
         self.epochs = epochs
 

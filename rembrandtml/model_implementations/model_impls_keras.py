@@ -30,18 +30,6 @@ class MLModelImplementationKeras(MLModelImplementation):
         self._model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=X.shape[1:]))
         self._model.add(layers.MaxPooling2D((2, 2)))
         self._model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        self._model.add(layers.MaxPooling2D((2,2)))
-        self._model.add(layers.Conv2D(128, (3, 3), activation='relu'))
-        self._model.add(layers.MaxPooling2D((2,2)))
-        self._model.add(layers.Conv2D(128, (3, 3), activation='relu'))
-        self._model.add(layers.MaxPooling2D((2,2)))
-        self._model.add(layers.Conv2D(128, (3, 3), activation='relu'))
-        self._model.add(layers.MaxPooling2D((2, 2)))
-        self._model.add(layers.Conv2D(128, (3, 3), activation='relu'))
-        self._model.add(layers.MaxPooling2D((2, 2)))
-        self._model.add(layers.Conv2D(128, (3, 3), activation='relu'))
-        self._model.add(layers.MaxPooling2D((2, 2)))
-        self._model.add(layers.Conv2D(128, (3, 3), activation='relu'))
         self._model.add(layers.MaxPooling2D((2, 2)))
         self._model.add(layers.Conv2D(128, (3, 3), activation='relu'))
         self._model.add(layers.MaxPooling2D((2, 2)))
@@ -57,7 +45,7 @@ class MLModelImplementationKeras(MLModelImplementation):
                       metrics=['accuracy', 'binary_accuracy'])
         history = self._model.fit(X, y,
                     epochs=self.model_config.epochs,
-                    batch_size=512
+                    batch_size=self.model_config.batch_size
                         #,validation_data=(X_val, y_val)
                         )
         acc_score = history.history['acc'][len(history.history['acc']) - 1]

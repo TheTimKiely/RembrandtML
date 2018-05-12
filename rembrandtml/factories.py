@@ -30,11 +30,13 @@ class ContextFactory(object):
         context = RMLContext(models, data_container, instrumentation, config)
         return context
 
+
 class DataContainerFactory(object):
     @staticmethod
     def create(data_config, instrumentation):
         data_container = DataContainer(data_config, instrumentation)
         return data_container
+
 
 class ModelImplFactory(object):
     model_impl_map = {'sklearn-logreg': MLModelSkLearn, 'sklearn-linreg': MLModelSkLearnLinReg,
@@ -44,6 +46,7 @@ class ModelImplFactory(object):
                       'tensorflow-linreg': MLModelTensorflow, 'tensorflow-cnn': MLModelTensorflowCNN,
                       'keras-cls': MLModelImplementationKeras}
                       #'cntk': MLModelImplementationCntk}
+
     @staticmethod
     def create(model_config, instrumentation):
         key = f'{model_config.framework_name}-{model_config.model_type}'
@@ -70,9 +73,9 @@ class ModelFactory(object):
                  ModelType.PERCEPTRON: MLModel,
                  ModelType.SVC: MLModel,
                  ModelType.DECISTION_TREE_CLASSIFIER: MLModel,
-                 ModelType.RNN:RecurrentNeuralNetwork,
-                 ModelType.LSTM:LstmRNN,
-                 ModelType.GRU:GruNN,
+                 ModelType.RNN: RecurrentNeuralNetwork,
+                 ModelType.LSTM: LstmRNN,
+                 ModelType.GRU: GruNN,
                  ModelType.VOTING_CLASSIFIER: VotingModel}
 
     @staticmethod

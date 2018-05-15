@@ -32,7 +32,8 @@ def main(params):
     # data_config = DataConfig('pandas', dataset, data_file)
     #data_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'data', 'hab_train.h5'))
     data_config = DataConfig('file', 'habs',
-                             data_file=args.data_file)
+                             data_source=args.data_file)
+    data_config = DataConfig('generator', 'habs', data_source='/home/timk/code/ML/projects/cyanotracker/images/raw/')
 
     # 2. Define the models.
     model_name = 'Keras Binary Classifier'
@@ -44,7 +45,9 @@ def main(params):
     weights_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'models', weights_file_name))
     model_configs = []
     model_configs.append(NeuralNetworkConfig(model_name, args.framework,
-                                             ModelType.SIMPLE_CLASSIFICATION, model_file, model_arch_file, weights_file,
+                                             ModelType.SIMPLE_CLASSIFICATION,
+                                             (128, 128, 3),
+                                             model_file, model_arch_file, weights_file,
                                              args.batch_size, args.epochs, args.learning_rate))
 
     # 3. Create the Context.

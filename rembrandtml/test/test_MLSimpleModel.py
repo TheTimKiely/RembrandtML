@@ -25,7 +25,7 @@ class TestMLSimpleModel(TestCase, RmlTest):
         # data_config = DataConfig('pandas', dataset, data_file)
         data_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'data', 'hab_train.h5'))
         data_config = DataConfig('file', 'habs',
-                                 data_file=data_file)
+                                 data_source=data_file)
 
         # 2. Define the models.
         model_name = 'Keras Binary Classifier'

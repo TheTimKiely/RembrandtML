@@ -60,11 +60,11 @@ class Verbosity(Enum):
 
 
 class DataConfig(object):
-    def __init__(self, framework_name, dataset_name, data_file=None, sample_size = -1):
+    def __init__(self, framework_name, dataset_name, data_source=None, sample_size = -1):
         self.framework_name = framework_name
         self.dataset_name = dataset_name
         self.sample_size = sample_size
-        self.data_file = data_file
+        self.data_source = data_source
         self.file_separator = ','
 
 class LoggerConfig(object):
@@ -167,7 +167,7 @@ class VisualizationConfig(object):
         self.style = style
 
 class ModelConfig(object):
-    def __init__(self, name, framework_name, model_type, batch_size=32, model_file=None, model_arch_file=None, weights_file=None):
+    def __init__(self, name, framework_name, model_type, shape=0, batch_size=32, model_file=None, model_arch_file=None, weights_file=None):
         """
         Metadata for instantiating a model.
         :param name:
@@ -176,6 +176,7 @@ class ModelConfig(object):
         :param data_config:
         """
         self.name = name
+        self.shape = shape
         self.model_type = model_type
         self.batch_size = batch_size
         self.model_file = model_file
@@ -244,9 +245,9 @@ class ModelConfig(object):
         self._layers = layers
 
 class NeuralNetworkConfig(ModelConfig):
-    def __init__(self, name, framework_name, model_type, model_file_path, model_arch_file_path, weights_file_path,
+    def __init__(self, name, framework_name, model_type, shape, model_file_path, model_arch_file_path, weights_file_path,
                  batch_size, epochs, learning_rate):
-        super(NeuralNetworkConfig, self).__init__(name, framework_name, model_type, model_file_path,
+        super(NeuralNetworkConfig, self).__init__(name, framework_name, model_type, shape, model_file_path,
                                                   model_arch_file_path, weights_file_path, batch_size)
         self.learning_rate = learning_rate
         self.epochs = epochs

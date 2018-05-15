@@ -13,6 +13,30 @@ class MLModelImplementationKeras(MLModelImplementation):
         self._model = models.Sequential()
         #self._model.add(layers.Dense(18, activation='relu', input_shape=(10000,)))
 
+    def build_model(self):
+        self._model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=self.model_config.shape))
+        self._model.add(layers.MaxPooling2D((2, 2)))
+        self._model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        self._model.add(layers.MaxPooling2D((2, 2)))
+        self._model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+        self._model.add(layers.MaxPooling2D((2, 2)))
+        self._model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+        self._model.add(layers.MaxPooling2D((2, 2)))
+        self._model.add(layers.Flatten())
+        self._model.add(layers.Dropout(0.5))
+        self._model.add(layers.Dense(512, activation='relu'))
+        self._model.add(layers.Dense(1, activation='sigmoid'))
+
+        self._model.compile(optimizer=optimizers.RMSprop(lr=1e-4),
+                            loss='binary_crossentropy',
+                            metrics=['accuracy', 'binary_accuracy'])
+
+    def fit_generator(self, data, validate=False):
+        self.build_model()
+        self.history = self._model.fit_generator(data)
+        acc_score = self.history.history['acc'][len(self.history.history['acc']) - 1]
+        self.log(f'Accuracy: {acc_score}')
+
     def fit(self, X, y, validate=False):
         #X_train = self.vectorize_sequece(X)
         #y_train = np.asanyarray(y).astype('float32')
@@ -27,28 +51,14 @@ class MLModelImplementationKeras(MLModelImplementation):
         self._model.add(layers.Dropout(0.4))
         self._model.add(layers.Dense(1, activation='sigmoid'))
         '''
-        self._model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=X.shape[1:]))
-        self._model.add(layers.MaxPooling2D((2, 2)))
-        self._model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        self._model.add(layers.MaxPooling2D((2, 2)))
-        self._model.add(layers.Conv2D(128, (3, 3), activation='relu'))
-        self._model.add(layers.MaxPooling2D((2, 2)))
-        self._model.add(layers.Conv2D(128, (3, 3), activation='relu'))
-        self._model.add(layers.MaxPooling2D((2, 2)))
-        self._model.add(layers.Flatten())
-        self._model.add(layers.Dropout(0.5))
-        self._model.add(layers.Dense(512, activation='relu'))
-        self._model.add(layers.Dense(1, activation='sigmoid'))
-
-        self._model.compile(optimizer=optimizers.RMSprop(lr=1e-4),
-                      loss='binary_crossentropy',
-                      metrics=['accuracy', 'binary_accuracy'])
-        history = self._model.fit(X, y,
-                    epochs=self.model_config.epochs,
-                    batch_size=self.model_config.batch_size
-                        #,validation_data=(X_val, y_val)
-                        )
-        acc_score = history.history['acc'][len(history.history['acc']) - 1]
+        self.build_model()
+        self.history = self._model.fit(X, y,
+                                  epochs=self.model_config.epochs,
+                                  batch_size=self.model_config.batch_size,
+                                  shuffle=True
+                                  #,validation_data=(X_val, y_val)
+                                  )
+        acc_score = self.history.history['acc'][len(history.history['acc']) - 1]
         self.log(f'Accuracy: {acc_score}')
 
     def save(self, model_path, model_arch_path, weights_path):

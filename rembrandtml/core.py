@@ -105,13 +105,14 @@ class RMLContext(object):
         """
         self.log(f'Preparing data with {self.data_container.__class__.__name__}')
         self.data_container.prepare_data(features, target_feature, split)
-        self.data_container.X = self.data_container.X / 255
         self.log(f'Finished preparing data with {self.data_container.__class__.__name__}')
 
     def train_model(self, model, save):
-        X, y = self.data_container.get_data()
         self.log(f'Training model: {model.name}')
-        model.fit(X, y, save)
+        self.log('Getting data')
+        data = self.data_container.get_data()
+        model.fit(data)
+
         self.log(f'Finished training model: {model.name}')
 
     def train(self, model_name=None, save=False):

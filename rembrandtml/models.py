@@ -176,7 +176,7 @@ class MLModelBase(MLEntityBase):
     def load_from_file(self, file_name = None):
         pass
 
-    def fit(self, X, y, save=False):
+    def fit(self, data, save=False):
         """
 
         :param X: The feature dataset to fit against
@@ -187,8 +187,14 @@ class MLModelBase(MLEntityBase):
         :param save: A boolean indicating whether or not to save the fitted model to a file
         :return: The path of the saved file if 'save' was 'True'
         """
-        self.log(f'Running fit with implementation: {self._model_impl.__class__.__name__} X: {X.shape} y: {y.shape}')
-        self._model_impl.fit(X, y)
+        if isinstance(data, tuple):
+            X = data[0]
+            y = data[1]
+            self.log(f'Running fit with implementation: {self._model_impl.__class__.__name__} X: {X.shape} y: {y.shape}')
+            self._model_impl.fit(X, y)
+        else:
+            self._model_impl.fit_generator(data)
+
         if save:
             self._model_impl.save(self.model_config.model_file,
                                   self.model_config.model_arch_file,

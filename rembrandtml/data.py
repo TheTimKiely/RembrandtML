@@ -1,9 +1,10 @@
 import os
 import numpy as np
+
 #from keras.preprocessing.text import Tokenizer
 #from keras.preprocessing.sequence import pad_sequences
 from rembrandtml.configuration import RunMode
-from rembrandtml.data_providers.data_provider_file import FileDataProvider
+from rembrandtml.data_providers.data_provider_file import FileDataProvider, GeneratorDataProvider
 from rembrandtml.data_providers.data_provider_keras import KerasDataProvider
 from rembrandtml.data_providers.data_provider_pandas import PandasDataProvider
 from rembrandtml.data_providers.data_provider_sklearn import SkLearnDataProvider
@@ -17,6 +18,7 @@ class DataContainer(MLEntityBase):
     DataContainer manages the structures that hold training and target data.
     """
     data_containers = {'file': FileDataProvider,
+                       'generator': GeneratorDataProvider,
                        'sklearn': SkLearnDataProvider, 'pandas': PandasDataProvider,
                        'keras': KerasDataProvider, 'tensorflow': TensorflowDataProvider}
 
@@ -53,6 +55,9 @@ class DataContainer(MLEntityBase):
         :param train: Specifies which data tensors to retrun.  Default is 'True'.  If 'False', test tensors are returned
         :return: X and y tensors
         """
+        if isinstance(self.data_provider, GeneratorDataProvider):
+            return self.data_provider.generator()
+
         if mode == RunMode.TRAIN:
             X = self.X_train
             y = self.y_train
@@ -67,6 +72,7 @@ class DataContainer(MLEntityBase):
     def get_prediction_data(self, features, prediction_file):
         return self.data_provider.get_prediction_data(features, prediction_file)
 
+    '''
     def build_generator(self, data, lookback, delay, min_index, max_index, shuffle, batch_size, step):
         if(max_index is None):
             max_index = len(data) - delay - 1
@@ -113,6 +119,7 @@ class DataContainer(MLEntityBase):
             #print(f'lookback:{lookback}, delay:{delay}, min_index{min_index}, max_index:{max_index}, shuffle{shuffle}, batch_size:{batch_size}, step: {step}')
             #print(f'Sample: {samples[0,0,0]} Target: {targets[0]}')
             yield samples, targets
+    '''
 
     def prepare_data(self, features = None, target_feature = None, split=True, sample_size=None):
         """
@@ -123,6 +130,9 @@ class DataContainer(MLEntityBase):
         :return:
         """
         self.log(f'Preparing data from dataset: {self.config.dataset_name} using {self.data_provider.name}')
+        if isinstance(self.data_provider, GeneratorDataProvider):
+            return
+
         self.X_columns, self.X, self.y = self.data_provider.prepare_data(features, target_feature)
         if split:
             self.split(features)

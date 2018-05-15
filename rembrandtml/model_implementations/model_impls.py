@@ -7,6 +7,7 @@ class MLModelImplementation(MLEntityBase):
     def __init__(self, model_config, instrumentation):
         super(MLModelImplementation, self).__init__(instrumentation)
         self._model = None
+        self.history = []
         self.theta = None
         self.score_notes = ''
         self.model_config = model_config

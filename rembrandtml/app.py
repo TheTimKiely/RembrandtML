@@ -12,16 +12,18 @@ from rembrandtml.utils import CommandLineParser, ImageProcessor
 
 def parse_args(params):
     parser = argparse.ArgumentParser()
+    parser.add_argument('-a', '--architecture', help='Network architecture to use.')
     parser.add_argument('-b', '--batch_size', help='Training batch size')
-    parser.add_argument('-d', '--data_file', help='Data file', required=True)
+    parser.add_argument('-c', '--test_data_source', help='Test data source, a directory will result in a generator')
+    parser.add_argument('-d', '--data_source', help='Data source, a directory will result in a generator', required=True)
     parser.add_argument('-e', '--epochs', type=int, default=10, help='Number of epochs to run')
-    parser.add_argument('-i', '--image_size', help='Size of training images.')
     parser.add_argument('-f', '--framework', default='keras',
                         help='ML framework to use, e.g. ScikitLearn, TensorFlow, etc.')
+    parser.add_argument('-i', '--image_size', help='Size of training images.')
     parser.add_argument('-m', '--model', help='Model file to use when testing or predicting')
+    parser.add_argument('-o', '--output_dir', help='Output directory')
     parser.add_argument('-r', '--learning_rate', default=0.005, help='Gradient descent learning rate')
     parser.add_argument('-t', '--task', help='Task to perform, e.g. train, test, predict', default='train')
-    parser.add_argument('-a', '--architecture', help='Network architecture to use.')
     return parser.parse_args(params)
 
 
@@ -41,11 +43,9 @@ def predict(args):
     model = models.load_model(model_path)
     if model is None:
         raise TypeError(f'Failed to load model from file {model_path}')
-    rgb_data = ImageProcessor(args.data_file).prepare_rgb_data(img_size=(128, 128))
+    rgb_data = ImageProcessor(args.data_source).prepare_rgb_data(img_size=(128, 128))
     preds = model.predict(rgb_data)
     print(preds)
-
-
 
 
 def main(params):
@@ -71,9 +71,9 @@ def main(params):
     weights_file_name = 'hab_' + model_name.replace(' ', '') + '_weights.h5'
     model_arch_file_name = 'hab_' + model_name.replace(' ', '') + '_model.json'
     model_file_name = 'hab_' + model_name.replace(' ', '') + '_model.h5'
-    model_arch_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'models', model_arch_file_name))
-    model_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'models', model_file_name))
-    weights_file = os.path.abspath(os.path.join(os.getcwd(), '..', 'models', weights_file_name))
+    model_arch_file = os.path.abspath(os.path.join(args.output_dir, model_arch_file_name))
+    model_file = os.path.abspath(os.path.join(args.output_dir, model_file_name))
+    weights_file = os.path.abspath(os.path.join(args.output_dir, weights_file_name))
     model_configs = []
     model_configs.append(NeuralNetworkConfig(model_name, args.framework,
                                              ModelType.SIMPLE_CLASSIFICATION,
@@ -100,6 +100,9 @@ def main(params):
 
     # 7. Make predictions.
     predictions = context.predict(context.data_container.get_data(RunMode.EVALUATE))
+    for prediction in predictions:
+        print(predictions[prediction].values)
+        print(predictions[prediction].accuracy)
     # for name, prediction in predictions.items():
     #    # df = pd.DataFrame({'Prediction': [[max(i) for i in predictions.values]], 'Predictions': [predictions.values], 'Labels:': [context.data_container.y_test]})
     #    results = zip(context.data_container.y_test, prediction.values)
@@ -117,11 +120,5 @@ def main(params):
 
 if __name__ == '__main__':
     params = sys.argv[1:]
-
-    cur_dir = os.path.abspath(os.path.dirname(__file__))
-    data_file = os.path.join(cur_dir, 'test', 'images', 'not-bloom.jpg')
-    model_file = os.path.join(cur_dir, '..', 'models', 'hab_KerasBinaryClassifier_model.h5')
-    params = ['-t', 'predict', '-d', data_file, '-m', model_file
-              ]
     main(params)
 

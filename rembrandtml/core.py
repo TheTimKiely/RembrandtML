@@ -1,3 +1,4 @@
+import numpy as np
 from enum import Enum
 import pandas as pd
 
@@ -68,9 +69,13 @@ class TuningResults(object):
 
 
 class Prediction(object):
-    def __init__(self, model_name, prediction):
+    def __init__(self, model_name, prediction, labels=None):
         self.model_name = model_name
         self.values = prediction
+        self.labels = labels
+        self.accuracy = -1
+        if self.labels is not None:
+            self.accuracy = 100 - np.mean(np.abs(self.values - self.labels)) * 100
 
     def __str__(self):
         str = f'Model: {self.model_name}\n\tPredictions: {self.values}'

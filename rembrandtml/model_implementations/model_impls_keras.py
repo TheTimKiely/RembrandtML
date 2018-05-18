@@ -89,10 +89,15 @@ class MLModelImplementationKeras(MLModelImplementation):
 
     def predict(self, data, with_probability):
         if isinstance(data, tuple):
-            y_pred = self._model.predict(data)
+            y_preds = self._model.predict(data)
         else:
-            y_pred = self._model.predict_generator(data)
+            y_preds = self._model.predict_generator(data)
 
+        y_preds = np.reshape(y_preds, y_preds.shape[0])
+        preds = np.rint(y_preds)
+        acc = 100 - np.mean(np.abs(preds - data.classes)) * 100
         #y_pred_classes = self._model.predict_classes(data)
-        prediction = Prediction(self.model_config.name, y_pred)
+        prediction = Prediction(self.model_config.name, preds, data.classes)
+
+
         return prediction

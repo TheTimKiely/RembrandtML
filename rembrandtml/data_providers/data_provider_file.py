@@ -73,6 +73,15 @@ class GeneratorDataProvider(DataProviderBase):
                                                 class_mode='binary')
         return generator
 
+    def test_generator(self):
+        from keras.preprocessing.image import ImageDataGenerator
+        datagen = ImageDataGenerator(rescale=1./255)
+        generator = datagen.flow_from_directory(self.data_config.test_data_source,
+                                                target_size=(128, 128),
+                                                batch_size=32,
+                                                class_mode='binary')
+        return generator
+
     def generatorOLD(self, data, lookback, delay, min_index, max_index, shuffle, batch_size, step):
         if max_index is None:
             max_index = len(data) - delay - 1

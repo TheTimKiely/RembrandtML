@@ -218,8 +218,8 @@ class MLModelBase(MLEntityBase):
     def tune(self, parameters):
         raise FunctionNotImplementedError(self.__class__.__name__, 'tune')
 
-    def predict(self, X, with_probabilities):
-        prediction = self._model_impl.predict(X, with_probabilities)
+    def predict(self, data, with_probabilities):
+        prediction = self._model_impl.predict(data, with_probabilities)
         return prediction
 
 class MLSingleModelBase(MLModelBase):

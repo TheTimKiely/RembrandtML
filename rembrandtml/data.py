@@ -56,7 +56,12 @@ class DataContainer(MLEntityBase):
         :return: X and y tensors
         """
         if isinstance(self.data_provider, GeneratorDataProvider):
-            return self.data_provider.generator()
+            if mode is RunMode.TRAIN:
+                return self.data_provider.generator()
+            elif mode == RunMode.EVALUATE:
+                return self.data_provider.test_generator()
+            else:
+                raise Exception('Unsupported RunMode, {}'.format(mode))
 
         if mode == RunMode.TRAIN:
             X = self.X_train

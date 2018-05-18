@@ -111,7 +111,7 @@ class RMLContext(object):
         self.log(f'Training model: {model.name}')
         self.log('Getting data')
         data = self.data_container.get_data()
-        model.fit(data)
+        model.fit(data, save)
 
         self.log(f'Finished training model: {model.name}')
 
@@ -162,21 +162,21 @@ class RMLContext(object):
         return results
 
 
-    def predict_model(self, X, model, with_probabilities=False):
+    def predict_model(self, data, model, with_probabilities=False):
         self.log(f'Predicting: {model.name}')
-        prediction = model.predict(X, with_probabilities)
+        prediction = model.predict(data, with_probabilities)
         self.log(f'Finished predicting: {model.name}')
         return prediction
 
-    def predict(self, X, model_name=None, with_probabilities=False):
+    def predict(self, data, model_name=None, with_probabilities=False):
         predictions = {}
         if model_name:
             model = self.models[model_name]
-            predictions[model.name] = self.predict_model(X, model, with_probabilities)
+            predictions[model.name] = self.predict_model(data, model, with_probabilities)
         else:
             for key in self.models:
                 model = self.models[key]
-                predictions[model.name] = self.predict_model(X, model, with_probabilities)
+                predictions[model.name] = self.predict_model(data, model, with_probabilities)
         return predictions
 
 

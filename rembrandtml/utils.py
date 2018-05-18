@@ -3,6 +3,9 @@ import getopt
 import sys
 import logging
 import argparse
+import numpy as np
+from PIL import Image
+
 from rembrandtml.configuration import ModelConfig, ContextConfig, DataConfig, InstrumentationConfig
 
 
@@ -131,4 +134,22 @@ class Instrumentation(object):
                     pylogger.addHandler(handler)
                 self.logger.pyloggers.append(pylogger)
 
+class ImageProcessor(object):
+    def __init__(self, image_file):
+        self._image = Image.open(image_file)
 
+    def prepare_rgb_data(self, img_size):
+        from keras.preprocessing.image import img_to_array
+        from keras.applications import imagenet_utils
+        rgb_data = None
+        if self._image.mode != 'RGB':
+            rgb_data = self._image.convert('RGB ')
+        else:
+            rgb_data = self._image
+
+        rgb_data = rgb_data.resize(img_size)
+        rgb_data = img_to_array(rgb_data)
+        rgb_data = np.expand_dims(rgb_data, axis=0)
+        rgb_data = imagenet_utils.preprocess_input(rgb_data)
+
+        return rgb_data

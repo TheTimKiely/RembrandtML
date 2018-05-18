@@ -33,7 +33,9 @@ class MLModelImplementationKeras(MLModelImplementation):
 
     def fit_generator(self, data, validate=False):
         self.build_model()
-        self.history = self._model.fit_generator(data)
+        self.history = self._model.fit_generator(data,
+                                                 epochs=self.model_config.epochs,
+                                                 shuffle=True)
         acc_score = self.history.history['acc'][len(self.history.history['acc']) - 1]
         self.log(f'Accuracy: {acc_score}')
 
@@ -58,7 +60,7 @@ class MLModelImplementationKeras(MLModelImplementation):
                                   shuffle=True
                                   #,validation_data=(X_val, y_val)
                                   )
-        acc_score = self.history.history['acc'][len(history.history['acc']) - 1]
+        acc_score = self.history.history['acc'][len(self.history.history['acc']) - 1]
         self.log(f'Accuracy: {acc_score}')
 
     def save(self, model_path, model_arch_path, weights_path):
@@ -71,13 +73,11 @@ class MLModelImplementationKeras(MLModelImplementation):
         self._model.save(model_path)
 
         self.log(f'Saving model architecture to: {model_arch_path}', verbosity=Verbosity.QUIET)
-        with open(model_path, 'w') as fh:
+        with open(model_arch_path, 'w') as fh:
             fh.write(self._model.to_json())
-        self.log(f'Saved model to: {model_path}', verbosity=Verbosity.QUIET)
 
         self.log(f'Saving weights to: {weights_path}', verbosity=Verbosity.QUIET)
         self._model.save_weights(weights_path)
-        self.log(f'Saved model to: {weights_path}', verbosity=Verbosity.QUIET)
 
     def evaluate(self, X, y):
         X_test = self.vectorize_sequece(X)
@@ -87,8 +87,12 @@ class MLModelImplementationKeras(MLModelImplementation):
         score.metrics['accuracy'] = acc
         return score
 
-    def predict(self, X, with_probability):
-        y_pred = self._model.predict(X)
-        y_pred_classes = self._model.predict_classes(X)
+    def predict(self, data, with_probability):
+        if isinstance(data, tuple):
+            y_pred = self._model.predict(data)
+        else:
+            y_pred = self._model.predict_generator(data)
+
+        #y_pred_classes = self._model.predict_classes(data)
         prediction = Prediction(self.model_config.name, y_pred)
         return prediction

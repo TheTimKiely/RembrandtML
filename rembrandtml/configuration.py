@@ -60,11 +60,12 @@ class Verbosity(Enum):
 
 
 class DataConfig(object):
-    def __init__(self, framework_name, dataset_name, data_source=None, sample_size = -1):
+    def __init__(self, framework_name, dataset_name, data_source, test_data_source=None, sample_size = -1):
         self.framework_name = framework_name
         self.dataset_name = dataset_name
         self.sample_size = sample_size
         self.data_source = data_source
+        self.test_data_source = test_data_source
         self.file_separator = ','
 
 class LoggerConfig(object):
@@ -245,10 +246,11 @@ class ModelConfig(object):
         self._layers = layers
 
 class NeuralNetworkConfig(ModelConfig):
-    def __init__(self, name, framework_name, model_type, shape, model_file_path, model_arch_file_path, weights_file_path,
+    def __init__(self, name, framework_name, model_type, shape,
+                 model_file_path, model_arch_file_path, weights_file_path,
                  batch_size, epochs, learning_rate):
-        super(NeuralNetworkConfig, self).__init__(name, framework_name, model_type, shape, model_file_path,
-                                                  model_arch_file_path, weights_file_path, batch_size)
+        super(NeuralNetworkConfig, self).__init__(name, framework_name, model_type, shape, batch_size,
+                                                  model_file_path, model_arch_file_path, weights_file_path)
         self.learning_rate = learning_rate
         self.epochs = epochs
 
